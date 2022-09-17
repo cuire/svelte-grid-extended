@@ -12,13 +12,13 @@
 
 	let active = false;
 
-	let left = item.x * cellSize.width + (item.x + 1) * gap;
-	let top = item.y * cellSize.height + (item.y + 1) * gap;
+	let left = item.x * cellSize.width + ((item.x + 1) * gap) / 2;
+	let top = item.y * cellSize.height + ((item.y + 1) * gap) / 2;
 
 	let width = item.w * cellSize.width;
 	let height = item.h * cellSize.height;
 
-	function movestart() {
+	function start() {
 		active = true;
 	}
 
@@ -27,12 +27,25 @@
 		top = event.detail.top;
 	}
 
+	function resizing(event: CustomEvent) {
+		width = event.detail.width;
+		height = event.detail.height;
+	}
+
 	function moveend(event: CustomEvent) {
 		active = false;
 
 		const newCords = snap(event.detail.left, event.detail.top);
 		left = newCords.left;
 		top = newCords.top;
+	}
+
+	function resizeend(event: CustomEvent) {
+		active = false;
+
+		const newCords = snap2(event.detail.width, event.detail.height);
+		width = newCords.width;
+		height = newCords.height;
 	}
 
 	function snap(left: number, top: number) {
@@ -44,16 +57,29 @@
 			top: t + cellSize.height / 2 + (t / cellSize.width + 1) * gap
 		};
 	}
+
+	function snap2(left: number, top: number) {
+		const w = left - ((left + cellSize.width / 2) % cellSize.width);
+		const h = top - ((top + cellSize.height / 2) % cellSize.height);
+
+		return {
+			width: w + cellSize.width / 2,
+			height: h + cellSize.height / 2
+		};
+	}
 </script>
 
 <div
 	class="svelte-grid-extended-grid-item"
 	class:svelte-grid-extended-grid-transparent={active}
 	use:move={{ initialPosition: { left, top } }}
-	on:movestart={movestart}
+	on:movestart={start}
 	on:move={moving}
 	on:moveend={moveend}
-	use:resize
+	use:resize={{ min: cellSize }}
+	on:resizestart={start}
+	on:resizing={resizing}
+	on:resizeend={resizeend}
 	style={`left:${left}px; top:${top}px; width: ${width}px; height: ${height}px;`}
 >
 	<slot />
@@ -61,9 +87,10 @@
 
 {#if active}
 	{@const shadow = snap(left, top)}
+	{@const size = snap2(width, height)}
 	<div
 		class="svelte-grid-extended-grid-item-preview"
-		style={`left:${shadow.left}px; top:${shadow.top}px;  width: ${width}px; height: ${height}px;`}
+		style={`left:${shadow.left}px; top:${shadow.top}px;  width: ${size.width}px; height: ${size.height}px;`}
 	/>
 {/if}
 

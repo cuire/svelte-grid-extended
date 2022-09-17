@@ -1,45 +1,60 @@
-export default function resize(node: HTMLElement) {
+type ResizeOptions = {
+	min: {
+		width: number;
+		height: number;
+	};
+};
+
+export default function resize(node: HTMLElement, options?: ResizeOptions) {
 	const bottomRight = document.createElement('div');
 	bottomRight.classList.add('svelte-grid-extended-debug-resizer');
 
-	let initialRect = null;
-	let initialPos = null;
+	const minSize = options?.min ?? { width: 10, height: 10 };
+
+	const rect = node.getBoundingClientRect();
+
+	let width = rect.width;
+	let height = rect.height;
 
 	node.appendChild(bottomRight);
 	bottomRight.addEventListener('mousedown', onMousedown);
 
 	function onMousedown(event: MouseEvent) {
 		event.stopPropagation();
-		const rect = node.getBoundingClientRect();
-		const parent = node.parentElement?.getBoundingClientRect();
 
-		if (!parent) return;
-
-		initialRect = {
-			width: rect.width,
-			height: rect.height
-		};
-		initialPos = { x: event.pageX, y: event.pageY };
-		(event.target as Element)?.classList.add('selected');
 		window.addEventListener('mousemove', onMove);
 		window.addEventListener('mouseup', onMouseup);
+
+		node.dispatchEvent(
+			new CustomEvent('resizestart', {
+				detail: { width, height }
+			})
+		);
 	}
 
 	function onMouseup(event: MouseEvent) {
 		event.stopPropagation();
-		(event.target as Element).classList.remove('selected');
-		initialRect = null;
-		initialPos = null;
 		window.removeEventListener('mousemove', onMove);
 		window.removeEventListener('mousemove', onMousedown);
+
+		node.dispatchEvent(
+			new CustomEvent('resizeend', {
+				detail: { width, height }
+			})
+		);
 	}
 
 	function onMove(event: MouseEvent) {
-		let delta;
-		delta = event.pageX - initialPos.x;
-		node.style.width = `${initialRect.width + delta}px`;
-		delta = event.pageY - initialPos.y;
-		node.style.height = `${initialRect.height + delta}px`;
+		width = Math.max(width + event.movementX, minSize.width);
+		height = Math.max(height + event.movementY, minSize.height);
+		node.style.width = `${width}px`;
+		node.style.height = `${height}px`;
+
+		node.dispatchEvent(
+			new CustomEvent('resizing', {
+				detail: { width, height }
+			})
+		);
 	}
 
 	return {

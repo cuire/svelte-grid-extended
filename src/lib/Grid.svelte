@@ -7,7 +7,7 @@
 	export let cols = 8;
 	export let rows = 8;
 
-	export let cellSize = { width: 167, height: 167 };
+	export let cellSize = { width: 100, height: 100 };
 
 	export let gap = 10;
 
