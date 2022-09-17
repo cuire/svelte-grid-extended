@@ -1,3 +1,20 @@
-<h1>Welcome to your library project</h1>
-<p>Create your package using @sveltejs/package and preview/showcase your work with SvelteKit</p>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<script lang="ts">
+	import Grid from '$lib';
+
+	const items = [
+		{ x: 0, y: 0, w: 1, h: 1 },
+		{ x: 1, y: 1, w: 3, h: 1 }
+	];
+</script>
+
+<div class="container">
+	<Grid {items}>123</Grid>
+</div>
+
+<style>
+	.container {
+		max-width: 800px;
+		background-color: aquamarine;
+		height: 500px;
+	}
+</style>
