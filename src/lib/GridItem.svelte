@@ -20,8 +20,8 @@
 	let left = calculatePosition(item.x, cellSize.width);
 	let top = calculatePosition(item.y, cellSize.height);
 
-	let width = item.w * cellSize.width;
-	let height = item.h * cellSize.height;
+	let width = calculateSize(item.w, cellSize.width);
+	let height = calculateSize(item.h, cellSize.height);
 
 	function start() {
 		active = true;
@@ -62,9 +62,13 @@
 		return coordinate * cellSize + (coordinate + 1) * gap;
 	}
 
+	function calculateSize(coordinate: number, cellSize: number) {
+		return coordinate * cellSize + (coordinate - 1) * gap;
+	}
+
 	function snapMove(left: number, top: number) {
-		const x = Math.floor((left + cellSize.height / 2) / cellSize.width);
-		const y = Math.floor((top + cellSize.height / 2) / cellSize.height);
+		const x = Math.floor((left + cellSize.width / 2) / (cellSize.width + gap));
+		const y = Math.floor((top + cellSize.height / 2) / (cellSize.height + gap));
 
 		return {
 			left: calculatePosition(x, cellSize.width),
@@ -73,12 +77,12 @@
 	}
 
 	function snapResize(width: number, height: number) {
-		const w = Math.floor(width / cellSize.width);
-		const h = Math.floor(height / cellSize.height);
+		const w = Math.floor((width + cellSize.width / 2 + gap * 2) / (cellSize.width + gap));
+		const h = Math.floor((height + cellSize.height / 2 + gap * 2) / (cellSize.height + gap));
 
 		return {
-			width: w * cellSize.width + (w - 1) * gap,
-			height: h * cellSize.height + (h - 1) * gap
+			width: calculateSize(w, cellSize.width),
+			height: calculateSize(h, cellSize.height)
 		};
 	}
 </script>
