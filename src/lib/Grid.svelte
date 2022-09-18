@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 
 	import GridItem from './GridItem.svelte';
-	import type { GridItemType } from './types';
+	import type { GridItemType, ItemChangeDetails } from './types';
 
 	export let cols = 8;
 	export let rows = 8;
@@ -17,6 +17,15 @@
 
 	let gridContainer: HTMLDivElement;
 	let width: number;
+
+	function updateItem(event: CustomEvent<ItemChangeDetails>) {
+		const { id, ...newValues } = event.detail;
+		if (items) {
+			items[id] = { ...items[id], ...newValues };
+		}
+	}
+
+	$: console.log(items);
 
 	onMount(() => {
 		const sizeObserver = new ResizeObserver((entries) => {
@@ -38,8 +47,8 @@
 	class:svelte-grid-extended-debug={debug}
 	bind:this={gridContainer}
 >
-	{#each items as item}
-		<GridItem {item} {cellSize} {gap}>
+	{#each items as item, index}
+		<GridItem id={index} {item} {cellSize} {gap} on:change={updateItem}>
 			<slot />
 		</GridItem>
 	{/each}

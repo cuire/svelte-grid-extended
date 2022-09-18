@@ -17,13 +17,13 @@ export default function resize(node: HTMLElement, options?: ResizeOptions) {
 	let height = rect.height;
 
 	node.appendChild(bottomRight);
-	bottomRight.addEventListener('mousedown', onMousedown);
+	bottomRight.addEventListener('mousedown', onMouseDown);
 
-	function onMousedown(event: MouseEvent) {
+	function onMouseDown(event: MouseEvent) {
 		event.stopPropagation();
 
 		window.addEventListener('mousemove', onMove);
-		window.addEventListener('mouseup', onMouseup);
+		window.addEventListener('mouseup', onMouseUp);
 
 		node.dispatchEvent(
 			new CustomEvent('resizestart', {
@@ -32,10 +32,10 @@ export default function resize(node: HTMLElement, options?: ResizeOptions) {
 		);
 	}
 
-	function onMouseup(event: MouseEvent) {
+	function onMouseUp(event: MouseEvent) {
 		event.stopPropagation();
 		window.removeEventListener('mousemove', onMove);
-		window.removeEventListener('mousemove', onMousedown);
+		window.removeEventListener('mouseup', onMouseUp);
 
 		node.dispatchEvent(
 			new CustomEvent('resizeend', {
@@ -60,7 +60,7 @@ export default function resize(node: HTMLElement, options?: ResizeOptions) {
 	return {
 		destroy() {
 			window.removeEventListener('mousemove', onMove);
-			window.removeEventListener('mousemove', onMousedown);
+			window.removeEventListener('mouseup', onMouseUp);
 
 			node.removeChild(bottomRight);
 		}

@@ -30,7 +30,7 @@ export default function move(node: HTMLElement, options?: MoveOptions) {
 	function onMouseUp() {
 		node.classList.remove('selected');
 		window.removeEventListener('mousemove', onMove);
-		window.removeEventListener('mousemove', onMouseDown);
+		window.removeEventListener('mouseup', onMouseUp);
 
 		node.dispatchEvent(
 			new CustomEvent('moveend', {
@@ -57,7 +57,7 @@ export default function move(node: HTMLElement, options?: MoveOptions) {
 	return {
 		destroy() {
 			window.removeEventListener('mousemove', onMove);
-			window.removeEventListener('mousemove', onMouseDown);
+			window.removeEventListener('mouseup', onMouseUp);
 		}
 	};
 }

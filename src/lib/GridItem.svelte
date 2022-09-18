@@ -1,8 +1,13 @@
 <script lang="ts">
+	import { createEventDispatcher } from 'svelte';
 	import move from './utils/move';
 	import resize from './utils/resize';
 
-	import type { CellSizeType, GridItemType } from './types';
+	import type { CellSizeType, GridItemType, ItemChangeDetails } from './types';
+
+	const dispatch = createEventDispatcher<{ change: ItemChangeDetails }>();
+
+	export let id: number;
 
 	export let item: GridItemType;
 
@@ -12,8 +17,8 @@
 
 	let active = false;
 
-	let left = item.x * cellSize.width + ((item.x + 1) * gap) / 2;
-	let top = item.y * cellSize.height + ((item.y + 1) * gap) / 2;
+	let left = calculatePosition(item.x, cellSize.width);
+	let top = calculatePosition(item.y, cellSize.height);
 
 	let width = item.w * cellSize.width;
 	let height = item.h * cellSize.height;
@@ -22,49 +27,58 @@
 		active = true;
 	}
 
-	function moving(event: CustomEvent) {
-		left = event.detail.left;
-		top = event.detail.top;
+	function update(event: CustomEvent) {
+		left = event.detail.left ?? left;
+		top = event.detail.top ?? top;
+		width = event.detail.width ?? width;
+		height = event.detail.height ?? height;
 	}
 
-	function resizing(event: CustomEvent) {
-		width = event.detail.width;
-		height = event.detail.height;
-	}
-
-	function moveend(event: CustomEvent) {
+	function end(event: CustomEvent) {
 		active = false;
 
-		const newCords = snap(event.detail.left, event.detail.top);
-		left = newCords.left;
-		top = newCords.top;
+		if (event.detail.left && event.detail.top) {
+			const newPosition = snapMove(event.detail.left, event.detail.top);
+			left = newPosition.left;
+			top = newPosition.top;
+		}
+
+		if (event.detail.width && event.detail.height) {
+			const newSize = snapResize(event.detail.width, event.detail.height);
+			width = newSize.width;
+			height = newSize.height;
+		}
+
+		dispatch('change', {
+			id: id,
+			x: left / cellSize.width,
+			y: top / cellSize.height,
+			w: width / cellSize.width,
+			h: height / cellSize.height
+		});
 	}
 
-	function resizeend(event: CustomEvent) {
-		active = false;
-
-		const newCords = snap2(event.detail.width, event.detail.height);
-		width = newCords.width;
-		height = newCords.height;
+	function calculatePosition(coordinate: number, cellSize: number) {
+		return coordinate * cellSize + (coordinate + 1) * gap;
 	}
 
-	function snap(left: number, top: number) {
-		const l = left - ((left + cellSize.width / 2) % cellSize.width);
-		const t = top - ((top + cellSize.height / 2) % cellSize.height);
+	function snapMove(left: number, top: number) {
+		const x = Math.floor((left + cellSize.height / 2) / cellSize.width);
+		const y = Math.floor((top + cellSize.height / 2) / cellSize.height);
 
 		return {
-			left: l + cellSize.width / 2 + (l / cellSize.width + 1) * gap,
-			top: t + cellSize.height / 2 + (t / cellSize.width + 1) * gap
+			left: calculatePosition(x, cellSize.width),
+			top: calculatePosition(y, cellSize.height)
 		};
 	}
 
-	function snap2(left: number, top: number) {
-		const w = left - ((left + cellSize.width / 2) % cellSize.width);
-		const h = top - ((top + cellSize.height / 2) % cellSize.height);
+	function snapResize(width: number, height: number) {
+		const w = Math.floor(width / cellSize.width);
+		const h = Math.floor(height / cellSize.height);
 
 		return {
-			width: w + cellSize.width / 2,
-			height: h + cellSize.height / 2
+			width: w * cellSize.width,
+			height: h * cellSize.height
 		};
 	}
 </script>
@@ -74,23 +88,24 @@
 	class:svelte-grid-extended-grid-transparent={active}
 	use:move={{ initialPosition: { left, top } }}
 	on:movestart={start}
-	on:move={moving}
-	on:moveend={moveend}
+	on:move={update}
+	on:moveend={end}
 	use:resize={{ min: cellSize }}
 	on:resizestart={start}
-	on:resizing={resizing}
-	on:resizeend={resizeend}
+	on:resizing={update}
+	on:resizeend={end}
 	style={`left:${left}px; top:${top}px; width: ${width}px; height: ${height}px;`}
 >
 	<slot />
 </div>
 
 {#if active}
-	{@const shadow = snap(left, top)}
-	{@const size = snap2(width, height)}
+	{@const preview = snapMove(left, top)}
+	{@const previewSize = snapResize(width, height)}
 	<div
 		class="svelte-grid-extended-grid-item-preview"
-		style={`left:${shadow.left}px; top:${shadow.top}px;  width: ${size.width}px; height: ${size.height}px;`}
+		style={`left:${preview.left}px; top:${preview.top}px;  
+		width: ${previewSize.width}px; height: ${previewSize.height}px;`}
 	/>
 {/if}
 
