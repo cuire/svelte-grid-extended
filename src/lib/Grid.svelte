@@ -2,10 +2,11 @@
 	import { onMount } from 'svelte';
 
 	import GridItem from './GridItem.svelte';
+	import { findCols } from './utils/breakpoints';
 
-	import type { CellSizeType, GridItemType, ItemChangeDetails } from './types';
+	import type { BreakPoints, CellSizeType, Cols, GridItemType, ItemChangeDetails } from './types';
 
-	export let cols = 8;
+	export let cols: Cols = 8;
 	export let rows = 8;
 
 	export let cellSize: CellSizeType | undefined = undefined;
@@ -13,6 +14,15 @@
 	export let gap = 10;
 
 	export let items: GridItemType[];
+
+	export let breakpoints: BreakPoints = {
+		xxl: 1536,
+		xl: 1280,
+		lg: 1024,
+		md: 768,
+		sm: 640,
+		xs: 320
+	};
 
 	export let debug = false;
 
@@ -42,10 +52,12 @@
 			width = entry.contentRect.width;
 			height = entry.contentRect.height;
 
+			const _cols = findCols(cols, width, breakpoints);
+
 			if (!cellSize) {
 				_cellSize = {
-					width: (width - (gap + 1) * rows) / rows,
-					height: (height - (gap + 1) * cols) / cols
+					width: (width - (gap + 1) * _cols) / _cols,
+					height: (height - (gap + 1) * rows) / rows
 				};
 			}
 		});
