@@ -2,12 +2,13 @@
 	import { onMount } from 'svelte';
 
 	import GridItem from './GridItem.svelte';
-	import type { GridItemType, ItemChangeDetails } from './types';
+
+	import type { CellSizeType, GridItemType, ItemChangeDetails } from './types';
 
 	export let cols = 8;
 	export let rows = 8;
 
-	export let cellSize = { width: 100, height: 100 };
+	export let cellSize: CellSizeType | undefined = undefined;
 
 	export let gap = 10;
 
@@ -15,8 +16,13 @@
 
 	export let debug = false;
 
+	let _cellSize: CellSizeType;
+
+	$: if (cellSize) _cellSize = cellSize;
+
 	let gridContainer: HTMLDivElement;
 	let width: number;
+	let height: number;
 
 	function updateItem(event: CustomEvent<ItemChangeDetails>) {
 		const { id, ...newValues } = event.detail;
@@ -34,6 +40,14 @@
 			}
 			const entry = entries[0];
 			width = entry.contentRect.width;
+			height = entry.contentRect.height;
+
+			if (!cellSize) {
+				_cellSize = {
+					width: (width - (gap + 1) * rows) / rows,
+					height: (height - (gap + 1) * cols) / cols
+				};
+			}
 		});
 
 		sizeObserver.observe(gridContainer);
@@ -47,16 +61,20 @@
 	class:svelte-grid-extended-debug={debug}
 	bind:this={gridContainer}
 >
-	{#each items as item, index}
-		<GridItem id={index} {item} {cellSize} {gap} on:change={updateItem}>
-			<slot />
-		</GridItem>
-	{/each}
+	{#if _cellSize}
+		{#each items as item, index}
+			<GridItem id={index} {item} cellSize={_cellSize} {gap} on:change={updateItem}>
+				<slot />
+			</GridItem>
+		{/each}
+	{/if}
 </div>
 
 <style>
 	:global(.svelte-grid-extended-container) {
 		position: relative;
+		width: 100%;
+		height: 100%;
 	}
 	:global(.svelte-grid-extended-debug) {
 		width: 100%;

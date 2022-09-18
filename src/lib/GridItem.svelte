@@ -1,7 +1,16 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
+
 	import move from './utils/move';
 	import resize from './utils/resize';
+	import {
+		calculateCoordinate,
+		calculatePosition,
+		calculateSize,
+		calculateSizeCoordinate,
+		snapMove,
+		snapResize
+	} from './utils/grid';
 
 	import type { CellSizeType, GridItemType, ItemChangeDetails } from './types';
 
@@ -17,11 +26,11 @@
 
 	let active = false;
 
-	let left = calculatePosition(item.x, cellSize.width);
-	let top = calculatePosition(item.y, cellSize.height);
+	$: left = calculatePosition(item.x, cellSize.width, gap);
+	$: top = calculatePosition(item.y, cellSize.height, gap);
 
-	let width = calculateSize(item.w, cellSize.width);
-	let height = calculateSize(item.h, cellSize.height);
+	$: width = calculateSize(item.w, cellSize.width, gap);
+	$: height = calculateSize(item.h, cellSize.height, gap);
 
 	function start() {
 		active = true;
@@ -38,52 +47,24 @@
 		active = false;
 
 		if (event.detail.left && event.detail.top) {
-			const newPosition = snapMove(event.detail.left, event.detail.top);
+			const newPosition = snapMove(event.detail.left, event.detail.top, cellSize, gap);
 			left = newPosition.left;
 			top = newPosition.top;
 		}
 
 		if (event.detail.width && event.detail.height) {
-			const newSize = snapResize(event.detail.width, event.detail.height);
+			const newSize = snapResize(event.detail.width, event.detail.height, cellSize, gap);
 			width = newSize.width;
 			height = newSize.height;
 		}
 
 		dispatch('change', {
 			id: id,
-			x: left / cellSize.width,
-			y: top / cellSize.height,
-			w: width / cellSize.width,
-			h: height / cellSize.height
+			x: calculateCoordinate(left, cellSize.width, gap),
+			y: calculateCoordinate(top, cellSize.height, gap),
+			w: calculateSizeCoordinate(width, cellSize.width, gap),
+			h: calculateSizeCoordinate(height, cellSize.height, gap)
 		});
-	}
-
-	function calculatePosition(coordinate: number, cellSize: number) {
-		return coordinate * cellSize + (coordinate + 1) * gap;
-	}
-
-	function calculateSize(coordinate: number, cellSize: number) {
-		return coordinate * cellSize + (coordinate - 1) * gap;
-	}
-
-	function snapMove(left: number, top: number) {
-		const x = Math.floor((left + cellSize.width / 2) / (cellSize.width + gap));
-		const y = Math.floor((top + cellSize.height / 2) / (cellSize.height + gap));
-
-		return {
-			left: calculatePosition(x, cellSize.width),
-			top: calculatePosition(y, cellSize.height)
-		};
-	}
-
-	function snapResize(width: number, height: number) {
-		const w = Math.floor((width + cellSize.width / 2 + gap * 2) / (cellSize.width + gap));
-		const h = Math.floor((height + cellSize.height / 2 + gap * 2) / (cellSize.height + gap));
-
-		return {
-			width: calculateSize(w, cellSize.width),
-			height: calculateSize(h, cellSize.height)
-		};
 	}
 </script>
 
@@ -104,8 +85,8 @@
 </div>
 
 {#if active}
-	{@const preview = snapMove(left, top)}
-	{@const previewSize = snapResize(width, height)}
+	{@const preview = snapMove(left, top, cellSize, gap)}
+	{@const previewSize = snapResize(width, height, cellSize, gap)}
 	<div
 		class="svelte-grid-extended-grid-item-preview"
 		style={`left:${preview.left}px; top:${preview.top}px;  
