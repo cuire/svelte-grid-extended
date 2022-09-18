@@ -77,8 +77,8 @@
 		const h = Math.floor(height / cellSize.height);
 
 		return {
-			width: w * cellSize.width,
-			height: h * cellSize.height
+			width: w * cellSize.width + (w - 1) * gap,
+			height: h * cellSize.height + (h - 1) * gap
 		};
 	}
 </script>
