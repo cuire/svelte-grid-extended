@@ -12,7 +12,7 @@
 		snapResize
 	} from './utils/item';
 
-	import type { ItemSize, GridItem as GridItemType, ItemChangeEvent } from './types';
+	import type { ItemSize, GridItem as GridItemType, ItemChangeEvent, Size } from './types';
 
 	const dispatch = createEventDispatcher<{ change: ItemChangeEvent }>();
 
@@ -24,6 +24,10 @@
 
 	export let gap: number;
 
+	let minSize: Size;
+
+	let maxSize: Size | undefined;
+
 	let active = false;
 
 	$: left = calculatePosition(item.x, size.width, gap);
@@ -31,6 +35,27 @@
 
 	$: width = calculateSize(item.w, size.width, gap);
 	$: height = calculateSize(item.h, size.height, gap);
+
+	$: minSize = item.min ?? { w: 1, h: 1 };
+	$: maxSize = item.max;
+
+	let min: ItemSize | undefined;
+
+	let max: ItemSize | undefined;
+
+	$: if (minSize) {
+		min = {
+			width: calculateSize(minSize.w, size.width, gap),
+			height: calculateSize(minSize.h, size.height, gap)
+		};
+	}
+
+	$: if (maxSize) {
+		max = {
+			width: calculateSize(maxSize.w, size.width, gap),
+			height: calculateSize(maxSize.h, size.height, gap)
+		};
+	}
 
 	function start() {
 		active = true;
@@ -75,7 +100,7 @@
 	on:movestart={start}
 	on:move={update}
 	on:moveend={end}
-	use:resize={{ min: size }}
+	use:resize={{ min, max }}
 	on:resizestart={start}
 	on:resizing={update}
 	on:resizeend={end}

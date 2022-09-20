@@ -1,4 +1,8 @@
-export type GridItem = Size & Position;
+export type GridItem = Size &
+	Position & {
+		min?: Size;
+		max?: Size;
+	};
 
 export type Size = { w: number; h: number };
 

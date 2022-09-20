@@ -1,15 +1,15 @@
+import type { ItemSize } from '$lib/types';
+
 type ResizeOptions = {
-	min: {
-		width: number;
-		height: number;
-	};
+	min?: ItemSize;
+	max?: ItemSize;
 };
 
 export default function resize(node: HTMLElement, options?: ResizeOptions) {
 	const bottomRight = document.createElement('div');
 	bottomRight.classList.add('svelte-grid-extended-debug-resizer');
 
-	const minSize = options?.min ?? { width: 10, height: 10 };
+	const { min, max } = options ?? {};
 
 	const rect = node.getBoundingClientRect();
 
@@ -45,8 +45,18 @@ export default function resize(node: HTMLElement, options?: ResizeOptions) {
 	}
 
 	function onMove(event: MouseEvent) {
-		width = Math.max(width + event.movementX, minSize.width);
-		height = Math.max(height + event.movementY, minSize.height);
+		width += event.movementX;
+		height += event.movementY;
+
+		if (min) {
+			width = Math.max(width, min.width);
+			height = Math.max(height, min.height);
+		}
+		if (max) {
+			width = Math.min(width, max.width);
+			height = Math.min(height, max.height);
+		}
+
 		node.style.width = `${width}px`;
 		node.style.height = `${height}px`;
 
