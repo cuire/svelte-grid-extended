@@ -1,4 +1,4 @@
-import type { CellPositionType, CellSizeType } from '$lib/types';
+import type { CellPosition, ItemSize } from '$lib/types';
 
 export function calculatePosition(coordinate: number, cellSize: number, gap: number): number {
 	return coordinate * cellSize + (coordinate + 1) * gap;
@@ -16,12 +16,7 @@ export function calculateSizeCoordinate(position: number, cellSize: number, gap:
 	return calculateCoordinate(position + gap * 2, cellSize, gap);
 }
 
-export function snapMove(
-	left: number,
-	top: number,
-	cellSize: CellSizeType,
-	gap: number
-): CellPositionType {
+export function snapMove(left: number, top: number, cellSize: ItemSize, gap: number): CellPosition {
 	const x = calculateCoordinate(left, cellSize.width, gap);
 	const y = calculateCoordinate(top, cellSize.height, gap);
 
@@ -34,9 +29,9 @@ export function snapMove(
 export function snapResize(
 	width: number,
 	height: number,
-	cellSize: CellSizeType,
+	cellSize: ItemSize,
 	gap: number
-): CellSizeType {
+): ItemSize {
 	const w = calculateCoordinate(width + gap * 2, cellSize.width, gap);
 	const h = calculateCoordinate(height + gap * 2, cellSize.height, gap);
 

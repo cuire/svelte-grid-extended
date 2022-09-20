@@ -4,18 +4,24 @@
 	import GridItem from './GridItem.svelte';
 	import { findCols } from './utils/breakpoints';
 
-	import type { BreakPoints, CellSizeType, Cols, GridItemType, ItemChangeDetails } from './types';
+	import type {
+		Breakpoints,
+		ItemSize,
+		Cols,
+		GridItem as GridItemType,
+		ItemChangeEvent
+	} from './types';
 
 	export let cols: Cols = 8;
 	export let rows = 8;
 
-	export let cellSize: CellSizeType | undefined = undefined;
+	export let itemSize: ItemSize | undefined = undefined;
 
 	export let gap = 10;
 
 	export let items: GridItemType[];
 
-	export let breakpoints: BreakPoints = {
+	export let breakpoints: Breakpoints = {
 		xxl: 1536,
 		xl: 1280,
 		lg: 1024,
@@ -26,15 +32,15 @@
 
 	export let debug = false;
 
-	let _cellSize: CellSizeType;
+	let _itemSize: ItemSize;
 
-	$: if (cellSize) _cellSize = cellSize;
+	$: if (itemSize) _itemSize = itemSize;
 
 	let gridContainer: HTMLDivElement;
 	let width: number;
 	let height: number;
 
-	function updateItem(event: CustomEvent<ItemChangeDetails>) {
+	function updateItem(event: CustomEvent<ItemChangeEvent>) {
 		const { id, ...newValues } = event.detail;
 		if (items) {
 			items[id] = { ...items[id], ...newValues };
@@ -54,8 +60,8 @@
 
 			const _cols = findCols(cols, width, breakpoints);
 
-			if (!cellSize) {
-				_cellSize = {
+			if (!itemSize) {
+				_itemSize = {
 					width: (width - (gap + 1) * _cols) / _cols,
 					height: (height - (gap + 1) * rows) / rows
 				};
@@ -73,9 +79,9 @@
 	class:svelte-grid-extended-debug={debug}
 	bind:this={gridContainer}
 >
-	{#if _cellSize}
+	{#if _itemSize}
 		{#each items as item, index}
-			<GridItem id={index} {item} cellSize={_cellSize} {gap} on:change={updateItem}>
+			<GridItem id={index} {item} size={_itemSize} {gap} on:change={updateItem}>
 				<slot />
 			</GridItem>
 		{/each}

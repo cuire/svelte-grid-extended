@@ -10,27 +10,27 @@
 		calculateSizeCoordinate,
 		snapMove,
 		snapResize
-	} from './utils/grid';
+	} from './utils/item';
 
-	import type { CellSizeType, GridItemType, ItemChangeDetails } from './types';
+	import type { ItemSize, GridItem as GridItemType, ItemChangeEvent } from './types';
 
-	const dispatch = createEventDispatcher<{ change: ItemChangeDetails }>();
+	const dispatch = createEventDispatcher<{ change: ItemChangeEvent }>();
 
 	export let id: number;
 
 	export let item: GridItemType;
 
-	export let cellSize: CellSizeType;
+	export let size: ItemSize;
 
 	export let gap: number;
 
 	let active = false;
 
-	$: left = calculatePosition(item.x, cellSize.width, gap);
-	$: top = calculatePosition(item.y, cellSize.height, gap);
+	$: left = calculatePosition(item.x, size.width, gap);
+	$: top = calculatePosition(item.y, size.height, gap);
 
-	$: width = calculateSize(item.w, cellSize.width, gap);
-	$: height = calculateSize(item.h, cellSize.height, gap);
+	$: width = calculateSize(item.w, size.width, gap);
+	$: height = calculateSize(item.h, size.height, gap);
 
 	function start() {
 		active = true;
@@ -47,23 +47,23 @@
 		active = false;
 
 		if (event.detail.left && event.detail.top) {
-			const newPosition = snapMove(event.detail.left, event.detail.top, cellSize, gap);
+			const newPosition = snapMove(event.detail.left, event.detail.top, size, gap);
 			left = newPosition.left;
 			top = newPosition.top;
 		}
 
 		if (event.detail.width && event.detail.height) {
-			const newSize = snapResize(event.detail.width, event.detail.height, cellSize, gap);
+			const newSize = snapResize(event.detail.width, event.detail.height, size, gap);
 			width = newSize.width;
 			height = newSize.height;
 		}
 
 		dispatch('change', {
 			id: id,
-			x: calculateCoordinate(left, cellSize.width, gap),
-			y: calculateCoordinate(top, cellSize.height, gap),
-			w: calculateSizeCoordinate(width, cellSize.width, gap),
-			h: calculateSizeCoordinate(height, cellSize.height, gap)
+			x: calculateCoordinate(left, size.width, gap),
+			y: calculateCoordinate(top, size.height, gap),
+			w: calculateSizeCoordinate(width, size.width, gap),
+			h: calculateSizeCoordinate(height, size.height, gap)
 		});
 	}
 </script>
@@ -75,7 +75,7 @@
 	on:movestart={start}
 	on:move={update}
 	on:moveend={end}
-	use:resize={{ min: cellSize }}
+	use:resize={{ min: size }}
 	on:resizestart={start}
 	on:resizing={update}
 	on:resizeend={end}
@@ -85,8 +85,8 @@
 </div>
 
 {#if active}
-	{@const preview = snapMove(left, top, cellSize, gap)}
-	{@const previewSize = snapResize(width, height, cellSize, gap)}
+	{@const preview = snapMove(left, top, size, gap)}
+	{@const previewSize = snapResize(width, height, size, gap)}
 	<div
 		class="svelte-grid-extended-grid-item-preview"
 		style={`left:${preview.left}px; top:${preview.top}px;  
