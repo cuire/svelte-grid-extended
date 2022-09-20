@@ -1,3 +1,5 @@
+import type { ActionReturn } from 'svelte/action';
+
 type MoveOptions = {
 	initialPosition?: {
 		left: number;
@@ -5,7 +7,23 @@ type MoveOptions = {
 	};
 };
 
-export default function move(node: HTMLElement, options?: MoveOptions) {
+type MoveAtributes = {
+	'on:movestart': MoveEventHandler;
+	'on:moving': MoveEventHandler;
+	'on:moveend': MoveEventHandler;
+};
+
+type MoveEventHandler = (e: CustomEvent<MoveEvent>) => void;
+
+export type MoveEvent = {
+	left: number;
+	top: number;
+};
+
+export default function move(
+	node: HTMLElement,
+	options?: MoveOptions
+): ActionReturn<MoveOptions, MoveAtributes> {
 	let left = options?.initialPosition?.left ?? 0;
 	let top = options?.initialPosition?.top ?? 0;
 
@@ -46,7 +64,7 @@ export default function move(node: HTMLElement, options?: MoveOptions) {
 		node.style.left = `${left}px`;
 
 		node.dispatchEvent(
-			new CustomEvent('move', {
+			new CustomEvent('moving', {
 				detail: { left, top }
 			})
 		);

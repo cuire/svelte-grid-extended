@@ -98,7 +98,7 @@
 	class:svelte-grid-extended-grid-transparent={active}
 	use:move={{ initialPosition: { left, top } }}
 	on:movestart={start}
-	on:move={update}
+	on:moving={update}
 	on:moveend={end}
 	use:resize={{ min, max }}
 	on:resizestart={start}

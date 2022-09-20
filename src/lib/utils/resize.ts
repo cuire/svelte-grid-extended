@@ -1,3 +1,5 @@
+import type { ActionReturn } from 'svelte/action';
+
 import type { ItemSize } from '$lib/types';
 
 type ResizeOptions = {
@@ -5,7 +7,23 @@ type ResizeOptions = {
 	max?: ItemSize;
 };
 
-export default function resize(node: HTMLElement, options?: ResizeOptions) {
+type ResizeAtributes = {
+	'on:resizestart': ResizeEventHandler;
+	'on:resizing': ResizeEventHandler;
+	'on:resizeend': ResizeEventHandler;
+};
+
+type ResizeEventHandler = (e: CustomEvent<ResizeEvent>) => void;
+
+export type ResizeEvent = {
+	width: number;
+	height: number;
+};
+
+export default function resize(
+	node: HTMLElement,
+	options?: ResizeOptions
+): ActionReturn<ResizeOptions, ResizeAtributes> {
 	const bottomRight = document.createElement('div');
 	bottomRight.classList.add('svelte-grid-extended-debug-resizer');
 

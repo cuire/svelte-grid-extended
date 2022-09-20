@@ -166,10 +166,10 @@
     "@vercel/nft" "^0.22.0"
     esbuild "^0.15.7"
 
-"@sveltejs/kit@^1.0.0-next.484":
-  version "1.0.0-next.484"
-  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.0.0-next.484.tgz#159d65be7d596ab9e49a59d52799e0983d6d6923"
-  integrity sha512-Y3l8OmlgmfJX3m081rMUZmmEQWHtiSsj3+YWYK/CQ4V99jqoztXPz/4cAxUt5mC45jVF5Ee9ykmh6GzkYjvfAQ==
+"@sveltejs/kit@^1.0.0-next.490":
+  version "1.0.0-next.490"
+  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.0.0-next.490.tgz#c818e7303628a6bc90d8ba0085e7dd70c489f933"
+  integrity sha512-CxaP59RaFytMIO/I0tSKCZOJGIh87IKkSRYsNIjtEgENdjbs695KB9JieraEL908la+ujPMQLdXJmrC730fJzQ==
   dependencies:
     "@sveltejs/vite-plugin-svelte" "^1.0.5"
     "@types/cookie" "^0.5.1"
@@ -196,9 +196,9 @@
     svelte2tsx "~0.5.10"
 
 "@sveltejs/vite-plugin-svelte@^1.0.5":
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/@sveltejs/vite-plugin-svelte/-/vite-plugin-svelte-1.0.6.tgz#3724e22d38882e2451b64f3e27a94c146b552f37"
-  integrity sha512-4VcYesosw2ekdsbx25ZbIcO2MueKLz5b3gWrimTDRTg4KF309ov/bLg8t5pk5v9C2dTrnyzzmPcITQ5dtjk+bw==
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/@sveltejs/vite-plugin-svelte/-/vite-plugin-svelte-1.0.7.tgz#16e8d9e5ad11ed72925badf7a676e7331cb72e02"
+  integrity sha512-bf3/xrpKP5Sj9I6hT0slYwY4rVElocWZ79zLPc/bPFCOjjuty0jW4hmC4Uehb7yifjf3I6QnT3eIs2EKqw+Kig==
   dependencies:
     "@rollup/pluginutils" "^4.2.1"
     debug "^4.3.4"
