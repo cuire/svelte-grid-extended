@@ -3,6 +3,7 @@
 
 	import GridItem from './GridItem.svelte';
 	import { findCols } from './utils/breakpoints';
+	import { getCollisions } from './utils/grid';
 
 	import type {
 		Breakpoints,
@@ -43,7 +44,12 @@
 	function updateItem(event: CustomEvent<ItemChangeEvent>) {
 		const { id, ...newValues } = event.detail;
 		if (items) {
-			items[id] = { ...items[id], ...newValues };
+			if (getCollisions(event.detail, items).length === 0) {
+				items[id] = { ...items[id], ...newValues };
+			} else {
+				// rerender item
+				items[id] = items[id];
+			}
 		}
 	}
 
