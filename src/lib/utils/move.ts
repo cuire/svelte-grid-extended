@@ -5,6 +5,7 @@ type MoveOptions = {
 		left: number;
 		top: number;
 	};
+	bounds?: boolean;
 };
 
 type MoveAtributes = {
@@ -24,6 +25,8 @@ export default function move(
 	node: HTMLElement,
 	options?: MoveOptions
 ): ActionReturn<MoveOptions, MoveAtributes> {
+	const { bounds = true } = options ?? {};
+
 	let left = options?.initialPosition?.left ?? 0;
 	let top = options?.initialPosition?.top ?? 0;
 
@@ -33,15 +36,22 @@ export default function move(
 	node.style.cursor = 'move';
 	node.style.userSelect = 'none';
 
-	let initialPosition = { x: 0, y: 0 };
+	let initialPosition = { left: 0, top: 0 };
+
+	let parentRect: DOMRect | undefined;
+
+	let rect: DOMRect;
 
 	function onMouseDown(event: MouseEvent) {
 		node.classList.add('selected');
 
 		initialPosition = {
-			x: node.offsetLeft - event.clientX,
-			y: node.offsetTop - event.clientY
+			left: node.offsetLeft - event.clientX,
+			top: node.offsetTop - event.clientY
 		};
+
+		parentRect = node.parentElement?.getBoundingClientRect();
+		rect = node.getBoundingClientRect();
 
 		window.addEventListener('mousemove', onMove);
 		window.addEventListener('mouseup', onMouseUp);
@@ -66,8 +76,24 @@ export default function move(
 	}
 
 	function onMove(event: MouseEvent) {
-		left = event.clientX + initialPosition.x;
-		top = event.clientY + initialPosition.y;
+		left = event.clientX + initialPosition.left;
+		top = event.clientY + initialPosition.top;
+
+		if (bounds && parentRect) {
+			if (left < parentRect.left) {
+				left = parentRect.left;
+			}
+			if (top < parentRect.top) {
+				top = parentRect.top;
+			}
+			if (left + rect.width > parentRect.right) {
+				left = parentRect.right - rect.width;
+			}
+			if (top + rect.height > parentRect.bottom) {
+				top = parentRect.bottom - rect.height;
+			}
+		}
+
 		node.style.top = `${top}px`;
 		node.style.left = `${left}px`;
 

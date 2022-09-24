@@ -5,6 +5,7 @@ import type { ItemSize } from '$lib/types';
 type ResizeOptions = {
 	min?: ItemSize;
 	max?: ItemSize;
+	bounds?: boolean;
 };
 
 type ResizeAtributes = {
@@ -27,13 +28,17 @@ export default function resize(
 	const bottomRight = document.createElement('div');
 	bottomRight.classList.add('svelte-grid-extended-debug-resizer');
 
-	const { min, max } = options ?? {};
+	const { min, max, bounds = true } = options ?? {};
 
 	let width: number;
 	let height: number;
 
 	let initialRect: { width: number; height: number };
 	let initialPosition = { x: 0, y: 0 };
+
+	let parentRect: DOMRect | undefined;
+
+	let rect: DOMRect;
 
 	node.appendChild(bottomRight);
 	bottomRight.addEventListener('mousedown', onMouseDown);
@@ -46,7 +51,9 @@ export default function resize(
 			y: event.clientY
 		};
 
-		const rect = node.getBoundingClientRect();
+		parentRect = node.parentElement?.getBoundingClientRect();
+		rect = node.getBoundingClientRect();
+		console.log(rect);
 
 		initialRect = {
 			width: rect.width,
@@ -81,6 +88,15 @@ export default function resize(
 	function onMove(event: MouseEvent) {
 		width = initialRect.width + event.clientX - initialPosition.x;
 		height = initialRect.height + event.clientY - initialPosition.y;
+
+		if (bounds && parentRect) {
+			if (width + rect.left > parentRect.width) {
+				width = parentRect.width - rect.left;
+			}
+			if (height + rect.top > parentRect.height) {
+				height = parentRect.height - rect.top;
+			}
+		}
 
 		if (min) {
 			width = Math.max(width, min.width);
