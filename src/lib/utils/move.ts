@@ -33,8 +33,16 @@ export default function move(
 	node.style.cursor = 'move';
 	node.style.userSelect = 'none';
 
-	function onMouseDown() {
+	let initialPosition = { x: 0, y: 0 };
+
+	function onMouseDown(event: MouseEvent) {
 		node.classList.add('selected');
+
+		initialPosition = {
+			x: node.offsetLeft - event.clientX,
+			y: node.offsetTop - event.clientY
+		};
+
 		window.addEventListener('mousemove', onMove);
 		window.addEventListener('mouseup', onMouseUp);
 
@@ -58,8 +66,8 @@ export default function move(
 	}
 
 	function onMove(event: MouseEvent) {
-		left += event.movementX;
-		top += event.movementY;
+		left = event.clientX + initialPosition.x;
+		top = event.clientY + initialPosition.y;
 		node.style.top = `${top}px`;
 		node.style.left = `${left}px`;
 

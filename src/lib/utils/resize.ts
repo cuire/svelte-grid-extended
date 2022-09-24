@@ -29,16 +29,32 @@ export default function resize(
 
 	const { min, max } = options ?? {};
 
-	const rect = node.getBoundingClientRect();
+	let width: number;
+	let height: number;
 
-	let width = rect.width;
-	let height = rect.height;
+	let initialRect: { width: number; height: number };
+	let initialPosition = { x: 0, y: 0 };
 
 	node.appendChild(bottomRight);
 	bottomRight.addEventListener('mousedown', onMouseDown);
 
 	function onMouseDown(event: MouseEvent) {
 		event.stopPropagation();
+
+		initialPosition = {
+			x: event.clientX,
+			y: event.clientY
+		};
+
+		const rect = node.getBoundingClientRect();
+
+		initialRect = {
+			width: rect.width,
+			height: rect.height
+		};
+
+		width = initialRect.width;
+		height = initialRect.height;
 
 		window.addEventListener('mousemove', onMove);
 		window.addEventListener('mouseup', onMouseUp);
@@ -63,8 +79,8 @@ export default function resize(
 	}
 
 	function onMove(event: MouseEvent) {
-		width += event.movementX;
-		height += event.movementY;
+		width = initialRect.width + event.clientX - initialPosition.x;
+		height = initialRect.height + event.clientY - initialPosition.y;
 
 		if (min) {
 			width = Math.max(width, min.width);
