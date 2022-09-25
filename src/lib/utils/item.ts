@@ -1,4 +1,4 @@
-import type { CellPosition, ItemSize } from '$lib/types';
+import type { ItemPosition, ItemSize } from '$lib/types';
 
 export function calculatePosition(coordinate: number, cellSize: number, gap: number): number {
 	return coordinate * cellSize + (coordinate + 1) * gap;
@@ -16,7 +16,7 @@ export function calculateSizeCoordinate(position: number, cellSize: number, gap:
 	return calculateCoordinate(position + gap * 2, cellSize, gap);
 }
 
-export function snapMove(left: number, top: number, cellSize: ItemSize, gap: number): CellPosition {
+export function snapMove(left: number, top: number, cellSize: ItemSize, gap: number): ItemPosition {
 	const x = calculateCoordinate(left, cellSize.width, gap);
 	const y = calculateCoordinate(top, cellSize.height, gap);
 

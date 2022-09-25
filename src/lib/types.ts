@@ -8,7 +8,7 @@ export type Size = { w: number; h: number };
 
 export type Position = { x: number; y: number };
 
-export type CellPosition = { left: number; top: number };
+export type ItemPosition = { left: number; top: number };
 
 export type ItemSize = { width: number; height: number };
 
