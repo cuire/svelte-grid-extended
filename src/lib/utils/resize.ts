@@ -28,7 +28,7 @@ export default function resize(
 	const bottomRight = document.createElement('div');
 	bottomRight.classList.add('svelte-grid-extended-debug-resizer');
 
-	const { min, max, bounds = true } = options ?? {};
+	const { min, max, bounds = false } = options ?? {};
 
 	let width: number;
 	let height: number;

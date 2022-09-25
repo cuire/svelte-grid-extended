@@ -25,7 +25,7 @@ export default function move(
 	node: HTMLElement,
 	options?: MoveOptions
 ): ActionReturn<MoveOptions, MoveAtributes> {
-	const { bounds = true } = options ?? {};
+	const { bounds = false } = options ?? {};
 
 	let left = options?.initialPosition?.left ?? 0;
 	let top = options?.initialPosition?.top ?? 0;
