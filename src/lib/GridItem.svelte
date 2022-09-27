@@ -4,15 +4,22 @@
 	import move from './utils/move';
 	import resize from './utils/resize';
 	import {
-		calculateCoordinate,
-		calculatePosition,
-		calculateSize,
-		calculateSizeCoordinate,
-		snapMove,
-		snapResize
+		position2coordinate,
+		coordinate2position,
+		coordinate2size,
+		size2coordinate,
+		snap,
+		snapOnMove,
+		snapOnResize
 	} from './utils/item';
 
-	import type { ItemSize, GridItem as GridItemType, ItemChangeEvent, Size } from './types';
+	import type {
+		ItemSize,
+		GridItem as GridItemType,
+		ItemChangeEvent,
+		Size,
+		ItemPosition
+	} from './types';
 
 	const dispatch = createEventDispatcher<{ change: ItemChangeEvent }>();
 
@@ -30,11 +37,11 @@
 
 	let active = false;
 
-	$: left = calculatePosition(item.x, size.width, gap);
-	$: top = calculatePosition(item.y, size.height, gap);
+	$: left = coordinate2position(item.x, size.width, gap);
+	$: top = coordinate2position(item.y, size.height, gap);
 
-	$: width = calculateSize(item.w, size.width, gap);
-	$: height = calculateSize(item.h, size.height, gap);
+	$: width = coordinate2size(item.w, size.width, gap);
+	$: height = coordinate2size(item.h, size.height, gap);
 
 	$: minSize = item.min ?? { w: 1, h: 1 };
 	$: maxSize = item.max;
@@ -45,15 +52,15 @@
 
 	$: if (minSize) {
 		min = {
-			width: calculateSize(minSize.w, size.width, gap),
-			height: calculateSize(minSize.h, size.height, gap)
+			width: coordinate2size(minSize.w, size.width, gap),
+			height: coordinate2size(minSize.h, size.height, gap)
 		};
 	}
 
 	$: if (maxSize) {
 		max = {
-			width: calculateSize(maxSize.w, size.width, gap),
-			height: calculateSize(maxSize.h, size.height, gap)
+			width: coordinate2size(maxSize.w, size.width, gap),
+			height: coordinate2size(maxSize.h, size.height, gap)
 		};
 	}
 
@@ -61,34 +68,51 @@
 		active = true;
 	}
 
-	function update(event: CustomEvent) {
-		left = event.detail.left ?? left;
-		top = event.detail.top ?? top;
-		width = event.detail.width ?? width;
-		height = event.detail.height ?? height;
+	function moving(event: CustomEvent<ItemPosition>) {
+		left = event.detail.left;
+		top = event.detail.top;
 	}
 
-	function end(event: CustomEvent) {
+	function resizing(event: CustomEvent<ItemSize>) {
+		width = event.detail.width;
+		height = event.detail.height;
+	}
+
+	function moveend(event: CustomEvent<ItemPosition>) {
 		active = false;
 
-		if (event.detail.left && event.detail.top) {
-			const newPosition = snapMove(event.detail.left, event.detail.top, size, gap);
-			left = newPosition.left;
-			top = newPosition.top;
-		}
-
-		if (event.detail.width && event.detail.height) {
-			const newSize = snapResize(event.detail.width, event.detail.height, size, gap);
-			width = newSize.width;
-			height = newSize.height;
-		}
+		const snaped = snapOnMove({
+			left: event.detail.left,
+			top: event.detail.top,
+			itemSize: size,
+			gap
+		});
 
 		dispatch('change', {
 			id: id,
-			x: calculateCoordinate(left, size.width, gap),
-			y: calculateCoordinate(top, size.height, gap),
-			w: calculateSizeCoordinate(width, size.width, gap),
-			h: calculateSizeCoordinate(height, size.height, gap)
+			x: position2coordinate(snaped.left, size.width, gap),
+			y: position2coordinate(snaped.top, size.height, gap),
+			w: size2coordinate(width, size.width, gap),
+			h: size2coordinate(height, size.height, gap)
+		});
+	}
+
+	function resizeend(event: CustomEvent<ItemSize>) {
+		active = false;
+
+		const snaped = snapOnResize({
+			width: event.detail.width,
+			height: event.detail.height,
+			itemSize: size,
+			gap
+		});
+
+		dispatch('change', {
+			id: id,
+			x: position2coordinate(left, size.width, gap),
+			y: position2coordinate(top, size.height, gap),
+			w: size2coordinate(snaped.width, size.width, gap),
+			h: size2coordinate(snaped.height, size.height, gap)
 		});
 	}
 </script>
@@ -98,24 +122,23 @@
 	class:svelte-grid-extended-grid-transparent={active}
 	use:move={{ initialPosition: { left, top } }}
 	on:movestart={start}
-	on:moving={update}
-	on:moveend={end}
+	on:moving={moving}
+	on:moveend={moveend}
 	use:resize={{ min, max }}
 	on:resizestart={start}
-	on:resizing={update}
-	on:resizeend={end}
+	on:resizing={resizing}
+	on:resizeend={resizeend}
 	style={`left:${left}px; top:${top}px; width: ${width}px; height: ${height}px;`}
 >
 	<slot />
 </div>
 
 {#if active}
-	{@const preview = snapMove(left, top, size, gap)}
-	{@const previewSize = snapResize(width, height, size, gap)}
+	{@const preview = snap({ left, top, width, height, itemSize: size, gap })}
 	<div
 		class="svelte-grid-extended-grid-item-preview"
 		style={`left:${preview.left}px; top:${preview.top}px;  
-		width: ${previewSize.width}px; height: ${previewSize.height}px;`}
+		width: ${preview.width}px; height: ${preview.height}px;`}
 	/>
 {/if}
 
