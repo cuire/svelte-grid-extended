@@ -6,7 +6,7 @@ export function getCollisions(currentItem: ItemChangeEvent, items: GridItem[]): 
 			index !== currentItem.id &&
 			currentItem.x <= item.x + item.w - 1 &&
 			currentItem.y <= item.y + item.h - 1 &&
-			currentItem.x + currentItem.w >= item.x &&
+			currentItem.x + currentItem.w - 1 >= item.x &&
 			currentItem.y + currentItem.h - 1 >= item.y
 	);
 
