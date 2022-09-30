@@ -42,18 +42,17 @@ export default function resize(
 
 	node.appendChild(bottomRight);
 	bottomRight.addEventListener('mousedown', onMouseDown);
+	bottomRight.addEventListener('touchstart', onMouseDown);
 
-	function onMouseDown(event: MouseEvent) {
+	function onMouseDown(event: MouseEvent | TouchEvent) {
 		event.stopPropagation();
 
-		initialPosition = {
-			x: event.clientX,
-			y: event.clientY
-		};
+		const { clientX, clientY } = event instanceof MouseEvent ? event : event.touches[0];
+
+		initialPosition = { x: clientX, y: clientY };
 
 		parentRect = node.parentElement?.getBoundingClientRect();
 		rect = node.getBoundingClientRect();
-		console.log(rect);
 
 		initialRect = {
 			width: rect.width,
@@ -65,6 +64,8 @@ export default function resize(
 
 		window.addEventListener('mousemove', onMove);
 		window.addEventListener('mouseup', onMouseUp);
+		window.addEventListener('touchmove', onMove);
+		window.addEventListener('touchend', onMouseUp);
 
 		node.dispatchEvent(
 			new CustomEvent('resizestart', {
@@ -73,10 +74,12 @@ export default function resize(
 		);
 	}
 
-	function onMouseUp(event: MouseEvent) {
+	function onMouseUp(event: MouseEvent | TouchEvent) {
 		event.stopPropagation();
 		window.removeEventListener('mousemove', onMove);
 		window.removeEventListener('mouseup', onMouseUp);
+		window.removeEventListener('touchmove', onMove);
+		window.removeEventListener('touchend', onMouseUp);
 
 		node.dispatchEvent(
 			new CustomEvent('resizeend', {
@@ -85,9 +88,11 @@ export default function resize(
 		);
 	}
 
-	function onMove(event: MouseEvent) {
-		width = initialRect.width + event.clientX - initialPosition.x;
-		height = initialRect.height + event.clientY - initialPosition.y;
+	function onMove(event: MouseEvent | TouchEvent) {
+		const { clientX, clientY } = event instanceof MouseEvent ? event : event.touches[0];
+
+		width = initialRect.width + clientX - initialPosition.x;
+		height = initialRect.height + clientY - initialPosition.y;
 
 		if (bounds && parentRect) {
 			if (width + rect.left > parentRect.width) {
@@ -121,6 +126,8 @@ export default function resize(
 		destroy() {
 			window.removeEventListener('mousemove', onMove);
 			window.removeEventListener('mouseup', onMouseUp);
+			window.removeEventListener('touchmove', onMove);
+			window.removeEventListener('touchend', onMouseUp);
 
 			node.removeChild(bottomRight);
 		}

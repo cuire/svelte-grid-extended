@@ -121,6 +121,9 @@
 
 <style>
 	:global(.svelte-grid-extended-grid-item) {
+		cursor: move;
+		user-select: none;
+		touch-action: none;
 		position: absolute;
 		background-color: blueviolet;
 		z-index: 10;
@@ -133,6 +136,9 @@
 		background-color: rgb(192, 127, 127);
 	}
 	:global(.svelte-grid-extended-debug-resizer) {
+		cursor: move;
+		user-select: none;
+		touch-action: none;
 		position: absolute;
 		user-select: none;
 		width: 20px;

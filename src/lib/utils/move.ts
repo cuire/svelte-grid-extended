@@ -33,8 +33,7 @@ export default function move(
 	node.style.position = 'absolute';
 	node.style.top = `${top}px`;
 	node.style.left = `${left}px`;
-	node.style.cursor = 'move';
-	node.style.userSelect = 'none';
+	node.classList.add('svelte-grid-extended-grid-item');
 
 	let initialPosition = { left: 0, top: 0 };
 
@@ -42,12 +41,14 @@ export default function move(
 
 	let rect: DOMRect;
 
-	function onMouseDown(event: MouseEvent) {
+	function onMouseDown(event: MouseEvent | TouchEvent) {
 		node.classList.add('selected');
 
+		const { clientX, clientY } = event instanceof MouseEvent ? event : event.touches[0];
+
 		initialPosition = {
-			left: node.offsetLeft - event.clientX,
-			top: node.offsetTop - event.clientY
+			left: node.offsetLeft - clientX,
+			top: node.offsetTop - clientY
 		};
 
 		parentRect = node.parentElement?.getBoundingClientRect();
@@ -55,6 +56,8 @@ export default function move(
 
 		window.addEventListener('mousemove', onMove);
 		window.addEventListener('mouseup', onMouseUp);
+		window.addEventListener('touchmove', onMove);
+		window.addEventListener('touchend', onMouseUp);
 
 		node.dispatchEvent(
 			new CustomEvent('movestart', {
@@ -67,6 +70,8 @@ export default function move(
 		node.classList.remove('selected');
 		window.removeEventListener('mousemove', onMove);
 		window.removeEventListener('mouseup', onMouseUp);
+		window.removeEventListener('touchmove', onMove);
+		window.removeEventListener('touchend', onMouseUp);
 
 		node.dispatchEvent(
 			new CustomEvent('moveend', {
@@ -75,9 +80,11 @@ export default function move(
 		);
 	}
 
-	function onMove(event: MouseEvent) {
-		left = event.clientX + initialPosition.left;
-		top = event.clientY + initialPosition.top;
+	function onMove(event: MouseEvent | TouchEvent) {
+		const { clientX, clientY } = event instanceof MouseEvent ? event : event.touches[0];
+
+		left = clientX + initialPosition.left;
+		top = clientY + initialPosition.top;
 
 		if (bounds && parentRect) {
 			if (left < parentRect.left) {
@@ -105,11 +112,14 @@ export default function move(
 	}
 
 	node.addEventListener('mousedown', onMouseDown);
+	node.addEventListener('touchstart', onMouseDown);
 
 	return {
 		destroy() {
 			window.removeEventListener('mousemove', onMove);
 			window.removeEventListener('mouseup', onMouseUp);
+			window.removeEventListener('touchmove', onMove);
+			window.removeEventListener('touchend', onMouseUp);
 		}
 	};
 }

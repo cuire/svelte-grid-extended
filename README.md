@@ -5,4 +5,4 @@
 - [x] Bound item to grid container
 - [ ] Drag item from one grid and drop to another
 - [ ] Customize resize handle
-- [ ] touch screen
+- [x] touch screen
