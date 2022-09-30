@@ -24,6 +24,8 @@
 
 	export let gap: number;
 
+	export let bounds = false;
+
 	let minSize: Size;
 
 	let maxSize: Size | undefined;
@@ -96,11 +98,11 @@
 <div
 	class="svelte-grid-extended-grid-item"
 	class:svelte-grid-extended-grid-transparent={active}
-	use:move={{ initialPosition: { left, top } }}
+	use:move={{ initialPosition: { left, top }, bounds }}
 	on:movestart={start}
 	on:moving={update}
 	on:moveend={end}
-	use:resize={{ min, max }}
+	use:resize={{ min, max, bounds }}
 	on:resizestart={start}
 	on:resizing={update}
 	on:resizeend={end}

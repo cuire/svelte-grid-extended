@@ -31,6 +31,8 @@
 		xs: 320
 	};
 
+	export let bounds = false;
+
 	export let debug = false;
 
 	let _itemSize: ItemSize;
@@ -87,7 +89,7 @@
 >
 	{#if _itemSize}
 		{#each items as item, index}
-			<GridItem id={index} {item} size={_itemSize} {gap} on:change={updateItem}>
+			<GridItem id={index} {item} size={_itemSize} {gap} {bounds} on:change={updateItem}>
 				<slot />
 			</GridItem>
 		{/each}
