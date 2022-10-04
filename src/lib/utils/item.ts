@@ -1,4 +1,4 @@
-import type { ItemPosition, ItemSize } from '$lib/types';
+import type { GridParams, Item, ItemPosition, ItemSize, Position, Size } from '$lib/types';
 
 export function coordinate2position(coordinate: number, cellSize: number, gap: number): number {
 	return coordinate * cellSize + (coordinate + 1) * gap;
@@ -16,59 +16,55 @@ export function size2coordinate(size: number, cellSize: number, gap: number): nu
 	return position2coordinate(size + gap * 2, cellSize, gap);
 }
 
-type SnapCommonParams = {
-	itemSize: ItemSize;
-	gap: number;
-};
+export function snapOnMove(
+	left: number,
+	top: number,
+	item: Item,
+	gridParams: GridParams
+): Position {
+	const { itemSize, gap } = gridParams;
+	const { w, h } = item;
 
-type SnapMoveParams = SnapCommonParams & {
-	left: number;
-	top: number;
-};
+	let x = position2coordinate(left, itemSize.width, gap);
+	let y = position2coordinate(top, itemSize.height, gap);
 
-export function snapOnMove(params: SnapMoveParams): ItemPosition {
-	const { left, top, itemSize, gap } = params;
+	x = clamp(x, 0, gridParams.cols - w);
+	y = clamp(y, 0, gridParams.rows - h);
 
-	const x = position2coordinate(left, itemSize.width, gap);
-	const y = position2coordinate(top, itemSize.height, gap);
+	return { x, y };
+}
 
+export function snapOnResize(
+	width: number,
+	height: number,
+	item: Item,
+	gridParams: GridParams
+): Size {
+	const { itemSize, gap } = gridParams;
+	const { x, y } = item;
+
+	let w = position2coordinate(width + gap * 2, itemSize.width, gap);
+	let h = position2coordinate(height + gap * 2, itemSize.height, gap);
+
+	w = clamp(w, 0, gridParams.cols - x);
+	h = clamp(h, 0, gridParams.rows - y);
+
+	return { w, h };
+}
+
+export function calcPosition(
+	item: Item,
+	options: { itemSize: ItemSize; gap: number }
+): ItemPosition & ItemSize {
+	const { itemSize, gap } = options;
 	return {
-		left: coordinate2position(x, itemSize.width, gap),
-		top: coordinate2position(y, itemSize.height, gap)
+		left: coordinate2position(item.x, itemSize.width, gap),
+		top: coordinate2position(item.y, itemSize.height, gap),
+		width: coordinate2size(item.w, itemSize.width, gap),
+		height: coordinate2size(item.h, itemSize.height, gap)
 	};
 }
 
-type SnapResizeParams = SnapCommonParams & {
-	width: number;
-	height: number;
-};
-
-export function snapOnResize(params: SnapResizeParams): ItemSize {
-	const { width, height, itemSize, gap } = params;
-
-	const w = position2coordinate(width + gap * 2, itemSize.width, gap);
-	const h = position2coordinate(height + gap * 2, itemSize.height, gap);
-
-	return {
-		width: coordinate2size(w, itemSize.width, gap),
-		height: coordinate2size(h, itemSize.height, gap)
-	};
-}
-
-type SnapMoveResizeParams = SnapMoveParams & SnapResizeParams;
-
-export function snap(params: SnapMoveResizeParams): ItemPosition & ItemSize {
-	const { left, top, width, height, itemSize, gap } = params;
-
-	const x = position2coordinate(left, itemSize.width, gap);
-	const y = position2coordinate(top, itemSize.height, gap);
-	const w = position2coordinate(width + gap * 2, itemSize.width, gap);
-	const h = position2coordinate(height + gap * 2, itemSize.height, gap);
-
-	return {
-		left: coordinate2position(x, itemSize.width, gap),
-		top: coordinate2position(y, itemSize.height, gap),
-		width: coordinate2size(w, itemSize.width, gap),
-		height: coordinate2size(h, itemSize.height, gap)
-	};
+export function clamp(num: number, min: number, max: number): number {
+	return Math.max(Math.min(num, max), min);
 }

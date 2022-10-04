@@ -1,68 +1,41 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
-
 	import move from './utils/move';
 	import resize from './utils/resize';
-	import {
-		position2coordinate,
-		coordinate2position,
-		coordinate2size,
-		size2coordinate,
-		snap,
-		snapOnMove,
-		snapOnResize
-	} from './utils/item';
+	import { coordinate2size, calcPosition, snapOnMove, snapOnResize } from './utils/item';
 
-	import type {
-		ItemSize,
-		GridItem as GridItemType,
-		ItemChangeEvent,
-		Size,
-		ItemPosition
-	} from './types';
+	import type { Item, ItemSize, ItemPosition, GridParams } from './types';
 
-	const dispatch = createEventDispatcher<{ change: ItemChangeEvent }>();
+	export let item: Item;
 
-	export let id: number;
-
-	export let item: GridItemType;
-
-	export let size: ItemSize;
-
-	export let gap: number;
-
-	let minSize: Size;
-
-	let maxSize: Size | undefined;
+	export let gridParams: GridParams;
 
 	let active = false;
 
-	$: left = coordinate2position(item.x, size.width, gap);
-	$: top = coordinate2position(item.y, size.height, gap);
+	$: ({ left, top, width, height } = calcPosition(item, {
+		itemSize: gridParams.itemSize,
+		gap: gridParams.gap
+	}));
 
-	$: width = coordinate2size(item.w, size.width, gap);
-	$: height = coordinate2size(item.h, size.height, gap);
-
-	$: minSize = item.min ?? { w: 1, h: 1 };
-	$: maxSize = item.max;
-
-	let min: ItemSize | undefined;
+	let min: ItemSize;
 
 	let max: ItemSize | undefined;
 
-	$: if (minSize) {
+	$: {
+		const minSize = item.min ?? { w: 1, h: 1 };
 		min = {
-			width: coordinate2size(minSize.w, size.width, gap),
-			height: coordinate2size(minSize.h, size.height, gap)
+			width: coordinate2size(minSize.w, gridParams.itemSize.width, gridParams.gap),
+			height: coordinate2size(minSize.h, gridParams.itemSize.height, gridParams.gap)
 		};
 	}
 
-	$: if (maxSize) {
+	$: if (item.max) {
 		max = {
-			width: coordinate2size(maxSize.w, size.width, gap),
-			height: coordinate2size(maxSize.h, size.height, gap)
+			width: coordinate2size(item.max.w, gridParams.itemSize.width, gridParams.gap),
+			height: coordinate2size(item.max.h, gridParams.itemSize.height, gridParams.gap)
 		};
 	}
+
+	let previewItem: Item = item;
 
 	function start() {
 		active = true;
@@ -71,49 +44,30 @@
 	function moving(event: CustomEvent<ItemPosition>) {
 		left = event.detail.left;
 		top = event.detail.top;
+
+		if (
+			Math.abs(left - item.w * gridParams.itemSize.width) > gridParams.itemSize.width / 8 ||
+			Math.abs(top - item.h * gridParams.itemSize.height) > gridParams.itemSize.height / 8
+		) {
+			const { x, y } = snapOnMove(left, top, previewItem, gridParams);
+			previewItem = { ...previewItem, x, y };
+		}
 	}
 
 	function resizing(event: CustomEvent<ItemSize>) {
 		width = event.detail.width;
 		height = event.detail.height;
+
+		// TODO: call if width's or height's delta is greater that half of the item's size
+		const { w, h } = snapOnResize(width, height, previewItem, gridParams);
+
+		previewItem = { ...previewItem, w, h };
 	}
 
-	function moveend(event: CustomEvent<ItemPosition>) {
+	function end() {
 		active = false;
 
-		const snaped = snapOnMove({
-			left: event.detail.left,
-			top: event.detail.top,
-			itemSize: size,
-			gap
-		});
-
-		dispatch('change', {
-			id: id,
-			x: position2coordinate(snaped.left, size.width, gap),
-			y: position2coordinate(snaped.top, size.height, gap),
-			w: size2coordinate(width, size.width, gap),
-			h: size2coordinate(height, size.height, gap)
-		});
-	}
-
-	function resizeend(event: CustomEvent<ItemSize>) {
-		active = false;
-
-		const snaped = snapOnResize({
-			width: event.detail.width,
-			height: event.detail.height,
-			itemSize: size,
-			gap
-		});
-
-		dispatch('change', {
-			id: id,
-			x: position2coordinate(left, size.width, gap),
-			y: position2coordinate(top, size.height, gap),
-			w: size2coordinate(snaped.width, size.width, gap),
-			h: size2coordinate(snaped.height, size.height, gap)
-		});
+		item = { ...item, ...previewItem };
 	}
 </script>
 
@@ -123,18 +77,21 @@
 	use:move={{ position: { left, top } }}
 	on:movestart={start}
 	on:moving={moving}
-	on:moveend={moveend}
+	on:moveend={end}
 	use:resize={{ min, max }}
 	on:resizestart={start}
 	on:resizing={resizing}
-	on:resizeend={resizeend}
+	on:resizeend={end}
 	style={`left:${left}px; top:${top}px; width: ${width}px; height: ${height}px;`}
 >
 	<slot />
 </div>
 
 {#if active}
-	{@const preview = snap({ left, top, width, height, itemSize: size, gap })}
+	{@const preview = calcPosition(previewItem, {
+		itemSize: gridParams.itemSize,
+		gap: gridParams.gap
+	})}
 	<div
 		class="svelte-grid-extended-grid-item-preview"
 		style={`left:${preview.left}px; top:${preview.top}px;  

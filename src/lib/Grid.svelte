@@ -2,25 +2,19 @@
 	import { onMount } from 'svelte';
 
 	import GridItem from './GridItem.svelte';
-	import { findCols } from './utils/breakpoints';
-	import { getCollisions } from './utils/grid';
+	import { findGridSize } from './utils/breakpoints';
 
-	import type {
-		Breakpoints,
-		ItemSize,
-		Cols,
-		GridItem as GridItemType,
-		ItemChangeEvent
-	} from './types';
+	import type { Breakpoints, ItemSize, GridSize, Item, ItemChangeEvent, GridParams } from './types';
 
-	export let cols: Cols = 8;
-	export let rows = 8;
+	export let cols: GridSize = 8;
+
+	export let rows: GridSize = 8;
 
 	export let itemSize: ItemSize | undefined = undefined;
 
 	export let gap = 10;
 
-	export let items: GridItemType[];
+	export let items: Item[];
 
 	export let breakpoints: Breakpoints = {
 		xxl: 1536,
@@ -35,25 +29,17 @@
 
 	let _itemSize: ItemSize;
 
+	let _cols: number;
+
+	let _rows: number;
+
+	$: if (typeof cols === 'number') _cols = cols;
+
+	$: if (typeof rows === 'number') _rows = rows;
+
 	$: if (itemSize) _itemSize = itemSize;
 
 	let gridContainer: HTMLDivElement;
-	let width: number;
-	let height: number;
-
-	function updateItem(event: CustomEvent<ItemChangeEvent>) {
-		const { id, ...newValues } = event.detail;
-		if (items) {
-			if (getCollisions(event.detail, items).length === 0) {
-				items[id] = { ...items[id], ...newValues };
-			} else {
-				// rerender item
-				items[id] = items[id];
-			}
-		}
-	}
-
-	$: console.log(items);
 
 	onMount(() => {
 		const sizeObserver = new ResizeObserver((entries) => {
@@ -61,15 +47,17 @@
 				throw new Error('that observer must have only one entry');
 			}
 			const entry = entries[0];
-			width = entry.contentRect.width;
-			height = entry.contentRect.height;
 
-			const _cols = findCols(cols, width, breakpoints);
+			const width = entry.contentRect.width;
+			const height = entry.contentRect.height;
+
+			_cols = findGridSize(cols, width, breakpoints);
+			_rows = findGridSize(rows, width, breakpoints);
 
 			if (!itemSize) {
 				_itemSize = {
 					width: (width - (gap + 1) * _cols) / _cols,
-					height: (height - (gap + 1) * rows) / rows
+					height: (height - (gap + 1) * _rows) / _rows
 				};
 			}
 		});
@@ -85,9 +73,18 @@
 	class:svelte-grid-extended-debug={debug}
 	bind:this={gridContainer}
 >
-	{#if _itemSize}
-		{#each items as item, index}
-			<GridItem id={index} {item} size={_itemSize} {gap} on:change={updateItem}>
+	{#if _itemSize && _cols && _rows}
+		{#each items as item}
+			<GridItem
+				{item}
+				gridParams={{
+					itemSize: _itemSize,
+					gap,
+					cols: _cols,
+					rows: _rows,
+					items
+				}}
+			>
 				<slot />
 			</GridItem>
 		{/each}
