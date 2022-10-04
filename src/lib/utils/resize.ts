@@ -9,9 +9,9 @@ type ResizeOptions = {
 };
 
 type ResizeAtributes = {
-	'on:resizestart': ResizeEventHandler;
-	'on:resizing': ResizeEventHandler;
-	'on:resizeend': ResizeEventHandler;
+	'on:resizestart'?: ResizeEventHandler;
+	'on:resizing'?: ResizeEventHandler;
+	'on:resizeend'?: ResizeEventHandler;
 };
 
 type ResizeEventHandler = (e: CustomEvent<ResizeEvent>) => void;

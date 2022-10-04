@@ -9,9 +9,9 @@ type MoveOptions = {
 };
 
 type MoveAtributes = {
-	'on:movestart': MoveEventHandler;
-	'on:moving': MoveEventHandler;
-	'on:moveend': MoveEventHandler;
+	'on:movestart'?: MoveEventHandler;
+	'on:moving'?: MoveEventHandler;
+	'on:moveend'?: MoveEventHandler;
 };
 
 type MoveEventHandler = (e: CustomEvent<MoveEvent>) => void;
