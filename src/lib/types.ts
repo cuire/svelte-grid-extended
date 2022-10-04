@@ -19,4 +19,4 @@ export type BreakpointKey = 'xxl' | 'xl' | 'lg' | 'md' | 'sm' | 'xs';
 
 export type Breakpoints = Record<BreakpointKey, number>;
 
-export type Cols = number | Pick<Breakpoints, 'md'>;
+export type GridSize = number | RequireAtLeastOne<Breakpoints>;
