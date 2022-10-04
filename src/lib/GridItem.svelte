@@ -120,7 +120,7 @@
 <div
 	class="svelte-grid-extended-grid-item"
 	class:svelte-grid-extended-grid-transparent={active}
-	use:move={{ initialPosition: { left, top } }}
+	use:move={{ position: { left, top } }}
 	on:movestart={start}
 	on:moving={moving}
 	on:moveend={moveend}
