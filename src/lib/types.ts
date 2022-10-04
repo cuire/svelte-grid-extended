@@ -1,5 +1,6 @@
 export type GridItem = Size &
 	Position & {
+		id: string;
 		min?: Size;
 		max?: Size;
 	};
