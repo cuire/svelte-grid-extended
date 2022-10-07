@@ -1,5 +1,8 @@
-export type GridItem = Size &
+import type { RequireAtLeastOne } from '$lib/utils/types';
+
+export type Item = Size &
 	Position & {
+		id: string;
 		min?: Size;
 		max?: Size;
 	};
@@ -18,4 +21,12 @@ export type BreakpointKey = 'xxl' | 'xl' | 'lg' | 'md' | 'sm' | 'xs';
 
 export type Breakpoints = Record<BreakpointKey, number>;
 
-export type Cols = number | Pick<Breakpoints, 'md'>;
+export type GridSize = number | RequireAtLeastOne<Breakpoints>;
+
+export type GridParams = {
+	itemSize: ItemSize;
+	gap: number;
+	cols: number;
+	rows: number;
+	items: Item[];
+};

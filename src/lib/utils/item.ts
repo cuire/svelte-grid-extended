@@ -1,42 +1,70 @@
-import type { ItemPosition, ItemSize } from '$lib/types';
+import type { GridParams, Item, ItemPosition, ItemSize, Position, Size } from '$lib/types';
 
-export function calculatePosition(coordinate: number, cellSize: number, gap: number): number {
+export function coordinate2position(coordinate: number, cellSize: number, gap: number): number {
 	return coordinate * cellSize + (coordinate + 1) * gap;
 }
 
-export function calculateSize(coordinate: number, cellSize: number, gap: number): number {
+export function coordinate2size(coordinate: number, cellSize: number, gap: number): number {
 	return coordinate * cellSize + (coordinate - 1) * gap;
 }
 
-export function calculateCoordinate(position: number, cellSize: number, gap: number): number {
-	return Math.floor((position + cellSize / 2) / (cellSize + gap));
+export function position2coordinate(position: number, cellSize: number, gap: number): number {
+	return Math.round(position / (cellSize + gap));
 }
 
-export function calculateSizeCoordinate(position: number, cellSize: number, gap: number): number {
-	return calculateCoordinate(position + gap * 2, cellSize, gap);
+export function size2coordinate(size: number, cellSize: number, gap: number): number {
+	return position2coordinate(size + gap * 2, cellSize, gap);
 }
 
-export function snapMove(left: number, top: number, cellSize: ItemSize, gap: number): ItemPosition {
-	const x = calculateCoordinate(left, cellSize.width, gap);
-	const y = calculateCoordinate(top, cellSize.height, gap);
+export function snapOnMove(
+	left: number,
+	top: number,
+	item: Item,
+	gridParams: GridParams
+): Position {
+	const { itemSize, gap } = gridParams;
+	const { w, h } = item;
 
-	return {
-		left: calculatePosition(x, cellSize.width, gap),
-		top: calculatePosition(y, cellSize.height, gap)
-	};
+	let x = position2coordinate(left, itemSize.width, gap);
+	let y = position2coordinate(top, itemSize.height, gap);
+
+	x = clamp(x, 0, gridParams.cols - w);
+	y = clamp(y, 0, gridParams.rows - h);
+
+	return { x, y };
 }
 
-export function snapResize(
+export function snapOnResize(
 	width: number,
 	height: number,
-	cellSize: ItemSize,
-	gap: number
-): ItemSize {
-	const w = calculateCoordinate(width + gap * 2, cellSize.width, gap);
-	const h = calculateCoordinate(height + gap * 2, cellSize.height, gap);
+	item: Item,
+	gridParams: GridParams
+): Size {
+	const { itemSize, gap } = gridParams;
+	const { x, y } = item;
 
+	let w = position2coordinate(width + gap * 2, itemSize.width, gap);
+	let h = position2coordinate(height + gap * 2, itemSize.height, gap);
+
+	w = clamp(w, 0, gridParams.cols - x);
+	h = clamp(h, 0, gridParams.rows - y);
+
+	return { w, h };
+}
+
+export function calcPosition(
+	item: Item,
+	options: { itemSize: ItemSize; gap: number }
+): ItemPosition & ItemSize {
+	const { itemSize, gap } = options;
 	return {
-		width: calculateSize(w, cellSize.width, gap),
-		height: calculateSize(h, cellSize.height, gap)
+		left: coordinate2position(item.x, itemSize.width, gap),
+		top: coordinate2position(item.y, itemSize.height, gap),
+		width: coordinate2size(item.w, itemSize.width, gap),
+		height: coordinate2size(item.h, itemSize.height, gap)
 	};
+}
+
+export function clamp(num: number, min: number, max: number): number {
+	return Math.max(Math.min(num, max), min);
 }

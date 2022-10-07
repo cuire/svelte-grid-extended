@@ -1,7 +1,7 @@
 import type { ActionReturn } from 'svelte/action';
 
 type MoveOptions = {
-	initialPosition?: {
+	position?: {
 		left: number;
 		top: number;
 	};
@@ -9,9 +9,9 @@ type MoveOptions = {
 };
 
 type MoveAtributes = {
-	'on:movestart': MoveEventHandler;
-	'on:moving': MoveEventHandler;
-	'on:moveend': MoveEventHandler;
+	'on:movestart'?: MoveEventHandler;
+	'on:moving'?: MoveEventHandler;
+	'on:moveend'?: MoveEventHandler;
 };
 
 type MoveEventHandler = (e: CustomEvent<MoveEvent>) => void;
@@ -23,12 +23,12 @@ export type MoveEvent = {
 
 export default function move(
 	node: HTMLElement,
-	options?: MoveOptions
+	options: MoveOptions = {}
 ): ActionReturn<MoveOptions, MoveAtributes> {
-	const { bounds = false } = options ?? {};
+	const { bounds = false } = options;
 
-	let left = options?.initialPosition?.left ?? 0;
-	let top = options?.initialPosition?.top ?? 0;
+	let left = options?.position?.left ?? 0;
+	let top = options?.position?.top ?? 0;
 
 	node.style.position = 'absolute';
 	node.style.top = `${top}px`;

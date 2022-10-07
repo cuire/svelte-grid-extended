@@ -9,9 +9,9 @@ type ResizeOptions = {
 };
 
 type ResizeAtributes = {
-	'on:resizestart': ResizeEventHandler;
-	'on:resizing': ResizeEventHandler;
-	'on:resizeend': ResizeEventHandler;
+	'on:resizestart'?: ResizeEventHandler;
+	'on:resizing'?: ResizeEventHandler;
+	'on:resizeend'?: ResizeEventHandler;
 };
 
 type ResizeEventHandler = (e: CustomEvent<ResizeEvent>) => void;
@@ -23,12 +23,12 @@ export type ResizeEvent = {
 
 export default function resize(
 	node: HTMLElement,
-	options?: ResizeOptions
+	options: ResizeOptions = {}
 ): ActionReturn<ResizeOptions, ResizeAtributes> {
 	const bottomRight = document.createElement('div');
 	bottomRight.classList.add('svelte-grid-extended-debug-resizer');
 
-	const { min, max, bounds = false } = options ?? {};
+	const { min, max, bounds = false } = options;
 
 	let width: number;
 	let height: number;
