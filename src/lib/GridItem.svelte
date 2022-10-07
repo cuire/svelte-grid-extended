@@ -2,6 +2,7 @@
 	import move from './utils/move';
 	import resize from './utils/resize';
 	import { coordinate2size, calcPosition, snapOnMove, snapOnResize } from './utils/item';
+	import { hasCollisions } from './utils/grid';
 
 	import type { Item, ItemSize, ItemPosition, GridParams } from './types';
 
@@ -50,7 +51,9 @@
 			Math.abs(top - item.h * gridParams.itemSize.height) > gridParams.itemSize.height / 8
 		) {
 			const { x, y } = snapOnMove(left, top, previewItem, gridParams);
-			previewItem = { ...previewItem, x, y };
+			if (!hasCollisions({ ...previewItem, x, y }, gridParams.items)) {
+				previewItem = { ...previewItem, x, y };
+			}
 		}
 	}
 
@@ -58,16 +61,23 @@
 		width = event.detail.width;
 		height = event.detail.height;
 
-		// TODO: call if width's or height's delta is greater that half of the item's size
-		const { w, h } = snapOnResize(width, height, previewItem, gridParams);
-
-		previewItem = { ...previewItem, w, h };
+		if (
+			Math.abs(left - item.w * gridParams.itemSize.width) > gridParams.itemSize.width / 8 ||
+			Math.abs(top - item.h * gridParams.itemSize.height) > gridParams.itemSize.height / 8
+		) {
+			const { w, h } = snapOnResize(width, height, previewItem, gridParams);
+			if (!hasCollisions({ ...previewItem, w, h }, gridParams.items)) {
+				previewItem = { ...previewItem, w, h };
+			}
+		}
 	}
 
 	function end() {
 		active = false;
-
-		item = { ...item, ...previewItem };
+		item.x = previewItem.x;
+		item.y = previewItem.y;
+		item.w = previewItem.w;
+		item.h = previewItem.h;
 	}
 </script>
 
