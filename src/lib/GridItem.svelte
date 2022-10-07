@@ -88,7 +88,7 @@
 	on:movestart={start}
 	on:moving={moving}
 	on:moveend={end}
-	use:resize={{ min, max, bounds }}
+	use:resize={{ min, max, bounds: gridParams.bounds }}
 	on:resizestart={start}
 	on:resizing={resizing}
 	on:resizeend={end}

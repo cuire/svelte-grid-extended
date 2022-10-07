@@ -84,6 +84,7 @@
 					gap,
 					cols: _cols,
 					rows: _rows,
+					bounds,
 					items
 				}}
 			>

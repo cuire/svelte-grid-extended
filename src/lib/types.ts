@@ -28,5 +28,6 @@ export type GridParams = {
 	gap: number;
 	cols: number;
 	rows: number;
+	bounds: boolean;
 	items: Item[];
 };
