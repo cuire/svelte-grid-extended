@@ -10,7 +10,7 @@
 </script>
 
 <div class="container">
-	<Grid {items} {cols}>123</Grid>
+	<Grid {items} {cols} bounds={true}>123</Grid>
 </div>
 
 <style>

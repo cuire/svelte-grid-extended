@@ -25,6 +25,8 @@
 		xs: 320
 	};
 
+	export let bounds = false;
+
 	export let debug = false;
 
 	let _itemSize: ItemSize;

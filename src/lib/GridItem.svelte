@@ -88,7 +88,7 @@
 	on:movestart={start}
 	on:moving={moving}
 	on:moveend={end}
-	use:resize={{ min, max }}
+	use:resize={{ min, max, bounds }}
 	on:resizestart={start}
 	on:resizing={resizing}
 	on:resizeend={end}
@@ -111,6 +111,9 @@
 
 <style>
 	:global(.svelte-grid-extended-grid-item) {
+		cursor: move;
+		user-select: none;
+		touch-action: none;
 		position: absolute;
 		background-color: blueviolet;
 		z-index: 10;
@@ -123,6 +126,9 @@
 		background-color: rgb(192, 127, 127);
 	}
 	:global(.svelte-grid-extended-debug-resizer) {
+		cursor: move;
+		user-select: none;
+		touch-action: none;
 		position: absolute;
 		user-select: none;
 		width: 20px;
