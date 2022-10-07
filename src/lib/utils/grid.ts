@@ -11,16 +11,9 @@ export function isItemColliding(item: Item, otherItem: Item): boolean {
 }
 
 export function getCollisions(currentItem: Item, items: Item[]): Item[] {
-	items = items.filter((item) => isItemColliding(currentItem, item));
-
-	return items;
+	return items.filter((item) => isItemColliding(currentItem, item));
 }
 
 export function hasCollisions(currentItem: Item, items: Item[]): boolean {
-	console.log(currentItem);
-	items.map((item) => {
-		if (isItemColliding(currentItem, item)) return true;
-	});
-
-	return false;
+	return items.some((item) => isItemColliding(currentItem, item));
 }

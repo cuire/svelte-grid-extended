@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { isItemColliding } from '../../src/lib/utils/grid';
+import { getCollisions, hasCollisions, isItemColliding } from '../../src/lib/utils/grid';
 
 import type { Item } from '../../src/lib/types';
 
@@ -65,5 +65,37 @@ describe('🎏 isItemColliding()', () => {
 		};
 		expect(isItemColliding(item, itemTopLeft)).toBe(false);
 		expect(isItemColliding(item, itemBottomRight)).toBe(false);
+	});
+});
+
+describe('🎐 hasCollisions()', () => {
+	test.each([
+		{ id: '8', x: 1, y: 3, w: 1, h: 1 },
+		{ id: '8', x: 2, y: 3, w: 1, h: 1 },
+		{ id: '8', x: 3, y: 3, w: 1, h: 1 },
+		{ id: '8', x: 1, y: 3, w: 2, h: 1 }
+	])('should not have collisions', (item) => {
+		expect(hasCollisions(item, items)).toBe(false);
+	});
+
+	test.each([
+		{ id: '8', x: 0, y: 0, w: 1, h: 1 },
+		{ id: '8', x: 0, y: 1, w: 1, h: 1 },
+		{ id: '8', x: 1, y: 0, w: 1, h: 1 },
+		{ id: '8', x: 1, y: 1, w: 1, h: 1 }
+	])('should have collision', (item) => {
+		expect(hasCollisions(item, items)).toBe(true);
+	});
+});
+
+describe('🎑 getCollisions()', () => {
+	test.each([
+		[{ id: '8', x: 0, y: 0, w: 1, h: 1 }, 1],
+		[{ id: '8', x: 0, y: 0, w: 2, h: 1 }, 2],
+		[{ id: '8', x: 0, y: 0, w: 2, h: 2 }, 4],
+		[{ id: '8', x: 0, y: 0, w: 3, h: 3 }, 6],
+		[{ id: '8', x: 0, y: 0, w: 4, h: 4 }, 8]
+	])('should not have collisions', (item, expected) => {
+		expect(getCollisions(item, items).length).toBe(expected);
 	});
 });
