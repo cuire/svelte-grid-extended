@@ -2,9 +2,10 @@
 	import { onMount } from 'svelte';
 
 	import GridItem from './GridItem.svelte';
+	import { assertGridOptions } from './utils/assert';
 	import { findGridSize } from './utils/breakpoints';
 
-	import type { Breakpoints, ItemSize, GridSize, Item, ItemChangeEvent, GridParams } from './types';
+	import type { Breakpoints, ItemSize, GridSize, Item } from './types';
 
 	export let cols: GridSize = 8;
 
@@ -24,6 +25,8 @@
 		sm: 640,
 		xs: 320
 	};
+
+	assertGridOptions({ cols, rows, itemSize });
 
 	export let bounds = false;
 
