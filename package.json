@@ -1,5 +1,5 @@
 {
-	"name": "svelte-grid-2",
+	"name": "svelte-grid-extended",
 	"version": "0.0.1",
 	"scripts": {
 		"dev": "vite dev",
