@@ -11,7 +11,7 @@
 
 	export let rows: GridSize = 8;
 
-	export let itemSize: ItemSize | undefined = undefined;
+	export let itemSize: Partial<ItemSize> = {};
 
 	export let gap = 10;
 
@@ -42,7 +42,9 @@
 
 	$: if (typeof rows === 'number') _rows = rows;
 
-	$: if (itemSize) _itemSize = itemSize;
+	$: if (itemSize?.width && itemSize?.height) _itemSize = itemSize as ItemSize;
+
+	$: if (_rows && _itemSize?.height) containerHeight = _rows * (_itemSize.height + gap);
 
 	let gridContainer: HTMLDivElement;
 
@@ -59,7 +61,7 @@
 			_cols = findGridSize(cols, width, breakpoints);
 			_rows = findGridSize(rows, width, breakpoints);
 
-			if (!itemSize) {
+			if (!(itemSize?.width && itemSize?.height)) {
 				_itemSize = {
 					width: (width - (gap + 1) * _cols) / _cols,
 					height: (height - (gap + 1) * _rows) / _rows

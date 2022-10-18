@@ -3,7 +3,7 @@ import type { GridSize, ItemSize } from '$lib/types';
 export type GridOptions = {
 	cols: GridSize;
 	rows: GridSize;
-	itemSize: ItemSize | undefined;
+	itemSize: Partial<ItemSize>;
 };
 
 export function assertGridOptions(options: GridOptions) {
