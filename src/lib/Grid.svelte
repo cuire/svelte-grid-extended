@@ -93,7 +93,7 @@
 					items
 				}}
 			>
-				<slot />
+				<slot {item} />
 			</GridItem>
 		{/each}
 	{/if}
