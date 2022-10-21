@@ -44,6 +44,8 @@ export default function move(
 	function onMouseDown(event: MouseEvent | TouchEvent) {
 		node.classList.add('selected');
 
+		if (event instanceof MouseEvent && event.button !== 0) return;
+
 		const { clientX, clientY } = event instanceof MouseEvent ? event : event.touches[0];
 
 		initialPosition = {

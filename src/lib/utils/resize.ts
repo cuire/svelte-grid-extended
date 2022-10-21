@@ -47,6 +47,8 @@ export default function resize(
 	function onMouseDown(event: MouseEvent | TouchEvent) {
 		event.stopPropagation();
 
+		if (event instanceof MouseEvent && event.button !== 0) return;
+
 		const { clientX, clientY } = event instanceof MouseEvent ? event : event.touches[0];
 
 		initialPosition = { x: clientX, y: clientY };
