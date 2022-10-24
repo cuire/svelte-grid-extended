@@ -7,16 +7,15 @@
 	];
 
 	const cols = { xxl: 6, xl: 5, lg: 4, md: 3, sm: 2, xs: 1 };
+	const itemSize = { height: 100 };
 </script>
 
-<div class="container">
-	<Grid {items} {cols} bounds={true}>123</Grid>
-</div>
+<Grid class="container" {items} {cols} {itemSize} bounds={true}>123</Grid>
 
 <style>
-	.container {
-		max-width: 800px;
+	:global(.container) {
+		max-width: 900px;
+		height: 100vh;
 		background-color: aquamarine;
-		height: 500px;
 	}
 </style>
