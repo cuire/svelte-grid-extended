@@ -23,11 +23,13 @@ export type Breakpoints = Record<BreakpointKey, number>;
 
 export type GridSize = number | RequireAtLeastOne<Breakpoints>;
 
+export type GridDimensions = { cols: number; rows: number };
+
 export type GridParams = {
 	itemSize: ItemSize;
 	gap: number;
-	cols: number;
-	rows: number;
+	maxCols: number;
+	maxRows: number;
 	bounds: boolean;
 	items: Item[];
 };

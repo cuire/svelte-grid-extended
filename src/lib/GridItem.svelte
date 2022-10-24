@@ -1,10 +1,17 @@
 <script lang="ts">
+	import { createEventDispatcher } from 'svelte';
+
 	import move from './utils/move';
 	import resize from './utils/resize';
 	import { coordinate2size, calcPosition, snapOnMove, snapOnResize } from './utils/item';
 	import { hasCollisions } from './utils/grid';
 
 	import type { Item, ItemSize, ItemPosition, GridParams } from './types';
+
+	const dispatch = createEventDispatcher<{
+		itemchange: { item: Item };
+		previewchange: { item: Item };
+	}>();
 
 	export let item: Item;
 
@@ -48,6 +55,8 @@
 
 	let previewItem: Item = item;
 
+	$: previewItem, dispatch('previewchange', { item: previewItem });
+
 	function start() {
 		active = true;
 	}
@@ -88,6 +97,7 @@
 		item.y = previewItem.y;
 		item.w = previewItem.w;
 		item.h = previewItem.h;
+		dispatch('itemchange', { item });
 	}
 </script>
 

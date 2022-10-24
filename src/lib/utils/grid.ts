@@ -1,4 +1,4 @@
-import type { Item } from '$lib/types';
+import type { GridDimensions, Item } from '$lib/types';
 
 export function isItemColliding(item: Item, otherItem: Item): boolean {
 	return (
@@ -16,4 +16,11 @@ export function getCollisions(currentItem: Item, items: Item[]): Item[] {
 
 export function hasCollisions(currentItem: Item, items: Item[]): boolean {
 	return items.some((item) => isItemColliding(currentItem, item));
+}
+
+export function getGridDimensions(items: Item[]): GridDimensions {
+	const cols = Math.max(...items.map((item) => item.x + item.w), 1);
+	const rows = Math.max(...items.map((item) => item.y + item.h), 1);
+
+	return { cols, rows };
 }

@@ -28,8 +28,8 @@ export function snapOnMove(
 	let x = position2coordinate(left, itemSize.width, gap);
 	let y = position2coordinate(top, itemSize.height, gap);
 
-	x = clamp(x, 0, gridParams.cols - w);
-	y = clamp(y, 0, gridParams.rows - h);
+	x = clamp(x, 0, gridParams.maxCols - w);
+	y = clamp(y, 0, gridParams.maxRows - h);
 
 	return { x, y };
 }
@@ -46,8 +46,8 @@ export function snapOnResize(
 	let w = position2coordinate(width + gap * 2, itemSize.width, gap);
 	let h = position2coordinate(height + gap * 2, itemSize.height, gap);
 
-	w = clamp(w, 0, gridParams.cols - x);
-	h = clamp(h, 0, gridParams.rows - y);
+	w = clamp(w, 0, gridParams.maxCols - x);
+	h = clamp(h, 0, gridParams.maxRows - y);
 
 	return { w, h };
 }

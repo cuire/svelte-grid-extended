@@ -4,12 +4,13 @@
 	import GridItem from './GridItem.svelte';
 	import { assertGridOptions } from './utils/assert';
 	import { findGridSize } from './utils/breakpoints';
+	import { getGridDimensions } from './utils/grid';
 
 	import type { Breakpoints, ItemSize, GridSize, Item } from './types';
 
-	export let cols: GridSize = 8;
+	export let cols: GridSize = 0;
 
-	export let rows: GridSize = 8;
+	export let rows: GridSize = 0;
 
 	export let itemSize: Partial<ItemSize> = {};
 
@@ -50,15 +51,51 @@
 
 	let _rows: number;
 
+	let maxCols: number;
+
+	let maxRows: number;
+
+	let containerWidth: number;
+
+	let containerHeight: number;
+
+	let shouldExpandRows = false;
+
+	let shouldExpandCols = false;
+
 	$: if (typeof cols === 'number') _cols = cols;
 
 	$: if (typeof rows === 'number') _rows = rows;
 
 	$: if (itemSize?.width && itemSize?.height) _itemSize = itemSize as ItemSize;
 
-	$: if (_rows && _itemSize?.height) containerHeight = _rows * (_itemSize.height + gap);
+	$: if (itemSize?.width && _itemSize?.width) containerWidth = _cols * (_itemSize.width + gap + 1);
+
+	$: if (itemSize?.height && _itemSize?.height)
+		containerHeight = _rows * (_itemSize.height + gap + 1);
+
+	$: calculatedGridSize = getGridDimensions(items);
 
 	let gridContainer: HTMLDivElement;
+
+	$: {
+		_cols = shouldExpandCols ? calculatedGridSize.cols : _cols;
+		maxCols = shouldExpandCols ? Infinity : _cols;
+	}
+
+	$: {
+		_rows = shouldExpandRows ? calculatedGridSize.rows : _rows;
+		maxRows = shouldExpandRows ? Infinity : _rows;
+	}
+
+	function updateGrid() {
+		items = [...items];
+	}
+
+	function updateGridDimensions(event: CustomEvent<{ item: Item }>) {
+		const { item } = event.detail;
+		calculatedGridSize = getGridDimensions([...items.filter((i) => i.id !== item.id), item]);
+	}
 
 	onMount(() => {
 		const sizeObserver = new ResizeObserver((entries) => {
@@ -73,12 +110,13 @@
 			_cols = findGridSize(cols, width, breakpoints);
 			_rows = findGridSize(rows, width, breakpoints);
 
-			if (!(itemSize?.width && itemSize?.height)) {
-				_itemSize = {
-					width: (width - (gap + 1) * _cols) / _cols,
-					height: (height - (gap + 1) * _rows) / _rows
-				};
-			}
+			shouldExpandCols = _cols === 0;
+			shouldExpandRows = _rows === 0;
+
+			_itemSize = {
+				width: itemSize.width ?? (width - (gap + 1) * _cols) / _cols,
+				height: itemSize.height ?? (height - (gap + 1) * _rows) / _rows
+			};
 		});
 
 		sizeObserver.observe(gridContainer);
@@ -89,6 +127,8 @@
 
 <div
 	class={`svelte-grid-extended ${classes}`}
+	style={`width: ${containerWidth ? `${containerWidth}px` : '100%'}; 
+		height: ${containerHeight ? `${containerHeight}px` : '100%'};`}
 	bind:this={gridContainer}
 >
 	{#if _itemSize && _cols && _rows}
@@ -107,10 +147,18 @@
 				activeClass={itemActiveClass}
 				previewClass={itemPreviewClass}
 				resizerClass={itemResizerClass}
+				on:itemchange={updateGrid}
+				on:previewchange={updateGridDimensions}
 			>
 				<slot {item} />
 			</GridItem>
 		{/each}
+	{:else}
+		<slot name="loader">
+			{#if debug}
+				{_itemSize} {_cols} {_rows}
+			{/if}
+		</slot>
 	{/if}
 </div>
 
