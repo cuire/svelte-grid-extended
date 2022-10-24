@@ -26,7 +26,9 @@ pnpm install svelte-grid-extended
 
 ## Usage
 
-- [Basic example](#basic-example)
+- [Basic](#basic)
+- [Static grid](#static-grid)
+- [Grid without bounds](#grid-without-bounds)
 
 ### Basic
 
