@@ -32,6 +32,18 @@
 
 	export let debug = false;
 
+	let classes = '';
+
+	export { classes as class };
+
+	export let itemClass = 'item-default';
+
+	export let itemActiveClass = 'active-default';
+
+	export let itemPreviewClass = 'item-preview-default';
+
+	export let itemResizerClass = 'resizer-default';
+
 	let _itemSize: ItemSize;
 
 	let _cols: number;
@@ -76,22 +88,25 @@
 </script>
 
 <div
-	class="svelte-grid-extended-container"
-	class:svelte-grid-extended-debug={debug}
+	class={`svelte-grid-extended ${classes}`}
 	bind:this={gridContainer}
 >
 	{#if _itemSize && _cols && _rows}
 		{#each items as item}
 			<GridItem
+				class={itemClass}
 				{item}
 				gridParams={{
 					itemSize: _itemSize,
 					gap,
-					cols: _cols,
-					rows: _rows,
+					maxCols,
+					maxRows,
 					bounds,
 					items
 				}}
+				activeClass={itemActiveClass}
+				previewClass={itemPreviewClass}
+				resizerClass={itemResizerClass}
 			>
 				<slot {item} />
 			</GridItem>
@@ -100,16 +115,40 @@
 </div>
 
 <style>
-	:global(.svelte-grid-extended-container) {
-		position: relative;
-		width: 100%;
-		height: 100%;
+	:global(.svelte-grid-extended) {
+		position: relative !important;
 	}
-	:global(.svelte-grid-extended-debug) {
-		width: 100%;
-		height: 100%;
-		background-image: repeating-linear-gradient(#ccc 0 1px, transparent 1px 100%),
-			repeating-linear-gradient(90deg, #ccc 0 1px, transparent 1px 100%);
-		background-size: 167px 167px;
+	:global(.svelte-grid-extended > .item-default) {
+		transition: width 0.2s, height 0.2s;
+		transition: transform 0.2s, opacity 0.2s;
+	}
+	:global(.svelte-grid-extended > .item-default.active-default) {
+		opacity: 0.5;
+	}
+	:global(.svelte-grid-extended .item-preview-default) {
+		background-color: rgb(192, 127, 127);
+		transition: all 0.2s;
+	}
+	:global(.svelte-grid-extended .resizer-default) {
+		cursor: move;
+		user-select: none;
+		touch-action: none;
+		position: absolute;
+		user-select: none;
+		width: 20px;
+		height: 20px;
+		right: 0;
+		bottom: 0;
+		cursor: se-resize;
+	}
+	:global(.svelte-grid-extended .resizer-default::after) {
+		content: '';
+		position: absolute;
+		right: 3px;
+		bottom: 3px;
+		width: 5px;
+		height: 5px;
+		border-right: 2px solid rgba(0, 0, 0, 0.4);
+		border-bottom: 2px solid rgba(0, 0, 0, 0.4);
 	}
 </style>

@@ -10,6 +10,16 @@
 
 	export let gridParams: GridParams;
 
+	let classes = '';
+
+	export { classes as class };
+
+	export let activeClass = '';
+
+	export let previewClass = '';
+
+	export let resizerClass = '';
+
 	let active = false;
 
 	$: ({ left, top, width, height } = calcPosition(item, {
@@ -82,13 +92,12 @@
 </script>
 
 <div
-	class="svelte-grid-extended-grid-item"
-	class:svelte-grid-extended-grid-transparent={active}
+	class={`svelte-grid-extended-item ${classes} ${active ? activeClass : ''}`}
 	use:move={{ position: { left, top } }}
 	on:movestart={start}
 	on:moving={moving}
 	on:moveend={end}
-	use:resize={{ min, max, bounds: gridParams.bounds }}
+	use:resize={{ min, max, resizerClass, bounds: gridParams.bounds }}
 	on:resizestart={start}
 	on:resizing={resizing}
 	on:resizeend={end}
@@ -103,48 +112,18 @@
 		gap: gridParams.gap
 	})}
 	<div
-		class="svelte-grid-extended-grid-item-preview"
-		style={`left:${preview.left}px; top:${preview.top}px;  
+		class={previewClass}
+		style={`position: absolute; left:${preview.left}px; top:${preview.top}px;  
 		width: ${preview.width}px; height: ${preview.height}px;`}
 	/>
 {/if}
 
 <style>
-	:global(.svelte-grid-extended-grid-item) {
+	:global(.svelte-grid-extended-item) {
 		cursor: move;
 		user-select: none;
 		touch-action: none;
 		position: absolute;
-		background-color: blueviolet;
-		z-index: 10;
-	}
-	:global(.svelte-grid-extended-grid-transparent) {
-		opacity: 0.5;
-	}
-	:global(.svelte-grid-extended-grid-item-preview) {
-		position: absolute;
-		background-color: rgb(192, 127, 127);
-	}
-	:global(.svelte-grid-extended-debug-resizer) {
-		cursor: move;
-		user-select: none;
-		touch-action: none;
-		position: absolute;
-		user-select: none;
-		width: 20px;
-		height: 20px;
-		right: 0;
-		bottom: 0;
-		cursor: se-resize;
-	}
-	:global(.svelte-grid-extended-debug-resizer::after) {
-		content: '';
-		position: absolute;
-		right: 3px;
-		bottom: 3px;
-		width: 5px;
-		height: 5px;
-		border-right: 2px solid rgba(0, 0, 0, 0.4);
-		border-bottom: 2px solid rgba(0, 0, 0, 0.4);
+		z-index: 1;
 	}
 </style>

@@ -5,6 +5,7 @@ import type { ItemSize } from '$lib/types';
 type ResizeOptions = {
 	min?: ItemSize;
 	max?: ItemSize;
+	resizerClass?: string;
 	bounds?: boolean;
 };
 
@@ -25,10 +26,10 @@ export default function resize(
 	node: HTMLElement,
 	options: ResizeOptions = {}
 ): ActionReturn<ResizeOptions, ResizeAtributes> {
-	const bottomRight = document.createElement('div');
-	bottomRight.classList.add('svelte-grid-extended-debug-resizer');
+	const { min, max, resizerClass = '', bounds = false } = options;
 
-	const { min, max, bounds = false } = options;
+	const bottomRight = document.createElement('div');
+	bottomRight.classList.add(resizerClass);
 
 	let width: number;
 	let height: number;
