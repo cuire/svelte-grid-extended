@@ -1,13 +1,8 @@
 import { describe, expect, test } from 'vitest';
 
-import {
-	getCollisions,
-	getGridDimensions,
-	hasCollisions,
-	isItemColliding
-} from '../../src/lib/utils/grid';
+import { getCollisions, getGridDimensions, hasCollisions, isItemColliding } from '$lib/utils/grid';
 
-import type { Item } from '../../src/lib/types';
+import type { Item } from '$lib/types';
 
 /**
  * Grid with shape:\
