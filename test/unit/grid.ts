@@ -1,6 +1,11 @@
 import { describe, expect, test } from 'vitest';
 
-import { getCollisions, hasCollisions, isItemColliding } from '../../src/lib/utils/grid';
+import {
+	getCollisions,
+	getGridDimensions,
+	hasCollisions,
+	isItemColliding
+} from '../../src/lib/utils/grid';
 
 import type { Item } from '../../src/lib/types';
 
@@ -95,7 +100,15 @@ describe('🎑 getCollisions()', () => {
 		[{ id: '8', x: 0, y: 0, w: 2, h: 2 }, 4],
 		[{ id: '8', x: 0, y: 0, w: 3, h: 3 }, 6],
 		[{ id: '8', x: 0, y: 0, w: 4, h: 4 }, 8]
-	])('should not have collisions', (item, expected) => {
+	])('should have collisions', (item, expected) => {
 		expect(getCollisions(item, items).length).toBe(expected);
+	});
+});
+
+describe('🍦 getGridDimensions()', () => {
+	test('items should have cols = 4 and rows = 4', () => {
+		const { cols, rows } = getGridDimensions(items);
+		expect(cols).toBe(4);
+		expect(rows).toBe(4);
 	});
 });
