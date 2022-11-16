@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { assertGridOptions, type GridOptions } from '$lib/utils/assert';
+import { assertGridOptions, type GridOptions } from '../../src/lib/utils/assert';
 
 describe('🥐 assertGridOptions()', () => {
 	test.each([

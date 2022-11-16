@@ -9,9 +9,9 @@ import {
 	size2coordinate,
 	snapOnMove,
 	snapOnResize
-} from '$lib/utils/item';
+} from '../../src/lib/utils/item';
 
-import type { GridParams, Item, ItemSize, Position, Size } from '$lib/types';
+import type { GridParams, Item, ItemSize, Position, Size } from '../../src/lib/types';
 
 describe('🥐 coordinate2position()', () => {
 	test.each([
