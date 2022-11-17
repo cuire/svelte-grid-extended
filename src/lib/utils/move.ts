@@ -33,7 +33,9 @@ export default function move(
 	node.style.position = 'absolute';
 	node.style.top = `${top}px`;
 	node.style.left = `${left}px`;
-	node.classList.add('svelte-grid-extended-grid-item');
+	node.style.cursor = 'move';
+	node.style.userSelect = 'none';
+	node.style.touchAction = 'none';
 
 	let initialPosition = { left: 0, top: 0 };
 

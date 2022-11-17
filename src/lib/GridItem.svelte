@@ -17,15 +17,15 @@
 
 	export let gridParams: GridParams;
 
-	let classes = '';
+	let classes: string | undefined = undefined;
 
 	export { classes as class };
 
-	export let activeClass = '';
+	export let activeClass: string | undefined = undefined;
 
-	export let previewClass = '';
+	export let previewClass: string | undefined = undefined;
 
-	export let resizerClass = '';
+	export let resizerClass = 'resizer-default';
 
 	let active = false;
 
@@ -102,7 +102,9 @@
 </script>
 
 <div
-	class={`svelte-grid-extended-item ${classes} ${active ? activeClass : ''}`}
+	class={`${classes} ${active ? activeClass : ''}`}
+	class:item-default={!classes}
+	class:active-default={!activeClass && active}
 	use:move={{ position: { left, top } }}
 	on:movestart={start}
 	on:moving={moving}
@@ -111,7 +113,8 @@
 	on:resizestart={start}
 	on:resizing={resizing}
 	on:resizeend={end}
-	style={`left:${left}px; top:${top}px; width: ${width}px; height: ${height}px;`}
+	style={`position: absolute; left:${left}px; top:${top}px; width: ${width}px; height: ${height}px; 
+			cursor: move; touch-action: none; user-select: none;`}
 >
 	<slot />
 </div>
@@ -123,17 +126,22 @@
 	})}
 	<div
 		class={previewClass}
+		class:item-preview-default={!previewClass}
 		style={`position: absolute; left:${preview.left}px; top:${preview.top}px;  
-		width: ${preview.width}px; height: ${preview.height}px;`}
+		width: ${preview.width}px; height: ${preview.height}px; z-index: -10;`}
 	/>
 {/if}
 
 <style>
-	:global(.svelte-grid-extended-item) {
-		cursor: move;
-		user-select: none;
-		touch-action: none;
-		position: absolute;
-		z-index: 1;
+	.item-default {
+		transition: width 0.2s, height 0.2s;
+		transition: transform 0.2s, opacity 0.2s;
+	}
+	.active-default {
+		opacity: 0.7;
+	}
+	.item-preview-default {
+		background-color: rgb(192, 127, 127);
+		transition: all 0.2s;
 	}
 </style>
