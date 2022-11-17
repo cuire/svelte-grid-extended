@@ -18,4 +18,12 @@ export function assertGridOptions(options: GridOptions) {
 	) {
 		throw new Error('If `rows` or `cols` === `0`, the `itemSize` parameter must be specified');
 	}
+
+	if (cols < 0) {
+		throw new Error('`cols` must be greater than or equal to `0`');
+	}
+
+	if (rows < 0) {
+		throw new Error('`rows` must be greater than or equal to `0`');
+	}
 }
