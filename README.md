@@ -24,13 +24,31 @@ With pnpm:
 pnpm install svelte-grid-extended
 ```
 
+
+## Props
+
+List of all available props:
+
+| prop     | description                                                                        | type                                                              | default  |
+| -------- | ---------------------------------------------------------------------------------- | ----------------------------------------------------------------- | -------- |
+| cols     | Grid columns count. If set to 0, grid will grow infinitly. Must be >= 0.           | number                                                            | 0        |
+| rows     | Grid rows count. If set to 0, grid will grow infinitly. Must be >= 0.              | number                                                            | 0        |
+| itemSize | Size of the grid item. If not set, grid will calculate it based on container size. | { width?: number, height?: number }                               | {}       |
+| items    | Array of grid items.                                                               | Array<{ id: string, x: number, y: number, w: number, h: number }> | requried |
+| gap      | Gap between grid items.                                                            | number                                                            | 10       |
+| bounds   | Should grid items be bounded by the grid container.                                | boolean                                                           | false    |
+
+> ⚠️ if `cols` or/and `rows` are set to 0, `itemSize.width` or/and `itemSize.height` must be setted.
+
 ## Usage
 
 - [Basic](#basic)
 - [Static grid](#static-grid)
 - [Grid without bounds](#grid-without-bounds)
 
-### Basic
+### Basic 
+
+✨ [repl](https://svelte.dev/repl/b3e11826a1b54e05aefeb1f9fead15ac?version=3.52.0)
 
 ```html
 <script lang="ts">
@@ -49,12 +67,14 @@ pnpm install svelte-grid-extended
 
 ### Static grid
 
+
 When `cols` or `rows` and `itemsSize` are set, grid becomes static and ignores the size of the container.
 
 It can be set to both dimensions or just one.
 
 
 Both:
+✨ [repl](https://svelte.dev/repl/d38bd9b77ad34f6da278a69fcdc09adf?version=3.52.0)
 
 ```html
 <script lang="ts">
@@ -74,6 +94,7 @@ Both:
 ```
 
 Only rows:
+✨ [repl](https://svelte.dev/repl/3e92c8de8c924a3d9e0cc340063b4381?version=3.52.0)
 
 ```html
 <script lang="ts">
@@ -95,10 +116,11 @@ Only rows:
 
 ### Grid without bounds
 
-When `cols` or `rows` params set to 0, grid grows infinitly. The grid container adapts its width and height to fit all elements.
+When `cols` or/and `rows` set to 0, grid grows infinitly. The grid container adapts its width and height to fit all elements.
 
 It can be set to both dimensions or just one.
 
+✨ [repl](https://svelte.dev/repl/858bb48cc8f8477590b8d45ac0c8891e?version=3.52.0)
 
 ```html
 <script lang="ts">
