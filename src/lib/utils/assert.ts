@@ -10,13 +10,16 @@ export function assertGridOptions(options: GridOptions) {
 	const { cols, rows, itemSize } = options;
 	if (
 		(cols === 0 && itemSize?.width === undefined) ||
+		(typeof cols === 'object' && Object.values(cols).includes(0) && itemSize?.width === undefined)
+	) {
+		throw new Error('If `cols` === `0`, the `itemSize.width` parameter must be specified');
+	}
+
+	if (
 		(rows === 0 && itemSize?.height === undefined) ||
-		(typeof cols === 'object' &&
-			Object.values(cols).includes(0) &&
-			itemSize?.width === undefined) ||
 		(typeof rows === 'object' && Object.values(rows).includes(0) && itemSize?.height === undefined)
 	) {
-		throw new Error('If `rows` or `cols` === `0`, the `itemSize` parameter must be specified');
+		throw new Error('If `rows` === `0`, the `itemSize.height` parameter must be specified');
 	}
 
 	if (cols < 0) {

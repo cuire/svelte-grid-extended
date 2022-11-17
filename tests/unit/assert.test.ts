@@ -13,7 +13,7 @@ describe('🥐 assertGridOptions()', () => {
 		{ cols: 10, rows: { md: 0 }, itemSize: {} },
 		{ cols: 10, rows: { md: 0 }, itemSize: { width: 10 } }
 	])('%o should throw', (options: GridOptions) => {
-		expect(() => assertGridOptions(options)).toThrow('`itemSize` parameter must be specified');
+		expect(() => assertGridOptions(options)).toThrow('parameter must be specified');
 	});
 
 	test.each([
