@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 
+	import './default.css';
 	import GridItem from './GridItem.svelte';
 	import { assertGridOptions } from './utils/assert';
 	import { findGridSize } from './utils/breakpoints';
@@ -37,11 +38,11 @@
 
 	export { classes as class };
 
-	export let itemClass = 'item-default';
+	export let itemClass: string | undefined = undefined;
 
-	export let itemActiveClass = 'active-default';
+	export let itemActiveClass: string | undefined = undefined;
 
-	export let itemPreviewClass = 'item-preview-default';
+	export let itemPreviewClass: string | undefined = undefined;
 
 	export let itemResizerClass = 'resizer-default';
 
@@ -134,7 +135,7 @@
 	{#if _itemSize && _cols && _rows}
 		{#each items as item}
 			<GridItem
-				class={itemClass}
+				class={itemClass ?? ''}
 				{item}
 				gridParams={{
 					itemSize: _itemSize,
@@ -163,40 +164,7 @@
 </div>
 
 <style>
-	:global(.svelte-grid-extended) {
+	.svelte-grid-extended {
 		position: relative !important;
-	}
-	:global(.svelte-grid-extended > .item-default) {
-		transition: width 0.2s, height 0.2s;
-		transition: transform 0.2s, opacity 0.2s;
-	}
-	:global(.svelte-grid-extended > .item-default.active-default) {
-		opacity: 0.5;
-	}
-	:global(.svelte-grid-extended .item-preview-default) {
-		background-color: rgb(192, 127, 127);
-		transition: all 0.2s;
-	}
-	:global(.svelte-grid-extended .resizer-default) {
-		cursor: move;
-		user-select: none;
-		touch-action: none;
-		position: absolute;
-		user-select: none;
-		width: 20px;
-		height: 20px;
-		right: 0;
-		bottom: 0;
-		cursor: se-resize;
-	}
-	:global(.svelte-grid-extended .resizer-default::after) {
-		content: '';
-		position: absolute;
-		right: 3px;
-		bottom: 3px;
-		width: 5px;
-		height: 5px;
-		border-right: 2px solid rgba(0, 0, 0, 0.4);
-		border-bottom: 2px solid rgba(0, 0, 0, 0.4);
 	}
 </style>

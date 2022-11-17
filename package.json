@@ -1,6 +1,6 @@
 {
 	"name": "svelte-grid-extended",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "A draggable and resizable grid layout, for Svelte",
 	"repository": "https://github.com/cuire/svelte-grid-extended",
 	"scripts": {
@@ -12,7 +12,8 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --check . && eslint .",
-		"format": "prettier --write ."
+		"format": "prettier --write .",
+		"prepare": "husky install"
 	},
 	"keywords": [
 		"svelte",
@@ -52,7 +53,8 @@
 		"tslib": "^2.3.1",
 		"typescript": "^4.7.4",
 		"vite": "^3.1.0",
-		"vitest": "^0.23.4"
+		"vitest": "^0.23.4",
+		"husky": "^8.0.0"
 	},
 	"type": "module"
 }
