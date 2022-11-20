@@ -1,5 +1,5 @@
 import Grid from './Grid.svelte';
-import type { Item } from './types';
+import type { Layout, LayoutItem } from './types';
 
-export { Grid, type Item };
+export { Grid, type Layout, type LayoutItem };
 export default Grid;

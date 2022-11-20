@@ -1,4 +1,4 @@
-import type { GridParams, Item, ItemPosition, ItemSize, Position, Size } from '$lib/types';
+import type { GridParams, LayoutItem, ItemPosition, ItemSize, Position, Size } from '$lib/types';
 
 export function coordinate2position(coordinate: number, cellSize: number, gap: number): number {
 	return coordinate * cellSize + (coordinate + 1) * gap;
@@ -19,7 +19,7 @@ export function size2coordinate(size: number, cellSize: number, gap: number): nu
 export function snapOnMove(
 	left: number,
 	top: number,
-	item: Item,
+	item: LayoutItem,
 	gridParams: GridParams
 ): Position {
 	const { itemSize, gap } = gridParams;
@@ -37,7 +37,7 @@ export function snapOnMove(
 export function snapOnResize(
 	width: number,
 	height: number,
-	item: Item,
+	item: LayoutItem,
 	gridParams: GridParams
 ): Size {
 	const { itemSize, gap } = gridParams;
@@ -53,7 +53,7 @@ export function snapOnResize(
 }
 
 export function calcPosition(
-	item: Item,
+	item: LayoutItem,
 	options: { itemSize: ItemSize; gap: number }
 ): ItemPosition & ItemSize {
 	const { itemSize, gap } = options;

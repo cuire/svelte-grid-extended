@@ -6,7 +6,7 @@
 	import { findGridSize } from './utils/breakpoints';
 	import { getGridDimensions } from './utils/grid';
 
-	import type { Breakpoints, ItemSize, GridSize, Item } from './types';
+	import type { Breakpoints, ItemSize, GridSize, LayoutItem } from './types';
 
 	export let cols: GridSize = 0;
 
@@ -20,12 +20,12 @@
 
 	interface $$Slots {
 		default: {
-			item: Item<T>;
+			item: LayoutItem<T>;
 		};
 		loader: Record<string, never>;
 	}
 
-	export let items: Item<T>[];
+	export let items: LayoutItem<T>[];
 
 	export let breakpoints: Breakpoints = {
 		xxl: 1536,
@@ -101,7 +101,7 @@
 		items = [...items];
 	}
 
-	function updateGridDimensions(event: CustomEvent<{ item: Item }>) {
+	function updateGridDimensions(event: CustomEvent<{ item: LayoutItem }>) {
 		const { item } = event.detail;
 		calculatedGridSize = getGridDimensions([...items.filter((i) => i.id !== item.id), item]);
 	}

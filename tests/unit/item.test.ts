@@ -11,7 +11,7 @@ import {
 	snapOnResize
 } from '../../src/lib/utils/item';
 
-import type { GridParams, Item, ItemSize, Position, Size } from '../../src/lib/types';
+import type { GridParams, LayoutItem, ItemSize, Position, Size } from '../../src/lib/types';
 
 describe('🥐 coordinate2position()', () => {
 	test.each([
@@ -160,8 +160,8 @@ const gridParams: GridParams = {
 };
 
 describe('🥥 snapOnMove()', () => {
-	const item1x1: Item = { id: '0', x: 0, y: 0, w: 1, h: 1 };
-	const item4x4: Item = { id: '0', x: 0, y: 0, w: 4, h: 4 };
+	const item1x1: LayoutItem = { id: '0', x: 0, y: 0, w: 1, h: 1 };
+	const item4x4: LayoutItem = { id: '0', x: 0, y: 0, w: 4, h: 4 };
 
 	test.each([
 		[0, 0, item1x1, gridParams, { x: 0, y: 0 }],
@@ -182,7 +182,7 @@ describe('🥥 snapOnMove()', () => {
 		[600, 600, item1x1, gridParams, { x: 6, y: 6 }]
 	])(
 		'should find the correct position %dx%d for item 1x1',
-		(left: number, top: number, item: Item, gridParams: GridParams, expected: Position) => {
+		(left: number, top: number, item: LayoutItem, gridParams: GridParams, expected: Position) => {
 			expect(snapOnMove(left, top, item, gridParams)).toEqual(expected);
 		}
 	);
@@ -206,15 +206,15 @@ describe('🥥 snapOnMove()', () => {
 		[600, 600, item4x4, gridParams, { x: 4, y: 4 }]
 	])(
 		'should find the correct position %dx%d for item4x4',
-		(left: number, top: number, item: Item, gridParams: GridParams, expected: Position) => {
+		(left: number, top: number, item: LayoutItem, gridParams: GridParams, expected: Position) => {
 			expect(snapOnMove(left, top, item, gridParams)).toEqual(expected);
 		}
 	);
 });
 
 describe('🍍 snapOnResize()', () => {
-	const itemX1Y1: Item = { id: '0', x: 1, y: 1, w: 1, h: 1 };
-	const itemX4Y4: Item = { id: '0', x: 4, y: 4, w: 1, h: 1 };
+	const itemX1Y1: LayoutItem = { id: '0', x: 1, y: 1, w: 1, h: 1 };
+	const itemX4Y4: LayoutItem = { id: '0', x: 4, y: 4, w: 1, h: 1 };
 
 	test.each([
 		[100, 100, itemX1Y1, gridParams, { w: 1, h: 1 }],
@@ -235,7 +235,7 @@ describe('🍍 snapOnResize()', () => {
 		[600, 600, itemX1Y1, gridParams, { w: 6, h: 6 }]
 	])(
 		'should find the correct size %dx%d for itemX1Y1',
-		(width: number, height: number, item: Item, gridParams: GridParams, expected: Size) => {
+		(width: number, height: number, item: LayoutItem, gridParams: GridParams, expected: Size) => {
 			expect(snapOnResize(width, height, item, gridParams)).toEqual(expected);
 		}
 	);
@@ -259,14 +259,14 @@ describe('🍍 snapOnResize()', () => {
 		[1200, 1200, itemX4Y4, gridParams, { w: 4, h: 4 }]
 	])(
 		'should find the correct size %dx%d for itemX4Y4',
-		(width: number, height: number, item: Item, gridParams: GridParams, expected: Size) => {
+		(width: number, height: number, item: LayoutItem, gridParams: GridParams, expected: Size) => {
 			expect(snapOnResize(width, height, item, gridParams)).toEqual(expected);
 		}
 	);
 });
 
 describe('🫑 calcPosition()', () => {
-	const item: Item = { id: '0', x: 1, y: 1, w: 1, h: 1 };
+	const item: LayoutItem = { id: '0', x: 1, y: 1, w: 1, h: 1 };
 	const itemSize: ItemSize = { width: 100, height: 100 };
 	const gap = 0;
 

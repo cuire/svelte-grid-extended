@@ -1,8 +1,8 @@
 <script lang="ts">
 	import Grid from '$lib';
-	import type { Item } from '$lib/types';
+	import type { Layout } from '$lib';
 
-	const items: Item<{ text: string }>[] = [
+	const items: Layout<{ text: string }> = [
 		{ id: '0', x: 6, y: 0, w: 2, h: 2, data: { text: '🎅' } },
 		{ id: '1', x: 6, y: 2, w: 2, h: 2, data: { text: '🤶' } },
 		{ id: '2', x: 4, y: 0, w: 2, h: 2, data: { text: '🦌' } },

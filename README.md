@@ -37,15 +37,15 @@ List of all available props:
 | cols     | Grid columns count. If set to 0, grid will grow infinitly. Must be >= 0.           | number                              | 0        |
 | rows     | Grid rows count. If set to 0, grid will grow infinitly. Must be >= 0.              | number                              | 0        |
 | itemSize | Size of the grid item. If not set, grid will calculate it based on container size. | { width?: number, height?: number } | {}       |
-| items    | Array of grid items.                                                               | [Item[]\<T\>](#item-type)           | requried |
+| items    | Array of grid items.                                                               | [Layout\<T\>](#layout-type)         | requried |
 | gap      | Gap between grid items.                                                            | number                              | 10       |
 | bounds   | Should grid items be bounded by the grid container.                                | boolean                             | false    |
 
 > ⚠️ if `cols` or/and `rows` are set to 0, `itemSize.width` or/and `itemSize.height` must be setted.
 
-### Item[] type
+### Layout
 
-`Item[]<T>` are represented as an array of objects, which must have the following properties:
+`Layout<T>` are represented as an array of objects, items of which must have the following properties:
 
 | prop | description                                                         | type   | default   |
 | ---- | ------------------------------------------------------------------- | ------ | --------- |

@@ -6,14 +6,14 @@
 	import { coordinate2size, calcPosition, snapOnMove, snapOnResize } from './utils/item';
 	import { hasCollisions } from './utils/grid';
 
-	import type { Item, ItemSize, ItemPosition, GridParams } from './types';
+	import type { LayoutItem, ItemSize, ItemPosition, GridParams } from './types';
 
 	const dispatch = createEventDispatcher<{
-		itemchange: { item: Item };
-		previewchange: { item: Item };
+		itemchange: { item: LayoutItem };
+		previewchange: { item: LayoutItem };
 	}>();
 
-	export let item: Item;
+	export let item: LayoutItem;
 
 	export let gridParams: GridParams;
 
@@ -67,7 +67,7 @@
 		};
 	}
 
-	let previewItem: Item = item;
+	let previewItem: LayoutItem = item;
 
 	$: previewItem, dispatch('previewchange', { item: previewItem });
 
