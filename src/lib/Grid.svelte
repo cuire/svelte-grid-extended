@@ -67,7 +67,7 @@
 
 	$: if (typeof rows === 'number') _rows = rows;
 
-	$: if (itemSize?.width && itemSize?.height) _itemSize = itemSize as ItemSize;
+	$: if (itemSize?.width && itemSize?.height) _itemSize = { ...itemSize } as ItemSize;
 
 	$: if (itemSize?.width && _itemSize?.width) containerWidth = _cols * (_itemSize.width + gap + 1);
 
@@ -108,7 +108,7 @@
 			const height = entry.contentRect.height;
 
 			_cols = findGridSize(cols, width, breakpoints);
-			_rows = findGridSize(rows, width, breakpoints);
+			_rows = findGridSize(rows, height, breakpoints);
 
 			shouldExpandCols = _cols === 0;
 			shouldExpandRows = _rows === 0;

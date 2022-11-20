@@ -29,10 +29,24 @@
 
 	let active = false;
 
-	$: ({ left, top, width, height } = calcPosition(item, {
-		itemSize: gridParams.itemSize,
-		gap: gridParams.gap
-	}));
+	let left: number;
+
+	let top: number;
+
+	let width: number;
+
+	let height: number;
+
+	$: if (!active) {
+		const newPosition = calcPosition(item, {
+			itemSize: gridParams.itemSize,
+			gap: gridParams.gap
+		});
+		left = newPosition.left;
+		top = newPosition.top;
+		width = newPosition.width;
+		height = newPosition.height;
+	}
 
 	let min: ItemSize;
 
