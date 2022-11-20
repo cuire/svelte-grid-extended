@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 
-	import './default.css';
 	import GridItem from './GridItem.svelte';
 	import { assertGridOptions } from './utils/assert';
 	import { findGridSize } from './utils/breakpoints';
@@ -166,5 +165,27 @@
 <style>
 	.svelte-grid-extended {
 		position: relative !important;
+	}
+
+	:global(.svelte-grid-extended .resizer-default) {
+		user-select: none;
+		touch-action: none;
+		position: absolute;
+		user-select: none;
+		width: 20px;
+		height: 20px;
+		right: 0;
+		bottom: 0;
+		cursor: se-resize;
+	}
+	:global(.svelte-grid-extended .resizer-default::after) {
+		content: '';
+		position: absolute;
+		right: 3px;
+		bottom: 3px;
+		width: 5px;
+		height: 5px;
+		border-right: 2px solid rgba(0, 0, 0, 0.4);
+		border-bottom: 2px solid rgba(0, 0, 0, 0.4);
 	}
 </style>
