@@ -1,11 +1,11 @@
 import type { RequireAtLeastOne } from '$lib/utils/types';
 
-export type Item = Size &
+export type Item<T = unknown> = Size &
 	Position & {
 		id: string;
 		min?: Size;
 		max?: Size;
-	};
+	} & (T extends undefined ? { data: T } : { data?: T });
 
 export type Size = { w: number; h: number };
 

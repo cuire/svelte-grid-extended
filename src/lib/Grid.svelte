@@ -16,7 +16,16 @@
 
 	export let gap = 10;
 
-	export let items: Item[];
+	type T = $$Generic;
+
+	interface $$Slots {
+		default: {
+			item: Item<T>;
+		};
+		loader: Record<string, never>;
+	}
+
+	export let items: Item<T>[];
 
 	export let breakpoints: Breakpoints = {
 		xxl: 1536,

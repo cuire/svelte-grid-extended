@@ -32,16 +32,29 @@ pnpm install svelte-grid-extended
 
 List of all available props:
 
-| prop     | description                                                                        | type                                                              | default  |
-| -------- | ---------------------------------------------------------------------------------- | ----------------------------------------------------------------- | -------- |
-| cols     | Grid columns count. If set to 0, grid will grow infinitly. Must be >= 0.           | number                                                            | 0        |
-| rows     | Grid rows count. If set to 0, grid will grow infinitly. Must be >= 0.              | number                                                            | 0        |
-| itemSize | Size of the grid item. If not set, grid will calculate it based on container size. | { width?: number, height?: number }                               | {}       |
-| items    | Array of grid items.                                                               | Array<{ id: string, x: number, y: number, w: number, h: number }> | requried |
-| gap      | Gap between grid items.                                                            | number                                                            | 10       |
-| bounds   | Should grid items be bounded by the grid container.                                | boolean                                                           | false    |
+| prop     | description                                                                        | type                                | default  |
+| -------- | ---------------------------------------------------------------------------------- | ----------------------------------- | -------- |
+| cols     | Grid columns count. If set to 0, grid will grow infinitly. Must be >= 0.           | number                              | 0        |
+| rows     | Grid rows count. If set to 0, grid will grow infinitly. Must be >= 0.              | number                              | 0        |
+| itemSize | Size of the grid item. If not set, grid will calculate it based on container size. | { width?: number, height?: number } | {}       |
+| items    | Array of grid items.                                                               | [Item[]\<T\>](#item-type)           | requried |
+| gap      | Gap between grid items.                                                            | number                              | 10       |
+| bounds   | Should grid items be bounded by the grid container.                                | boolean                             | false    |
 
 > ⚠️ if `cols` or/and `rows` are set to 0, `itemSize.width` or/and `itemSize.height` must be setted.
+
+### Item[] type
+
+`Item[]<T>` are represented as an array of objects, which must have the following properties:
+
+| prop | description                                                         | type   | default   |
+| ---- | ------------------------------------------------------------------- | ------ | --------- |
+| id   | Unique id of the item. Used to compare items during collision tests | string | requried  |
+| x    | X position of the item in grid units.                               | number | requried  |
+| y    | Y position of the item in grid units.                               | number | requried  |
+| w    | Width of the item in grid units.                                    | number | requried  |
+| h    | Height of the item in grid units.                                   | number | requried  |
+| data | Custom attributes. 🦌                                               | T      | undefined |
 
 ## Usage
 
