@@ -7,6 +7,7 @@
 	import { hasCollisions } from './utils/grid';
 
 	import type { LayoutItem, ItemSize, ItemPosition, GridParams } from './types';
+	import Grid from './Grid.svelte';
 
 	const dispatch = createEventDispatcher<{
 		itemchange: { item: LayoutItem };
@@ -71,6 +72,15 @@
 
 	$: previewItem, dispatch('previewchange', { item: previewItem });
 
+	const movable = !gridParams.readOnly && item.movable === undefined && item.movable !== false;
+
+	const resizable =
+		!gridParams.readOnly && item.resizable === undefined && item.resizable !== false;
+
+	const moveAction = movable ? move : () => {};
+
+	const resizeAction = resizable ? resize : () => {};
+
 	function start() {
 		active = true;
 	}
@@ -119,16 +129,16 @@
 	class={`${classes} ${active ? activeClass : ''}`}
 	class:item-default={!classes}
 	class:active-default={!activeClass && active}
-	use:move={{ position: { left, top } }}
+	use:moveAction={{ position: { left, top } }}
 	on:movestart={start}
 	on:moving={moving}
 	on:moveend={end}
-	use:resize={{ min, max, resizerClass, bounds: gridParams.bounds }}
+	use:resizeAction={{ min, max, resizerClass, bounds: gridParams.bounds }}
 	on:resizestart={start}
 	on:resizing={resizing}
 	on:resizeend={end}
 	style={`position: absolute; left:${left}px; top:${top}px; width: ${width}px; height: ${height}px; 
-			cursor: move; touch-action: none; user-select: none;`}
+			${movable ? 'cursor: move;' : ''} touch-action: none; user-select: none;`}
 >
 	<slot />
 </div>

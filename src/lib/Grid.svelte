@@ -40,6 +40,8 @@
 
 	export let bounds = false;
 
+	export let readOnly = false;
+
 	export let debug = false;
 
 	let classes = '';
@@ -151,7 +153,8 @@
 					maxCols,
 					maxRows,
 					bounds,
-					items
+					items,
+					readOnly
 				}}
 				activeClass={itemActiveClass}
 				previewClass={itemPreviewClass}

@@ -5,6 +5,8 @@ export type LayoutItem<T = unknown> = Size &
 		id: string;
 		min?: Size;
 		max?: Size;
+		movable?: boolean;
+		resizable?: boolean;
 	} & (T extends undefined ? { data: T } : { data?: T });
 
 export type Layout<T = unknown> = LayoutItem<T>[];
@@ -34,4 +36,5 @@ export type GridParams = {
 	maxRows: number;
 	bounds: boolean;
 	items: LayoutItem[];
+	readOnly: boolean;
 };
