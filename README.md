@@ -30,7 +30,7 @@ pnpm install svelte-grid-extended
 
 ## Props
 
-List of all available props:
+### Main props
 
 | prop     | description                                                                        | type                                | default  |
 | -------- | ---------------------------------------------------------------------------------- | ----------------------------------- | -------- |
@@ -56,11 +56,47 @@ List of all available props:
 | h    | Height of the item in grid units.                                   | number | requried  |
 | data | Custom attributes. 🦌                                               | T      | undefined |
 
+### Style related props:
+
+Component can be styled with css framework of your choice or with global classes. To do so, you can use the following props:
+
+- `class` - class name for grid container.
+- `itemClass` - class name for grid item.
+- `itemActiveClass` - class name that applies when item is currently being dragged or resized. By default, it is used to make active grid item transparent.
+- `itemPreviewClass` - class name for preview where item will be placed after interaction.
+- `resizerClass` - class name for item's resize handle.
+
+To understand how to use these props, look at `<Grid />` component simplified structure.
+
+> 📄 `active` is variable that indicates if grid item is currently being dragged or resized:
+
+```svelte
+<!-- Grid -->
+<div class={class}>
+	<!-- GridItem -->
+	<div class={itemClass} class:itemActiveClass={active}>
+		<slot />
+		<!-- Resizer -->
+		<div class={resizerClass} />
+		<!-- Resizer -->
+	</div>
+
+	{#if active}
+		<!-- GridItemGhost -->
+		<div class={itemPreviewClass} />
+	{/if}
+
+	<!-- /GridItem -->
+</div>
+<!-- /Grid -->
+```
+
 ## Usage
 
 - [Basic](#basic)
 - [Static grid](#static-grid)
 - [Grid without bounds](#grid-without-bounds)
+- [Styling](#styling)
 
 ### Basic
 
@@ -150,4 +186,55 @@ It can be set to both dimensions or just one.
 <Grid {items} {itemSize} cols={0} rows={0}>
 	<div>Content</div>
 </Grid>
+```
+
+### Styling
+
+Grid can be styled with classes passed to various props. Check [Style related props](#style-related-props) section for more info.
+
+✨ [repl](https://svelte.dev/repl/b158b6fbb2234241b7ea9737b7e2fc24?version=3.53.1)
+
+```svelte
+<script lang="ts">
+	import Grid from 'svelte-grid-extended';
+
+	const items = [
+		{ id: '0', x: 0, y: 0, w: 1, h: 1 },
+		{ id: '1', x: 0, y: 1, w: 1, h: 1 }
+	];
+</script>
+
+<Grid
+	{items}
+	class="grid-container"
+	itemClass="grid-item"
+	itemActiveClass="grid-item-active"
+	itemPreviewClass="bg-red-500 rounded"
+>
+	<div>Content</div>
+</Grid>
+
+<style>
+	:global(.grid-container) {
+		opacity: 0.7;
+	}
+
+	:global(.grid-item) {
+		transition: width 4s, height 4s;
+		transition: transform 4s, opacity 4s;
+	}
+
+	:global(.grid-item-active) {
+		opacity: 0.1;
+	}
+
+	/* tailwind classes */
+	:global(.bg-red-500) {
+		background-color: rgb(202, 33, 33);
+	}
+
+	:global(.rounded) {
+		border-radius: 0.25rem;
+	}
+</style>
 ```
