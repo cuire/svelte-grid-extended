@@ -7,7 +7,6 @@
 	import { hasCollisions } from './utils/grid';
 
 	import type { LayoutItem, ItemSize, ItemPosition, GridParams } from './types';
-	import Grid from './Grid.svelte';
 
 	const dispatch = createEventDispatcher<{
 		itemchange: { item: LayoutItem };
@@ -77,9 +76,17 @@
 	const resizable =
 		!gridParams.readOnly && item.resizable === undefined && item.resizable !== false;
 
-	const moveAction = movable ? move : () => {};
+	const moveAction = movable
+		? move
+		: () => {
+				// do nothing
+		  };
 
-	const resizeAction = resizable ? resize : () => {};
+	const resizeAction = resizable
+		? resize
+		: () => {
+				// do nothing
+		  };
 
 	function start() {
 		active = true;
