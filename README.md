@@ -57,7 +57,7 @@ pnpm install svelte-grid-extended
 | h         | Height of the item in grid units.                                   | number  | requried  |
 | movable   | If true, item can be moved by user.                                 | boolean | true      |
 | resizable | If true, item can be resized by user.                               | boolean | true      |
-| data      | Custom attributes. 🦌                                                | T       | undefined |
+| data      | Custom attributes. 🦌                                               | T       | undefined |
 
 ### Style related props:
 
@@ -245,7 +245,7 @@ Grid can be styled with classes passed to various props. Check [Style related pr
 
 ### Disable interactions
 
-To disable interactions, set `readOnly` prop to `true`. Or set `movable` and/or `resizable` to `false` on specific item. 
+To disable interactions, set `readOnly` prop to `true`. Or set `movable` and/or `resizable` to `false` on specific item.
 
 Read Only grid: ✨ [repl](https://svelte.dev/repl/29ce85a23a714c51b6638f12f5ecdd7c?version=3.53.1)
 
@@ -272,13 +272,11 @@ Make item non-interactive: ✨ [repl](https://svelte.dev/repl/1b3b9b9b9b9b9b9b9b
 
 	const items = [
 		{ id: '0', x: 0, y: 0, w: 1, h: 1, movable: false },
-		{ id: '1', x: 0, y: 1, w: 1, h: 1, movable: false, resizable: false}
+		{ id: '1', x: 0, y: 1, w: 1, h: 1, movable: false, resizable: false }
 	];
 </script>
 
 <Grid {items} cols={10} rows={10}>
 	<div>Content</div>
 </Grid>
-
 ```
-
