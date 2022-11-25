@@ -1,11 +1,15 @@
 import type { RequireAtLeastOne } from '$lib/utils/types';
 
-export type Item = Size &
+export type LayoutItem<T = unknown> = Size &
 	Position & {
 		id: string;
 		min?: Size;
 		max?: Size;
-	};
+		movable?: boolean;
+		resizable?: boolean;
+	} & (T extends undefined ? { data: T } : { data?: T });
+
+export type Layout<T = unknown> = LayoutItem<T>[];
 
 export type Size = { w: number; h: number };
 
@@ -31,5 +35,6 @@ export type GridParams = {
 	maxCols: number;
 	maxRows: number;
 	bounds: boolean;
-	items: Item[];
+	items: LayoutItem[];
+	readOnly: boolean;
 };

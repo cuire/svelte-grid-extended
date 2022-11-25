@@ -1,6 +1,6 @@
-import type { GridDimensions, Item } from '$lib/types';
+import type { GridDimensions, LayoutItem } from '$lib/types';
 
-export function isItemColliding(item: Item, otherItem: Item): boolean {
+export function isItemColliding(item: LayoutItem, otherItem: LayoutItem): boolean {
 	return (
 		item.id !== otherItem.id &&
 		item.x <= otherItem.x + otherItem.w - 1 &&
@@ -10,15 +10,15 @@ export function isItemColliding(item: Item, otherItem: Item): boolean {
 	);
 }
 
-export function getCollisions(currentItem: Item, items: Item[]): Item[] {
+export function getCollisions(currentItem: LayoutItem, items: LayoutItem[]): LayoutItem[] {
 	return items.filter((item) => isItemColliding(currentItem, item));
 }
 
-export function hasCollisions(currentItem: Item, items: Item[]): boolean {
+export function hasCollisions(currentItem: LayoutItem, items: LayoutItem[]): boolean {
 	return items.some((item) => isItemColliding(currentItem, item));
 }
 
-export function getGridDimensions(items: Item[]): GridDimensions {
+export function getGridDimensions(items: LayoutItem[]): GridDimensions {
 	const cols = Math.max(...items.map((item) => item.x + item.w), 1);
 	const rows = Math.max(...items.map((item) => item.y + item.h), 1);
 

@@ -7,7 +7,7 @@ import {
 	isItemColliding
 } from '../../src/lib/utils/grid';
 
-import type { Item } from '../../src/lib/types';
+import type { LayoutItem } from '../../src/lib/types';
 
 /**
  * Grid with shape:\
@@ -17,7 +17,7 @@ import type { Item } from '../../src/lib/types';
  * |  7 ~ ~ ~ |\
  * Where ~ is empty spot
  */
-const items: Item[] = [
+const items: LayoutItem[] = [
 	{ id: '0', x: 0, y: 0, w: 1, h: 1 },
 	{ id: '1', x: 1, y: 0, w: 1, h: 1 },
 	{ id: '2', x: 2, y: 0, w: 1, h: 1 },

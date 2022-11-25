@@ -6,14 +6,14 @@
 	import { coordinate2size, calcPosition, snapOnMove, snapOnResize } from './utils/item';
 	import { hasCollisions } from './utils/grid';
 
-	import type { Item, ItemSize, ItemPosition, GridParams } from './types';
+	import type { LayoutItem, ItemSize, ItemPosition, GridParams } from './types';
 
 	const dispatch = createEventDispatcher<{
-		itemchange: { item: Item };
-		previewchange: { item: Item };
+		itemchange: { item: LayoutItem };
+		previewchange: { item: LayoutItem };
 	}>();
 
-	export let item: Item;
+	export let item: LayoutItem;
 
 	export let gridParams: GridParams;
 
@@ -29,10 +29,24 @@
 
 	let active = false;
 
-	$: ({ left, top, width, height } = calcPosition(item, {
-		itemSize: gridParams.itemSize,
-		gap: gridParams.gap
-	}));
+	let left: number;
+
+	let top: number;
+
+	let width: number;
+
+	let height: number;
+
+	$: if (!active) {
+		const newPosition = calcPosition(item, {
+			itemSize: gridParams.itemSize,
+			gap: gridParams.gap
+		});
+		left = newPosition.left;
+		top = newPosition.top;
+		width = newPosition.width;
+		height = newPosition.height;
+	}
 
 	let min: ItemSize;
 
@@ -53,9 +67,26 @@
 		};
 	}
 
-	let previewItem: Item = item;
+	let previewItem: LayoutItem = item;
 
 	$: previewItem, dispatch('previewchange', { item: previewItem });
+
+	const movable = !gridParams.readOnly && item.movable === undefined && item.movable !== false;
+
+	const resizable =
+		!gridParams.readOnly && item.resizable === undefined && item.resizable !== false;
+
+	const moveAction = movable
+		? move
+		: () => {
+				// do nothing
+		  };
+
+	const resizeAction = resizable
+		? resize
+		: () => {
+				// do nothing
+		  };
 
 	function start() {
 		active = true;
@@ -105,16 +136,16 @@
 	class={`${classes} ${active ? activeClass : ''}`}
 	class:item-default={!classes}
 	class:active-default={!activeClass && active}
-	use:move={{ position: { left, top } }}
+	use:moveAction={{ position: { left, top } }}
 	on:movestart={start}
 	on:moving={moving}
 	on:moveend={end}
-	use:resize={{ min, max, resizerClass, bounds: gridParams.bounds }}
+	use:resizeAction={{ min, max, resizerClass, bounds: gridParams.bounds }}
 	on:resizestart={start}
 	on:resizing={resizing}
 	on:resizeend={end}
 	style={`position: absolute; left:${left}px; top:${top}px; width: ${width}px; height: ${height}px; 
-			cursor: move; touch-action: none; user-select: none;`}
+			${movable ? 'cursor: move;' : ''} touch-action: none; user-select: none;`}
 >
 	<slot />
 </div>
