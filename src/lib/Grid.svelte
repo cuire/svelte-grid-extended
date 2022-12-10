@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { createEventDispatcher, onMount } from 'svelte';
 
 	import GridItem from './GridItem.svelte';
 	import { assertGridOptions } from './utils/assert';
@@ -7,6 +7,10 @@
 	import { getGridDimensions } from './utils/grid';
 
 	import type { Breakpoints, ItemSize, GridSize, LayoutItem } from './types';
+
+	const dispatch = createEventDispatcher<{
+		change: { item: LayoutItem };
+	}>();
 
 	export let cols: GridSize = 0;
 
@@ -99,7 +103,8 @@
 		maxRows = shouldExpandRows ? Infinity : _rows;
 	}
 
-	function updateGrid() {
+	function handleItemChange(event: CustomEvent<{ item: LayoutItem }>) {
+		dispatch('change', { item: event.detail.item });
 		items = [...items];
 	}
 
@@ -159,7 +164,7 @@
 				activeClass={itemActiveClass}
 				previewClass={itemPreviewClass}
 				resizerClass={itemResizerClass}
-				on:itemchange={updateGrid}
+				on:itemchange={handleItemChange}
 				on:previewchange={updateGridDimensions}
 			>
 				<slot {item} />
