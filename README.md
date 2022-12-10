@@ -57,7 +57,7 @@ pnpm install svelte-grid-extended
 | h         | Height of the item in grid units.                                   | number  | requried  |
 | movable   | If true, item can be moved by user.                                 | boolean | true      |
 | resizable | If true, item can be resized by user.                               | boolean | true      |
-| data      | Custom attributes. 🦌                                                | T       | undefined |
+| data      | Custom attributes. 🦌                                               | T       | undefined |
 
 ### Style related props:
 
@@ -102,7 +102,6 @@ Grid emits the following events:
 | ---------- | ------------------------------------ | ------------------ |
 | change     | Emitted when grid items are changed. | {item: LayoutItem} |
 
-
 ```svelte
 <script lang="ts">
 	import Grid from 'svelte-grid-extended';
@@ -120,7 +119,6 @@ Grid emits the following events:
 <Grid {items} cols={10} rows={10} on:change={hanleGridChange}>
 	<div>Content</div>
 </Grid>
-
 ```
 
 ## Usage
