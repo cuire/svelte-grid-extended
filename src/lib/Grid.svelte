@@ -58,7 +58,7 @@
 
 	export let itemPreviewClass: string | undefined = undefined;
 
-	export let itemResizerClass = 'resizer-default';
+	export let itemResizerClass: string | undefined = undefined;
 
 	let _itemSize: ItemSize;
 
@@ -158,6 +158,7 @@
 					maxCols,
 					maxRows,
 					bounds,
+					boundsTo: gridContainer,
 					items,
 					readOnly
 				}}
@@ -182,27 +183,5 @@
 <style>
 	.svelte-grid-extended {
 		position: relative !important;
-	}
-
-	:global(.svelte-grid-extended .resizer-default) {
-		user-select: none;
-		touch-action: none;
-		position: absolute;
-		user-select: none;
-		width: 20px;
-		height: 20px;
-		right: 0;
-		bottom: 0;
-		cursor: se-resize;
-	}
-	:global(.svelte-grid-extended .resizer-default::after) {
-		content: '';
-		position: absolute;
-		right: 3px;
-		bottom: 3px;
-		width: 5px;
-		height: 5px;
-		border-right: 2px solid rgba(0, 0, 0, 0.4);
-		border-bottom: 2px solid rgba(0, 0, 0, 0.4);
 	}
 </style>

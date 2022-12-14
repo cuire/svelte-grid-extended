@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 
-	import move from './utils/move';
-	import resize from './utils/resize';
 	import { coordinate2size, calcPosition, snapOnMove, snapOnResize } from './utils/item';
 	import { hasCollisions } from './utils/grid';
 
@@ -25,7 +23,7 @@
 
 	export let previewClass: string | undefined = undefined;
 
-	export let resizerClass = 'resizer-default';
+	export let resizerClass: string | undefined = undefined;
 
 	let active = false;
 
@@ -48,6 +46,70 @@
 		height = newPosition.height;
 	}
 
+	let previewItem: LayoutItem = item;
+
+	$: previewItem, dispatch('previewchange', { item: previewItem });
+
+	function applyPreview() {
+		active = false;
+		item.x = previewItem.x;
+		item.y = previewItem.y;
+		item.w = previewItem.w;
+		item.h = previewItem.h;
+		dispatch('itemchange', { item });
+	}
+
+	// MOVE ITEM LOGIC
+
+	$: movable = !gridParams.readOnly && item.movable === undefined && item.movable !== false;
+
+	function moveStart(event: PointerEvent) {
+		if (!movable) return;
+		if (event.button !== 0) return;
+		active = true;
+		window.addEventListener('pointermove', move);
+		window.addEventListener('pointerup', moveEnd);
+	}
+
+	function move(event: PointerEvent) {
+		left += event.movementX;
+		top += event.movementY;
+
+		if (gridParams.bounds) {
+			const parentRect = gridParams.boundsTo.getBoundingClientRect();
+			if (left < parentRect.left) {
+				left = parentRect.left;
+			}
+			if (top < parentRect.top) {
+				top = parentRect.top;
+			}
+			if (left + width > parentRect.right) {
+				left = parentRect.right - width;
+			}
+			if (top + height > parentRect.bottom) {
+				top = parentRect.bottom - height;
+			}
+		}
+
+		if (
+			Math.abs(left - item.w * gridParams.itemSize.width) > gridParams.itemSize.width / 8 ||
+			Math.abs(top - item.h * gridParams.itemSize.height) > gridParams.itemSize.height / 8
+		) {
+			const { x, y } = snapOnMove(left, top, previewItem, gridParams);
+			if (!hasCollisions({ ...previewItem, x, y }, gridParams.items)) {
+				previewItem = { ...previewItem, x, y };
+			}
+		}
+	}
+
+	function moveEnd() {
+		applyPreview();
+		window.removeEventListener('pointermove', move);
+		window.removeEventListener('pointerup', moveEnd);
+	}
+
+	// RESIZE ITEM LOGIC
+
 	let min: ItemSize;
 
 	let max: ItemSize | undefined;
@@ -67,49 +129,39 @@
 		};
 	}
 
-	let previewItem: LayoutItem = item;
+	$: resizable = !gridParams.readOnly && item.resizable === undefined && item.resizable !== false;
 
-	$: previewItem, dispatch('previewchange', { item: previewItem });
-
-	const movable = !gridParams.readOnly && item.movable === undefined && item.movable !== false;
-
-	const resizable =
-		!gridParams.readOnly && item.resizable === undefined && item.resizable !== false;
-
-	const moveAction = movable
-		? move
-		: () => {
-				// do nothing
-		  };
-
-	const resizeAction = resizable
-		? resize
-		: () => {
-				// do nothing
-		  };
-
-	function start() {
+	function resizeStart(event: PointerEvent) {
+		event.stopPropagation();
+		if (event.button !== 0) return;
+		if (!resizable) return;
 		active = true;
+		window.addEventListener('pointermove', resize);
+		window.addEventListener('pointerup', resizeEnd);
 	}
 
-	function moving(event: CustomEvent<ItemPosition>) {
-		left = event.detail.left;
-		top = event.detail.top;
+	function resize(event: PointerEvent) {
+		width += event.movementX;
+		height += event.movementY;
 
-		if (
-			Math.abs(left - item.w * gridParams.itemSize.width) > gridParams.itemSize.width / 8 ||
-			Math.abs(top - item.h * gridParams.itemSize.height) > gridParams.itemSize.height / 8
-		) {
-			const { x, y } = snapOnMove(left, top, previewItem, gridParams);
-			if (!hasCollisions({ ...previewItem, x, y }, gridParams.items)) {
-				previewItem = { ...previewItem, x, y };
+		if (gridParams.bounds) {
+			const parentRect = gridParams.boundsTo.getBoundingClientRect();
+			if (width + left > parentRect.width) {
+				width = parentRect.width - left;
+			}
+			if (height + top > parentRect.height) {
+				height = parentRect.height - top;
 			}
 		}
-	}
 
-	function resizing(event: CustomEvent<ItemSize>) {
-		width = event.detail.width;
-		height = event.detail.height;
+		if (min) {
+			width = Math.max(width, min.width);
+			height = Math.max(height, min.height);
+		}
+		if (max) {
+			width = Math.min(width, max.width);
+			height = Math.min(height, max.height);
+		}
 
 		if (
 			Math.abs(left - item.w * gridParams.itemSize.width) > gridParams.itemSize.width / 8 ||
@@ -122,13 +174,10 @@
 		}
 	}
 
-	function end() {
-		active = false;
-		item.x = previewItem.x;
-		item.y = previewItem.y;
-		item.w = previewItem.w;
-		item.h = previewItem.h;
-		dispatch('itemchange', { item });
+	function resizeEnd() {
+		applyPreview();
+		window.removeEventListener('pointermove', resize);
+		window.removeEventListener('pointerup', resizeEnd);
 	}
 </script>
 
@@ -136,18 +185,20 @@
 	class={`${classes} ${active ? activeClass : ''}`}
 	class:item-default={!classes}
 	class:active-default={!activeClass && active}
-	use:moveAction={{ position: { left, top } }}
-	on:movestart={start}
-	on:moving={moving}
-	on:moveend={end}
-	use:resizeAction={{ min, max, resizerClass, bounds: gridParams.bounds }}
-	on:resizestart={start}
-	on:resizing={resizing}
-	on:resizeend={end}
+	on:pointerdown={moveStart}
 	style={`position: absolute; left:${left}px; top:${top}px; width: ${width}px; height: ${height}px; 
 			${movable ? 'cursor: move;' : ''} touch-action: none; user-select: none;`}
 >
 	<slot />
+	{#if resizable}
+		<slot name="resizeHandle">
+			<div
+				class={resizerClass}
+				class:resizer-default={!resizerClass}
+				on:pointerdown={resizeStart}
+			/>
+		</slot>
+	{/if}
 </div>
 
 {#if active}
@@ -174,5 +225,27 @@
 	.item-preview-default {
 		background-color: rgb(192, 127, 127);
 		transition: all 0.2s;
+	}
+
+	.resizer-default {
+		user-select: none;
+		touch-action: none;
+		position: absolute;
+		user-select: none;
+		width: 20px;
+		height: 20px;
+		right: 0;
+		bottom: 0;
+		cursor: se-resize;
+	}
+	.resizer-default::after {
+		content: '';
+		position: absolute;
+		right: 3px;
+		bottom: 3px;
+		width: 5px;
+		height: 5px;
+		border-right: 2px solid rgba(0, 0, 0, 0.4);
+		border-bottom: 2px solid rgba(0, 0, 0, 0.4);
 	}
 </style>
