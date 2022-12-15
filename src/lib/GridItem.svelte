@@ -4,7 +4,7 @@
 	import { coordinate2size, calcPosition, snapOnMove, snapOnResize } from './utils/item';
 	import { hasCollisions } from './utils/grid';
 
-	import type { LayoutItem, ItemSize, ItemPosition, GridParams } from './types';
+	import type { LayoutItem, ItemSize, GridParams } from './types';
 
 	const dispatch = createEventDispatcher<{
 		itemchange: { item: LayoutItem };
@@ -59,37 +59,61 @@
 		dispatch('itemchange', { item });
 	}
 
+	// INTERACTION LOGIC
+
+	let itemRef: HTMLElement;
+
+	let pointerShift = { left: 0, top: 0 };
+
+	function initInteraction(event: PointerEvent) {
+		if (event.button !== 0) return;
+		active = true;
+		pointerShift = { left: event.clientX - left, top: event.clientY - top };
+		itemRef.setPointerCapture(event.pointerId);
+	}
+
 	// MOVE ITEM LOGIC
 
 	$: movable = !gridParams.readOnly && item.movable === undefined && item.movable !== false;
 
 	function moveStart(event: PointerEvent) {
 		if (!movable) return;
-		if (event.button !== 0) return;
-		active = true;
+		initInteraction(event);
 		window.addEventListener('pointermove', move);
 		window.addEventListener('pointerup', moveEnd);
 	}
 
 	function move(event: PointerEvent) {
-		left += event.movementX;
-		top += event.movementY;
+		let _left = event.pageX - pointerShift.left;
+		let _top = event.pageY - pointerShift.top;
 
 		if (gridParams.bounds) {
 			const parentRect = gridParams.boundsTo.getBoundingClientRect();
-			if (left < parentRect.left) {
-				left = parentRect.left;
+			if (_left < parentRect.left) {
+				_left = parentRect.left;
 			}
-			if (top < parentRect.top) {
-				top = parentRect.top;
+			if (_top < parentRect.top) {
+				_top = parentRect.top;
 			}
-			if (left + width > parentRect.right) {
-				left = parentRect.right - width;
+			if (_left + width > parentRect.right) {
+				_left = parentRect.right - width;
 			}
-			if (top + height > parentRect.bottom) {
-				top = parentRect.bottom - height;
+			if (_top + height > parentRect.bottom) {
+				_top = parentRect.bottom - height;
 			}
 		}
+
+		left = _left;
+		top = _top;
+
+		// eslint-disable-next-line no-undef
+		const scrollOptions: ScrollIntoViewOptions = {
+			behavior: 'smooth',
+			block: 'center',
+			inline: 'center'
+		};
+
+		itemRef.scrollIntoView(scrollOptions);
 
 		if (
 			Math.abs(left - item.w * gridParams.itemSize.width) > gridParams.itemSize.width / 8 ||
@@ -104,6 +128,7 @@
 
 	function moveEnd() {
 		applyPreview();
+		pointerShift = { left: 0, top: 0 };
 		window.removeEventListener('pointermove', move);
 		window.removeEventListener('pointerup', moveEnd);
 	}
@@ -133,9 +158,7 @@
 
 	function resizeStart(event: PointerEvent) {
 		event.stopPropagation();
-		if (event.button !== 0) return;
-		if (!resizable) return;
-		active = true;
+		initInteraction(event);
 		window.addEventListener('pointermove', resize);
 		window.addEventListener('pointerup', resizeEnd);
 	}
@@ -153,6 +176,15 @@
 				height = parentRect.height - top;
 			}
 		}
+
+		// eslint-disable-next-line no-undef
+		const scrollOptions: ScrollIntoViewOptions = {
+			behavior: 'smooth',
+			block: 'center',
+			inline: 'center'
+		};
+
+		itemRef.scrollIntoView(scrollOptions);
 
 		if (min) {
 			width = Math.max(width, min.width);
@@ -188,6 +220,7 @@
 	on:pointerdown={moveStart}
 	style={`position: absolute; left:${left}px; top:${top}px; width: ${width}px; height: ${height}px; 
 			${movable ? 'cursor: move;' : ''} touch-action: none; user-select: none;`}
+	bind:this={itemRef}
 >
 	<slot />
 	{#if resizable}
