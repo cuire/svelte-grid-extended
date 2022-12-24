@@ -143,7 +143,7 @@
 	bind:this={gridContainer}
 >
 	{#if _itemSize && _cols && _rows}
-		{#each items as item}
+		{#each items as item (item.id)}
 			<GridItem
 				class={itemClass ?? ''}
 				{item}
