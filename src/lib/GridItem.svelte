@@ -51,7 +51,6 @@
 	$: previewItem, dispatch('previewchange', { item: previewItem });
 
 	function applyPreview() {
-		active = false;
 		item.x = previewItem.x;
 		item.y = previewItem.y;
 		item.w = previewItem.w;
@@ -63,29 +62,44 @@
 
 	let itemRef: HTMLElement;
 
-	let pointerShift = { left: 0, top: 0 };
+	const initialPointerPosition = { left: 0, top: 0 };
 
 	function initInteraction(event: PointerEvent) {
-		if (event.button !== 0) return;
 		active = true;
-		pointerShift = { left: event.clientX - left, top: event.clientY - top };
+		initialPointerPosition.left = event.pageX;
+		initialPointerPosition.top = event.pageY;
 		itemRef.setPointerCapture(event.pointerId);
+	}
+
+	function endInteraction(event: PointerEvent) {
+		applyPreview();
+		active = false;
+		initialPointerPosition.left = 0;
+		initialPointerPosition.top = 0;
+		itemRef.releasePointerCapture(event.pointerId);
 	}
 
 	// MOVE ITEM LOGIC
 
+	let initialPosition = { left: 0, top: 0 };
+
 	$: movable = !gridParams.readOnly && item.movable === undefined && item.movable !== false;
+
+	let pointerShift = { left: 0, top: 0 };
 
 	function moveStart(event: PointerEvent) {
 		if (!movable) return;
+		if (event.button !== 0) return;
 		initInteraction(event);
+		initialPosition = { left, top };
+		// pointerShift = { left: event.pageX - left, top: event.pageY - top };
 		window.addEventListener('pointermove', move);
 		window.addEventListener('pointerup', moveEnd);
 	}
 
 	function move(event: PointerEvent) {
-		let _left = event.pageX - pointerShift.left;
-		let _top = event.pageY - pointerShift.top;
+		let _left = event.pageX - initialPointerPosition.left + initialPosition.left;
+		let _top = event.pageY - initialPointerPosition.top + initialPosition.top;
 
 		if (gridParams.bounds) {
 			const parentRect = gridParams.boundsTo.getBoundingClientRect();
@@ -106,15 +120,6 @@
 		left = _left;
 		top = _top;
 
-		// eslint-disable-next-line no-undef
-		const scrollOptions: ScrollIntoViewOptions = {
-			behavior: 'smooth',
-			block: 'center',
-			inline: 'center'
-		};
-
-		itemRef.scrollIntoView(scrollOptions);
-
 		if (
 			Math.abs(left - item.w * gridParams.itemSize.width) > gridParams.itemSize.width / 8 ||
 			Math.abs(top - item.h * gridParams.itemSize.height) > gridParams.itemSize.height / 8
@@ -126,8 +131,9 @@
 		}
 	}
 
-	function moveEnd() {
-		applyPreview();
+	function moveEnd(event: PointerEvent) {
+		if (event.button !== 0) return;
+		endInteraction(event);
 		pointerShift = { left: 0, top: 0 };
 		window.removeEventListener('pointermove', move);
 		window.removeEventListener('pointerup', moveEnd);
@@ -138,6 +144,8 @@
 	let min: ItemSize;
 
 	let max: ItemSize | undefined;
+
+	let initialSize = { width: 0, height: 0 };
 
 	$: {
 		const minSize = item.min ?? { w: 1, h: 1 };
@@ -157,15 +165,17 @@
 	$: resizable = !gridParams.readOnly && item.resizable === undefined && item.resizable !== false;
 
 	function resizeStart(event: PointerEvent) {
+		if (event.button !== 0) return;
 		event.stopPropagation();
 		initInteraction(event);
+		initialSize = { width, height };
 		window.addEventListener('pointermove', resize);
 		window.addEventListener('pointerup', resizeEnd);
 	}
 
 	function resize(event: PointerEvent) {
-		width += event.movementX;
-		height += event.movementY;
+		width = event.pageX + initialSize.width - initialPointerPosition.left;
+		height = event.pageY + initialSize.height - initialPointerPosition.top;
 
 		if (gridParams.bounds) {
 			const parentRect = gridParams.boundsTo.getBoundingClientRect();
@@ -176,15 +186,6 @@
 				height = parentRect.height - top;
 			}
 		}
-
-		// eslint-disable-next-line no-undef
-		const scrollOptions: ScrollIntoViewOptions = {
-			behavior: 'smooth',
-			block: 'center',
-			inline: 'center'
-		};
-
-		itemRef.scrollIntoView(scrollOptions);
 
 		if (min) {
 			width = Math.max(width, min.width);
@@ -206,8 +207,9 @@
 		}
 	}
 
-	function resizeEnd() {
-		applyPreview();
+	function resizeEnd(event: PointerEvent) {
+		if (event.button !== 0) return;
+		endInteraction(event);
 		window.removeEventListener('pointermove', resize);
 		window.removeEventListener('pointerup', resizeEnd);
 	}

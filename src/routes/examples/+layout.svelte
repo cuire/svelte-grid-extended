@@ -4,8 +4,6 @@
 
 <style>
 	.layout {
-		display: grid;
-		place-items: center;
 		height: 100vh;
 	}
 </style>
