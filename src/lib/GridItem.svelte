@@ -120,6 +120,12 @@
 		left = _left;
 		top = _top;
 
+		window.scroll({
+			left: left - window.innerWidth / 2,
+			top: top - window.innerHeight / 2,
+			behavior: 'smooth'
+		});
+
 		if (
 			Math.abs(left - item.w * gridParams.itemSize.width) > gridParams.itemSize.width / 8 ||
 			Math.abs(top - item.h * gridParams.itemSize.height) > gridParams.itemSize.height / 8
@@ -195,6 +201,12 @@
 			width = Math.min(width, max.width);
 			height = Math.min(height, max.height);
 		}
+
+		window.scroll({
+			left: left - window.innerWidth / 2,
+			top: top - window.innerHeight / 2,
+			behavior: 'smooth'
+		});
 
 		if (
 			Math.abs(left - item.w * gridParams.itemSize.width) > gridParams.itemSize.width / 8 ||
