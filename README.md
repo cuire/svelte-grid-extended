@@ -94,6 +94,33 @@ To understand how to use these props, look at `<Grid />` component simplified st
 <!-- /Grid -->
 ```
 
+## Events
+
+Grid emits the following events:
+
+| event name | description                          | payload            |
+| ---------- | ------------------------------------ | ------------------ |
+| change     | Emitted when grid items are changed. | {item: LayoutItem} |
+
+```svelte
+<script lang="ts">
+	import Grid {type LayoutChangeDetail} from 'svelte-grid-extended';
+
+	const items = [
+		{ id: '0', x: 0, y: 0, w: 1, h: 1 },
+		{ id: '1', x: 0, y: 1, w: 3, h: 1 }
+	];
+
+	function hanleGridChange(event: CustomEvent<LayoutChangeDetail>) {
+		console.log(event.detail.item);
+	}
+</script>
+
+<Grid {items} cols={10} rows={10} on:change={hanleGridChange}>
+	<div>Content</div>
+</Grid>
+```
+
 ## Usage
 
 - [Basic](#basic)

@@ -35,6 +35,11 @@ export type GridParams = {
 	maxCols: number;
 	maxRows: number;
 	bounds: boolean;
+	boundsTo: HTMLElement;
 	items: LayoutItem[];
 	readOnly: boolean;
+};
+
+export type LayoutChangeDetail<T = unknown> = {
+	item: LayoutItem<T>;
 };

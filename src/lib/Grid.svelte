@@ -1,32 +1,72 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { createEventDispatcher, onMount } from 'svelte';
 
 	import GridItem from './GridItem.svelte';
 	import { assertGridOptions } from './utils/assert';
 	import { findGridSize } from './utils/breakpoints';
 	import { getGridDimensions } from './utils/grid';
 
-	import type { Breakpoints, ItemSize, GridSize, LayoutItem } from './types';
-
-	export let cols: GridSize = 0;
-
-	export let rows: GridSize = 0;
-
-	export let itemSize: Partial<ItemSize> = {};
-
-	export let gap = 10;
+	import type { Breakpoints, ItemSize, GridSize, LayoutItem, LayoutChangeDetail } from './types';
 
 	type T = $$Generic;
 
+	const dispatch = createEventDispatcher<{
+		change: LayoutChangeDetail<T>;
+	}>();
+
 	interface $$Slots {
 		default: {
+			/**
+			 * GridItem data object.
+			 */
 			item: LayoutItem<T>;
 		};
 		loader: Record<string, never>;
 	}
 
+	/**
+	 * Number of columns in the grid.
+	 */
+	export let cols: GridSize = 0;
+
+	/**
+	 * Number of rows in the grid.
+	 */
+	export let rows: GridSize = 0;
+
+	/**
+	 * Size of the grid items.
+	 * @description
+	 * If not provided, the grid will try to calculate the size based on the container size.
+	 *
+	 * You can provide only one of the dimensions, the other will be calculated automatically or you can provide both.
+	 * @example
+	 * ```svelte
+	 * <Grid itemSize={{ width: 100, height: 100 }}>
+	 * <Grid itemSize={{ width: 100}}>
+	 * ```
+	 */
+	export let itemSize: Partial<ItemSize> = {};
+
+	/**
+	 * Gap between the grid items.
+	 */
+	export let gap = 10;
+
+	/**
+	 * Grid items.
+	 */
 	export let items: LayoutItem<T>[];
 
+	/**
+	 * Breakpoints for the grid. That will be used to calculate the grid size.
+	 *
+	 * Important: numbers represent container width NOT document width.
+	 * @example
+	 * ```svelte
+	 * <Grid breakpoints={{ xs: 320, sm: 640, md: 768, lg: 1024, xl: 1280, xxl: 1536 }}>
+	 * ```
+	 */
 	export let breakpoints: Breakpoints = {
 		xxl: 1536,
 		xl: 1280,
@@ -38,23 +78,48 @@
 
 	assertGridOptions({ cols, rows, itemSize });
 
+	/**
+	 * Bound the grid items to the grid container.
+	 */
 	export let bounds = false;
 
+	/**
+	 * Disable the items interaction.
+	 */
 	export let readOnly = false;
 
+	/**
+	 * Enable the grid debug mode.
+	 * WIP
+	 */
 	export let debug = false;
 
+	/**
+	 * Grid container class.
+	 */
 	let classes = '';
 
 	export { classes as class };
 
+	/**
+	 * GridItem container style.
+	 */
 	export let itemClass: string | undefined = undefined;
 
+	/**
+	 * GridItem active state style.
+	 */
 	export let itemActiveClass: string | undefined = undefined;
 
+	/**
+	 * GridItem preview state style.
+	 */
 	export let itemPreviewClass: string | undefined = undefined;
 
-	export let itemResizerClass = 'resizer-default';
+	/**
+	 * GridItem resize handle style.
+	 */
+	export let itemResizerClass: string | undefined = undefined;
 
 	let _itemSize: ItemSize;
 
@@ -99,11 +164,12 @@
 		maxRows = shouldExpandRows ? Infinity : _rows;
 	}
 
-	function updateGrid() {
+	function handleItemChange(event: CustomEvent<LayoutChangeDetail<T>>) {
+		dispatch('change', { item: event.detail.item });
 		items = [...items];
 	}
 
-	function updateGridDimensions(event: CustomEvent<{ item: LayoutItem }>) {
+	function updateGridDimensions(event: CustomEvent<LayoutChangeDetail<T>>) {
 		const { item } = event.detail;
 		calculatedGridSize = getGridDimensions([...items.filter((i) => i.id !== item.id), item]);
 	}
@@ -153,13 +219,14 @@
 					maxCols,
 					maxRows,
 					bounds,
+					boundsTo: gridContainer,
 					items,
 					readOnly
 				}}
 				activeClass={itemActiveClass}
 				previewClass={itemPreviewClass}
 				resizerClass={itemResizerClass}
-				on:itemchange={updateGrid}
+				on:itemchange={handleItemChange}
 				on:previewchange={updateGridDimensions}
 			>
 				<slot {item} />
@@ -177,27 +244,5 @@
 <style>
 	.svelte-grid-extended {
 		position: relative !important;
-	}
-
-	:global(.svelte-grid-extended .resizer-default) {
-		user-select: none;
-		touch-action: none;
-		position: absolute;
-		user-select: none;
-		width: 20px;
-		height: 20px;
-		right: 0;
-		bottom: 0;
-		cursor: se-resize;
-	}
-	:global(.svelte-grid-extended .resizer-default::after) {
-		content: '';
-		position: absolute;
-		right: 3px;
-		bottom: 3px;
-		width: 5px;
-		height: 5px;
-		border-right: 2px solid rgba(0, 0, 0, 0.4);
-		border-bottom: 2px solid rgba(0, 0, 0, 0.4);
 	}
 </style>
