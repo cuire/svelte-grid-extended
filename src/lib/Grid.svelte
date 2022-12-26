@@ -12,25 +12,61 @@
 		change: { item: LayoutItem };
 	}>();
 
-	export let cols: GridSize = 0;
-
-	export let rows: GridSize = 0;
-
-	export let itemSize: Partial<ItemSize> = {};
-
-	export let gap = 10;
-
 	type T = $$Generic;
 
 	interface $$Slots {
 		default: {
+			/**
+			 * GridItem data object.
+			 */
 			item: LayoutItem<T>;
 		};
 		loader: Record<string, never>;
 	}
 
+	/**
+	 * Number of columns in the grid.
+	 */
+	export let cols: GridSize = 0;
+
+	/**
+	 * Number of rows in the grid.
+	 */
+	export let rows: GridSize = 0;
+
+	/**
+	 * Size of the grid items.
+	 * @description
+	 * If not provided, the grid will try to calculate the size based on the container size.
+	 *
+	 * You can provide only one of the dimensions, the other will be calculated automatically or you can provide both.
+	 * @example
+	 * ```svelte
+	 * <Grid itemSize={{ width: 100, height: 100 }}>
+	 * <Grid itemSize={{ width: 100}}>
+	 * ```
+	 */
+	export let itemSize: Partial<ItemSize> = {};
+
+	/**
+	 * Gap between the grid items.
+	 */
+	export let gap = 10;
+
+	/**
+	 * Grid items.
+	 */
 	export let items: LayoutItem<T>[];
 
+	/**
+	 * Breakpoints for the grid. That will be used to calculate the grid size.
+	 *
+	 * Important: numbers represent container width NOT document width.
+	 * @example
+	 * ```svelte
+	 * <Grid breakpoints={{ xs: 320, sm: 640, md: 768, lg: 1024, xl: 1280, xxl: 1536 }}>
+	 * ```
+	 */
 	export let breakpoints: Breakpoints = {
 		xxl: 1536,
 		xl: 1280,
@@ -42,22 +78,47 @@
 
 	assertGridOptions({ cols, rows, itemSize });
 
+	/**
+	 * Bound the grid items to the grid container.
+	 */
 	export let bounds = false;
 
+	/**
+	 * Disable the items interaction.
+	 */
 	export let readOnly = false;
 
+	/**
+	 * Enable the grid debug mode.
+	 * WIP
+	 */
 	export let debug = false;
 
+	/**
+	 * Grid container class.
+	 */
 	let classes = '';
 
 	export { classes as class };
 
+	/**
+	 * GridItem container style.
+	 */
 	export let itemClass: string | undefined = undefined;
 
+	/**
+	 * GridItem active state style.
+	 */
 	export let itemActiveClass: string | undefined = undefined;
 
+	/**
+	 * GridItem preview state style.
+	 */
 	export let itemPreviewClass: string | undefined = undefined;
 
+	/**
+	 * GridItem resize handle style.
+	 */
 	export let itemResizerClass: string | undefined = undefined;
 
 	let _itemSize: ItemSize;
