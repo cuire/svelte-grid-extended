@@ -6,13 +6,13 @@
 	import { findGridSize } from './utils/breakpoints';
 	import { getGridDimensions } from './utils/grid';
 
-	import type { Breakpoints, ItemSize, GridSize, LayoutItem } from './types';
-
-	const dispatch = createEventDispatcher<{
-		change: { item: LayoutItem };
-	}>();
+	import type { Breakpoints, ItemSize, GridSize, LayoutItem, LayoutChangeDetail } from './types';
 
 	type T = $$Generic;
+
+	const dispatch = createEventDispatcher<{
+		change: LayoutChangeDetail<T>;
+	}>();
 
 	interface $$Slots {
 		default: {
@@ -164,12 +164,12 @@
 		maxRows = shouldExpandRows ? Infinity : _rows;
 	}
 
-	function handleItemChange(event: CustomEvent<{ item: LayoutItem }>) {
+	function handleItemChange(event: CustomEvent<LayoutChangeDetail<T>>) {
 		dispatch('change', { item: event.detail.item });
 		items = [...items];
 	}
 
-	function updateGridDimensions(event: CustomEvent<{ item: LayoutItem }>) {
+	function updateGridDimensions(event: CustomEvent<LayoutChangeDetail<T>>) {
 		const { item } = event.detail;
 		calculatedGridSize = getGridDimensions([...items.filter((i) => i.id !== item.id), item]);
 	}

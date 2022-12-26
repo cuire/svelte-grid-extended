@@ -39,3 +39,7 @@ export type GridParams = {
 	items: LayoutItem[];
 	readOnly: boolean;
 };
+
+export type LayoutChangeDetail<T = unknown> = {
+	item: LayoutItem<T>;
+};

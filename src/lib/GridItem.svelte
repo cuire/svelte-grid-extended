@@ -4,14 +4,16 @@
 	import { coordinate2size, calcPosition, snapOnMove, snapOnResize } from './utils/item';
 	import { hasCollisions } from './utils/grid';
 
-	import type { LayoutItem, ItemSize, GridParams } from './types';
+	import type { LayoutItem, ItemSize, GridParams, LayoutChangeDetail } from './types';
+
+	type T = $$Generic;
 
 	const dispatch = createEventDispatcher<{
-		itemchange: { item: LayoutItem };
-		previewchange: { item: LayoutItem };
+		itemchange: LayoutChangeDetail<T>;
+		previewchange: LayoutChangeDetail<T>;
 	}>();
 
-	export let item: LayoutItem;
+	export let item: LayoutItem<T>;
 
 	export let gridParams: GridParams;
 
@@ -46,7 +48,7 @@
 		height = newPosition.height;
 	}
 
-	let previewItem: LayoutItem = item;
+	let previewItem: LayoutItem<T> = item;
 
 	$: previewItem, dispatch('previewchange', { item: previewItem });
 

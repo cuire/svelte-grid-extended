@@ -104,14 +104,14 @@ Grid emits the following events:
 
 ```svelte
 <script lang="ts">
-	import Grid from 'svelte-grid-extended';
+	import Grid {type LayoutChangeDetail} from 'svelte-grid-extended';
 
 	const items = [
 		{ id: '0', x: 0, y: 0, w: 1, h: 1 },
 		{ id: '1', x: 0, y: 1, w: 3, h: 1 }
 	];
 
-	function hanleGridChange(event) {
+	function hanleGridChange(event: CustomEvent<LayoutChangeDetail>) {
 		console.log(event.detail.item);
 	}
 </script>
