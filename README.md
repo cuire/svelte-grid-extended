@@ -104,7 +104,7 @@ Grid emits the following events:
 
 ```svelte
 <script lang="ts">
-	import Grid {type LayoutChangeDetail} from 'svelte-grid-extended';
+	import Grid, { type LayoutChangeDetail } from 'svelte-grid-extended';
 
 	const items = [
 		{ id: '0', x: 0, y: 0, w: 1, h: 1 },
