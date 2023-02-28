@@ -25,7 +25,7 @@ yarn add svelte-grid-extended
 With pnpm:
 
 ```sh
-pnpm install svelte-grid-extended
+pnpm add svelte-grid-extended
 ```
 
 ## Props
