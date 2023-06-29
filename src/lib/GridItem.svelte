@@ -137,7 +137,6 @@
 	let pointerShift = { left: 0, top: 0 };
 
 	function moveStart(event: PointerEvent) {
-		if (!_movable) return;
 		if (event.button !== 0) return;
 		initInteraction(event);
 		initialPosition = { left, top };
@@ -221,7 +220,6 @@
 
 	function resizeStart(event: PointerEvent) {
 		if (event.button !== 0) return;
-		if (!_resizable) return;
 		event.stopPropagation();
 		initInteraction(event);
 		initialSize = { width, height };
@@ -283,14 +281,19 @@
 	class={`${classes} ${active ? activeClass : ''}`}
 	class:item-default={!classes}
 	class:active-default={!activeClass && active}
-	on:pointerdown={moveStart}
+	on:pointerdown={_movable && !$$slots.moveHandle ? moveStart : null}
 	style={`position: absolute; left:${left}px; top:${top}px; width: ${width}px; height: ${height}px; 
-			${_movable ? 'cursor: move;' : ''} touch-action: none; user-select: none;`}
+			${_movable && !$$slots.moveHandle ? 'cursor: move;' : ''} touch-action: none; user-select: none;`}
 	bind:this={itemRef}
 >
+	{#if _movable}
+		<slot name="moveHandle" {moveStart} />
+	{/if}
+
 	<slot />
+
 	{#if _resizable}
-		<slot name="resizeHandle">
+		<slot name="resizeHandle" {resizeStart}>
 			<div class="resizer-default" on:pointerdown={resizeStart} />
 		</slot>
 	{/if}
