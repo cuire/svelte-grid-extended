@@ -1,31 +1,57 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onMount } from 'svelte';
 
 	import { coordinate2size, calcPosition, snapOnMove, snapOnResize } from './utils/item';
 	import { hasCollisions } from './utils/grid';
 
-	import type { LayoutItem, ItemSize, GridParams, LayoutChangeDetail } from './types';
-
-	type T = $$Generic;
+	import type { LayoutItem, LayoutChangeDetail, Size, ItemSize } from './types';
+	import { getGridContext } from './Grid.svelte';
 
 	const dispatch = createEventDispatcher<{
-		itemchange: LayoutChangeDetail<T>;
-		previewchange: LayoutChangeDetail<T>;
+		itemchange: LayoutChangeDetail;
+		previewchange: LayoutChangeDetail;
 	}>();
 
-	export let item: LayoutItem<T>;
-
-	export let gridParams: GridParams;
+	let gridParams = getGridContext();
 
 	let classes: string | undefined = undefined;
 
 	export { classes as class };
 
+	/**
+	 * Unique identifier of the item. Used to identify the item in collision checks.
+	 * @default uuidv4
+	 *
+	 * TODO: crypto.randomUUID() is not supported in non ssl environments
+	 */
+	export let id: string = crypto.randomUUID();
+
 	export let activeClass: string | undefined = undefined;
 
 	export let previewClass: string | undefined = undefined;
 
-	export let resizerClass: string | undefined = undefined;
+	export let x = 0;
+
+	export let y = 0;
+
+	export let w = 1;
+
+	export let h = 1;
+
+	/**
+	 * Minimum size of the item in Grid Units.
+	 */
+	export let min: Size = { w: 1, h: 1 };
+
+	/**
+	 * Maximum size of the item in Grid Units.
+	 * If not provided, the item will be able to grow infinitely.
+	 */
+	export let max: Size | undefined = undefined;
+
+	export let movable = true;
+
+	export let resizable = true;
 
 	let active = false;
 
@@ -37,10 +63,30 @@
 
 	let height: number;
 
-	$: if (!active) {
+	let item: LayoutItem = {
+		id,
+		x,
+		y,
+		w,
+		h,
+		min,
+		max,
+		movable,
+		resizable
+	};
+
+	onMount(() => {
+		$gridParams.registerItem(item);
+		return () => {
+			$gridParams.unregisterItem(item);
+		};
+	});
+
+	// reposition item on grid change
+	$: if (!active && $gridParams.itemSize) {
 		const newPosition = calcPosition(item, {
-			itemSize: gridParams.itemSize,
-			gap: gridParams.gap
+			itemSize: $gridParams.itemSize,
+			gap: $gridParams.gap
 		});
 		left = newPosition.left;
 		top = newPosition.top;
@@ -48,7 +94,7 @@
 		height = newPosition.height;
 	}
 
-	let previewItem: LayoutItem<T> = item;
+	let previewItem: LayoutItem = { ...item };
 
 	$: previewItem, dispatch('previewchange', { item: previewItem });
 
@@ -79,13 +125,14 @@
 		initialPointerPosition.left = 0;
 		initialPointerPosition.top = 0;
 		itemRef.releasePointerCapture(event.pointerId);
+		$gridParams.updateGridDimensions();
 	}
 
 	// MOVE ITEM LOGIC
 
 	let initialPosition = { left: 0, top: 0 };
 
-	$: movable = !gridParams.readOnly && item.movable === undefined && item.movable !== false;
+	$: movable = !$gridParams.readOnly && movable;
 
 	let pointerShift = { left: 0, top: 0 };
 
@@ -94,17 +141,20 @@
 		if (event.button !== 0) return;
 		initInteraction(event);
 		initialPosition = { left, top };
-		// pointerShift = { left: event.pageX - left, top: event.pageY - top };
+		pointerShift = { left: event.pageX - left, top: event.pageY - top };
 		window.addEventListener('pointermove', move);
 		window.addEventListener('pointerup', moveEnd);
 	}
 
 	function move(event: PointerEvent) {
+		if (!$gridParams.itemSize) {
+			throw new Error('Grid is not mounted yet');
+		}
 		let _left = event.pageX - initialPointerPosition.left + initialPosition.left;
 		let _top = event.pageY - initialPointerPosition.top + initialPosition.top;
 
-		if (gridParams.bounds) {
-			const parentRect = gridParams.boundsTo.getBoundingClientRect();
+		if ($gridParams.bounds && $gridParams.boundsTo) {
+			const parentRect = $gridParams.boundsTo.getBoundingClientRect();
 			if (_left < parentRect.left) {
 				_left = parentRect.left;
 			}
@@ -129,11 +179,11 @@
 		});
 
 		if (
-			Math.abs(left - item.w * gridParams.itemSize.width) > gridParams.itemSize.width / 8 ||
-			Math.abs(top - item.h * gridParams.itemSize.height) > gridParams.itemSize.height / 8
+			Math.abs(left - item.w * $gridParams.itemSize.width) > $gridParams.itemSize.width / 8 ||
+			Math.abs(top - item.h * $gridParams.itemSize.height) > $gridParams.itemSize.height / 8
 		) {
-			const { x, y } = snapOnMove(left, top, previewItem, gridParams);
-			if (!hasCollisions({ ...previewItem, x, y }, gridParams.items)) {
+			const { x, y } = snapOnMove(left, top, previewItem, $gridParams);
+			if (!hasCollisions({ ...previewItem, x, y }, Object.values($gridParams.items))) {
 				previewItem = { ...previewItem, x, y };
 			}
 		}
@@ -149,28 +199,27 @@
 
 	// RESIZE ITEM LOGIC
 
-	let min: ItemSize;
-
-	let max: ItemSize | undefined;
-
 	let initialSize = { width: 0, height: 0 };
 
-	$: {
-		const minSize = item.min ?? { w: 1, h: 1 };
-		min = {
-			width: coordinate2size(minSize.w, gridParams.itemSize.width, gridParams.gap),
-			height: coordinate2size(minSize.h, gridParams.itemSize.height, gridParams.gap)
+	let minSize: ItemSize | undefined;
+
+	let maxSize: ItemSize | undefined;
+
+	$: if ($gridParams.itemSize) {
+		minSize = {
+			width: coordinate2size(min.w, $gridParams.itemSize.width, $gridParams.gap),
+			height: coordinate2size(min.h, $gridParams.itemSize.height, $gridParams.gap)
 		};
 	}
 
-	$: if (item.max) {
-		max = {
-			width: coordinate2size(item.max.w, gridParams.itemSize.width, gridParams.gap),
-			height: coordinate2size(item.max.h, gridParams.itemSize.height, gridParams.gap)
+	$: if ($gridParams.itemSize && max) {
+		maxSize = {
+			width: coordinate2size(max.w, $gridParams.itemSize.width, $gridParams.gap),
+			height: coordinate2size(max.h, $gridParams.itemSize.height, $gridParams.gap)
 		};
 	}
 
-	$: resizable = !gridParams.readOnly && item.resizable === undefined && item.resizable !== false;
+	$: resizable = !$gridParams.readOnly && item.resizable;
 
 	function resizeStart(event: PointerEvent) {
 		if (event.button !== 0) return;
@@ -182,11 +231,15 @@
 	}
 
 	function resize(event: PointerEvent) {
+		if (!$gridParams.itemSize) {
+			throw new Error('Grid is not mounted yet');
+		}
+
 		width = event.pageX + initialSize.width - initialPointerPosition.left;
 		height = event.pageY + initialSize.height - initialPointerPosition.top;
 
-		if (gridParams.bounds) {
-			const parentRect = gridParams.boundsTo.getBoundingClientRect();
+		if ($gridParams.bounds && $gridParams.boundsTo) {
+			const parentRect = $gridParams.boundsTo.getBoundingClientRect();
 			if (width + left > parentRect.width) {
 				width = parentRect.width - left;
 			}
@@ -195,13 +248,13 @@
 			}
 		}
 
-		if (min) {
-			width = Math.max(width, min.width);
-			height = Math.max(height, min.height);
+		if (minSize) {
+			width = Math.max(width, minSize.width);
+			height = Math.max(height, minSize.height);
 		}
-		if (max) {
-			width = Math.min(width, max.width);
-			height = Math.min(height, max.height);
+		if (maxSize) {
+			width = Math.min(width, maxSize.width);
+			height = Math.min(height, maxSize.height);
 		}
 
 		window.scroll({
@@ -211,11 +264,11 @@
 		});
 
 		if (
-			Math.abs(left - item.w * gridParams.itemSize.width) > gridParams.itemSize.width / 8 ||
-			Math.abs(top - item.h * gridParams.itemSize.height) > gridParams.itemSize.height / 8
+			Math.abs(left - item.w * $gridParams.itemSize.width) > $gridParams.itemSize.width / 8 ||
+			Math.abs(top - item.h * $gridParams.itemSize.height) > $gridParams.itemSize.height / 8
 		) {
-			const { w, h } = snapOnResize(width, height, previewItem, gridParams);
-			if (!hasCollisions({ ...previewItem, w, h }, gridParams.items)) {
+			const { w, h } = snapOnResize(width, height, previewItem, $gridParams);
+			if (!hasCollisions({ ...previewItem, w, h }, Object.values($gridParams.items))) {
 				previewItem = { ...previewItem, w, h };
 			}
 		}
@@ -241,22 +294,18 @@
 	<slot />
 	{#if resizable}
 		<slot name="resizeHandle">
-			<div
-				class={resizerClass}
-				class:resizer-default={!resizerClass}
-				on:pointerdown={resizeStart}
-			/>
+			<div class="resizer-default" on:pointerdown={resizeStart} />
 		</slot>
 	{/if}
 </div>
 
-{#if active}
+{#if active && $gridParams.itemSize}
 	{@const preview = calcPosition(previewItem, {
-		itemSize: gridParams.itemSize,
-		gap: gridParams.gap
+		itemSize: $gridParams.itemSize,
+		gap: $gridParams.gap
 	})}
 	<div
-		class={previewClass}
+		class={previewClass ?? ''}
 		class:item-preview-default={!previewClass}
 		style={`position: absolute; left:${preview.left}px; top:${preview.top}px;  
 		width: ${preview.width}px; height: ${preview.height}px; z-index: -10;`}

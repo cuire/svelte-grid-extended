@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Grid from '$lib';
+	import Grid, { GridItem } from '$lib';
 
 	const items = [
 		{ id: '0', x: 0, y: 0, w: 2, h: 5 },
@@ -14,8 +14,12 @@
 	];
 </script>
 
-<Grid {items} cols={10} rows={10} readOnly let:item>
-	<div class="item">{item.id}</div>
+<Grid cols={10} rows={10} readOnly>
+	{#each items as item}
+		<GridItem x={item.x} y={item.y} w={item.w} h={item.h}>
+			<div class="item">{item.id}</div>
+		</GridItem>
+	{/each}
 </Grid>
 
 <style>

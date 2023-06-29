@@ -1,28 +1,36 @@
-<script lang="ts">
-	import { createEventDispatcher, onMount } from 'svelte';
+<script lang="ts" context="module">
+	const GRID_CONTEXT_NAME = Symbol('svelte-grid-extended-context');
+	export function getGridContext(): Readable<GridParams> {
+		let context: Writable<GridParams> | undefined = getContext(GRID_CONTEXT_NAME);
+		if (context === undefined) {
+			throw new Error(
+				`<GridItem /> is missing a parent <Grid /> component. Make sure you are using the component inside a <Grid />.`
+			);
+		}
+		return context;
+	}
+</script>
 
-	import GridItem from './GridItem.svelte';
+<script lang="ts">
+	import { createEventDispatcher, getContext, onMount, setContext } from 'svelte';
+
 	import { assertGridOptions } from './utils/assert';
 	import { findGridSize } from './utils/breakpoints';
 	import { getGridDimensions } from './utils/grid';
 
-	import type { Breakpoints, ItemSize, GridSize, LayoutItem, LayoutChangeDetail } from './types';
-
-	type T = $$Generic;
+	import type {
+		Breakpoints,
+		ItemSize,
+		GridSize,
+		LayoutItem,
+		LayoutChangeDetail,
+		GridParams
+	} from './types';
+	import { writable, type Readable, type Writable } from 'svelte/store';
 
 	const dispatch = createEventDispatcher<{
-		change: LayoutChangeDetail<T>;
+		change: LayoutChangeDetail;
 	}>();
-
-	interface $$Slots {
-		default: {
-			/**
-			 * GridItem data object.
-			 */
-			item: LayoutItem<T>;
-		};
-		loader: Record<string, never>;
-	}
 
 	/**
 	 * Number of columns in the grid.
@@ -56,7 +64,7 @@
 	/**
 	 * Grid items.
 	 */
-	export let items: LayoutItem<T>[];
+	let items: Record<string, LayoutItem> = {};
 
 	/**
 	 * Breakpoints for the grid. That will be used to calculate the grid size.
@@ -101,35 +109,13 @@
 
 	export { classes as class };
 
-	/**
-	 * GridItem container style.
-	 */
-	export let itemClass: string | undefined = undefined;
-
-	/**
-	 * GridItem active state style.
-	 */
-	export let itemActiveClass: string | undefined = undefined;
-
-	/**
-	 * GridItem preview state style.
-	 */
-	export let itemPreviewClass: string | undefined = undefined;
-
-	/**
-	 * GridItem resize handle style.
-	 */
-	export let itemResizerClass: string | undefined = undefined;
-
-	let _itemSize: ItemSize;
-
 	let _cols: number;
 
 	let _rows: number;
 
-	let maxCols: number;
+	let maxCols = Infinity;
 
-	let maxRows: number;
+	let maxRows = Infinity;
 
 	let containerWidth: number;
 
@@ -143,14 +129,14 @@
 
 	$: if (typeof rows === 'number') _rows = rows;
 
-	$: if (itemSize?.width && itemSize?.height) _itemSize = { ...itemSize } as ItemSize;
+	$: if (itemSize?.width && itemSize?.height) $gridSettings.itemSize = { ...itemSize } as ItemSize;
 
-	$: if (itemSize?.width && _itemSize?.width) containerWidth = _cols * (_itemSize.width + gap + 1);
+	$: if ($gridSettings.itemSize) containerWidth = _cols * ($gridSettings.itemSize.width + gap + 1);
 
-	$: if (itemSize?.height && _itemSize?.height)
-		containerHeight = _rows * (_itemSize.height + gap + 1);
+	$: if ($gridSettings.itemSize)
+		containerHeight = _rows * ($gridSettings.itemSize.height + gap + 1);
 
-	$: calculatedGridSize = getGridDimensions(items);
+	$: calculatedGridSize = getGridDimensions(Object.values(items));
 
 	let gridContainer: HTMLDivElement;
 
@@ -164,14 +150,11 @@
 		maxRows = shouldExpandRows ? Infinity : _rows;
 	}
 
-	function handleItemChange(event: CustomEvent<LayoutChangeDetail<T>>) {
-		dispatch('change', { item: event.detail.item });
-		items = [...items];
-	}
-
-	function updateGridDimensions(event: CustomEvent<LayoutChangeDetail<T>>) {
-		const { item } = event.detail;
-		calculatedGridSize = getGridDimensions([...items.filter((i) => i.id !== item.id), item]);
+	/**
+	 * Force the grid to update its dimensions. By default called when any of the grid items changes.
+	 */
+	function updateGridDimensions() {
+		items = items;
 	}
 
 	onMount(() => {
@@ -190,7 +173,7 @@
 			shouldExpandCols = _cols === 0;
 			shouldExpandRows = _rows === 0;
 
-			_itemSize = {
+			$gridSettings.itemSize = {
 				width: itemSize.width ?? (width - (gap + 1) * _cols) / _cols,
 				height: itemSize.height ?? (height - (gap + 1) * _rows) / _rows
 			};
@@ -200,6 +183,49 @@
 
 		return () => sizeObserver.disconnect();
 	});
+
+	// writable with grid settings
+
+	function registerItem(item: LayoutItem): void {
+		if (item.id in items) return;
+		items[item.id] = item;
+		items = items;
+	}
+
+	function unregisterItem(item: LayoutItem): void {
+		delete items[item.id];
+		items = items;
+	}
+
+	const gridSettings = writable<GridParams>({
+		cols: 0,
+		rows: 0,
+		maxCols,
+		maxRows,
+		gap,
+		items,
+		bounds,
+		readOnly,
+		debug,
+		registerItem,
+		unregisterItem,
+		updateGridDimensions
+	});
+
+	$: gridSettings.update((settings) => ({
+		...settings,
+		cols: _cols,
+		rows: _rows,
+		maxCols,
+		maxRows,
+		gap,
+		items,
+		bounds,
+		readOnly,
+		debug
+	}));
+
+	setContext(GRID_CONTEXT_NAME, gridSettings);
 </script>
 
 <div
@@ -208,37 +234,7 @@
 		height: ${containerHeight ? `${containerHeight}px` : '100%'};`}
 	bind:this={gridContainer}
 >
-	{#if _itemSize && _cols && _rows}
-		{#each items as item (item.id)}
-			<GridItem
-				class={itemClass ?? ''}
-				{item}
-				gridParams={{
-					itemSize: _itemSize,
-					gap,
-					maxCols,
-					maxRows,
-					bounds,
-					boundsTo: gridContainer,
-					items,
-					readOnly
-				}}
-				activeClass={itemActiveClass}
-				previewClass={itemPreviewClass}
-				resizerClass={itemResizerClass}
-				on:itemchange={handleItemChange}
-				on:previewchange={updateGridDimensions}
-			>
-				<slot {item} />
-			</GridItem>
-		{/each}
-	{:else}
-		<slot name="loader">
-			{#if debug}
-				{_itemSize} {_cols} {_rows}
-			{/if}
-		</slot>
-	{/if}
+	<slot />
 </div>
 
 <style>

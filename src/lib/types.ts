@@ -1,22 +1,32 @@
 import type { RequireAtLeastOne } from '$lib/utils/types';
 
-export type LayoutItem<T = unknown> = Size &
+export type LayoutItem = Size &
 	Position & {
 		id: string;
 		min?: Size;
 		max?: Size;
-		movable?: boolean;
-		resizable?: boolean;
-	} & (T extends undefined ? { data: T } : { data?: T });
+		movable: boolean;
+		resizable: boolean;
+	};
 
-export type Layout<T = unknown> = LayoutItem<T>[];
-
+/**
+ * Item position in grid units
+ */
 export type Size = { w: number; h: number };
 
+/**
+ * Item position in grid units
+ */
 export type Position = { x: number; y: number };
 
+/**
+ * Item position in pixels
+ */
 export type ItemPosition = { left: number; top: number };
 
+/**
+ * Item size in pixels
+ */
 export type ItemSize = { width: number; height: number };
 
 export type ItemChangeEvent = { id: number; x: number; y: number; w: number; h: number };
@@ -30,16 +40,22 @@ export type GridSize = number | RequireAtLeastOne<Breakpoints>;
 export type GridDimensions = { cols: number; rows: number };
 
 export type GridParams = {
-	itemSize: ItemSize;
+	cols: number;
+	rows: number;
+	itemSize?: ItemSize;
 	gap: number;
 	maxCols: number;
 	maxRows: number;
 	bounds: boolean;
-	boundsTo: HTMLElement;
-	items: LayoutItem[];
+	boundsTo?: HTMLElement;
+	items: Record<string, LayoutItem>;
 	readOnly: boolean;
+	debug: boolean;
+	registerItem: (item: LayoutItem) => void;
+	unregisterItem: (item: LayoutItem) => void;
+	updateGridDimensions: () => void;
 };
 
-export type LayoutChangeDetail<T = unknown> = {
-	item: LayoutItem<T>;
+export type LayoutChangeDetail = {
+	item: LayoutItem;
 };
