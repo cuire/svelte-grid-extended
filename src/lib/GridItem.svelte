@@ -63,7 +63,7 @@
 
 	let height: number;
 
-	let item: LayoutItem = {
+	$: item = {
 		id,
 		x,
 		y,
@@ -73,7 +73,7 @@
 		max,
 		movable,
 		resizable
-	};
+	} as LayoutItem;
 
 	onMount(() => {
 		$gridParams.registerItem(item);
@@ -94,7 +94,7 @@
 		height = newPosition.height;
 	}
 
-	let previewItem: LayoutItem = { ...item };
+	$: previewItem = { ...item };
 
 	$: previewItem, dispatch('previewchange', { item: previewItem });
 
@@ -132,12 +132,12 @@
 
 	let initialPosition = { left: 0, top: 0 };
 
-	$: movable = !$gridParams.readOnly && movable;
+	$: _movable = !$gridParams.readOnly && movable;
 
 	let pointerShift = { left: 0, top: 0 };
 
 	function moveStart(event: PointerEvent) {
-		if (!movable) return;
+		if (!_movable) return;
 		if (event.button !== 0) return;
 		initInteraction(event);
 		initialPosition = { left, top };
@@ -179,8 +179,9 @@
 		});
 
 		if (
-			Math.abs(left - item.w * $gridParams.itemSize.width) > $gridParams.itemSize.width / 8 ||
-			Math.abs(top - item.h * $gridParams.itemSize.height) > $gridParams.itemSize.height / 8
+			Math.abs(left - previewItem.w * $gridParams.itemSize.width) >
+				$gridParams.itemSize.width / 8 ||
+			Math.abs(top - previewItem.h * $gridParams.itemSize.height) > $gridParams.itemSize.height / 8
 		) {
 			const { x, y } = snapOnMove(left, top, previewItem, $gridParams);
 			if (!hasCollisions({ ...previewItem, x, y }, Object.values($gridParams.items))) {
@@ -219,10 +220,11 @@
 		};
 	}
 
-	$: resizable = !$gridParams.readOnly && item.resizable;
+	$: _resizable = !$gridParams.readOnly && item.resizable;
 
 	function resizeStart(event: PointerEvent) {
 		if (event.button !== 0) return;
+		if (!_resizable) return;
 		event.stopPropagation();
 		initInteraction(event);
 		initialSize = { width, height };
@@ -288,11 +290,11 @@
 	class:active-default={!activeClass && active}
 	on:pointerdown={moveStart}
 	style={`position: absolute; left:${left}px; top:${top}px; width: ${width}px; height: ${height}px; 
-			${movable ? 'cursor: move;' : ''} touch-action: none; user-select: none;`}
+			${_movable ? 'cursor: move;' : ''} touch-action: none; user-select: none;`}
 	bind:this={itemRef}
 >
 	<slot />
-	{#if resizable}
+	{#if _resizable}
 		<slot name="resizeHandle">
 			<div class="resizer-default" on:pointerdown={resizeStart} />
 		</slot>
