@@ -121,6 +121,8 @@
 	 */
 	export let itemResizerClass: string | undefined = undefined;
 
+	export let collision: boolean | undefined = undefined;
+
 	let _itemSize: ItemSize;
 
 	let _cols: number;
@@ -223,6 +225,7 @@
 					items,
 					readOnly
 				}}
+				{collision}
 				activeClass={itemActiveClass}
 				previewClass={itemPreviewClass}
 				resizerClass={itemResizerClass}
