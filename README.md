@@ -32,15 +32,16 @@ pnpm add svelte-grid-extended
 
 ### Main props
 
-| prop     | description                                                                        | type                                | default  |
-| -------- | ---------------------------------------------------------------------------------- | ----------------------------------- | -------- |
-| cols     | Grid columns count. If set to 0, grid will grow infinitly. Must be >= 0.           | number                              | 0        |
-| rows     | Grid rows count. If set to 0, grid will grow infinitly. Must be >= 0.              | number                              | 0        |
-| itemSize | Size of the grid item. If not set, grid will calculate it based on container size. | { width?: number, height?: number } | {}       |
-| items    | Array of grid items.                                                               | [Layout\<T\>](#layout-type)         | requried |
-| gap      | Gap between grid items.                                                            | number                              | 10       |
-| bounds   | Should grid items be bounded by the grid container.                                | boolean                             | false    |
-| readonly | If true disables interaction with grid items.                                      | boolean                             | false    |
+| prop      | description                                                                                             | type                                | default  |
+| --------- | ------------------------------------------------------------------------------------------------------- | ----------------------------------- | -------- |
+| cols      | Grid columns count. If set to 0, grid will grow infinitly. Must be >= 0.                                | number                              | 0        |
+| rows      | Grid rows count. If set to 0, grid will grow infinitly. Must be >= 0.                                   | number                              | 0        |
+| itemSize  | Size of the grid item. If not set, grid will calculate it based on container size.                      | { width?: number, height?: number } | {}       |
+| items     | Array of grid items.                                                                                    | [Layout\<T\>](#layout-type)         | requried |
+| gap       | Gap between grid items.                                                                                 | number                              | 10       |
+| bounds    | Should grid items be bounded by the grid container.                                                     | boolean                             | false    |
+| readonly  | If true disables interaction with grid items.                                                           | boolean                             | false    |
+| collision | If true, grid will try to move all coliding items to the nearest available position. ⚠️ Sets `rows = 0` | boolean                             | false    |
 
 > ⚠️ if `cols` or/and `rows` are set to 0, `itemSize.width` or/and `itemSize.height` must be setted.
 
@@ -128,6 +129,7 @@ Grid emits the following events:
 - [Grid without bounds](#grid-without-bounds)
 - [Styling](#styling)
 - [Disable interactions](#disable-interactions)
+- [Enable Collisions](#enable-collisions)
 
 ### Basic
 
@@ -305,5 +307,33 @@ Make item non-interactive: ✨ [repl](https://svelte.dev/repl/1b3b9b9b9b9b9b9b9b
 
 <Grid {items} cols={10} rows={10}>
 	<div>Content</div>
+</Grid>
+```
+
+### Enable Collisions
+
+<!-- set collision = true -->
+
+To enable collisions, set `collision` prop to `true`. Now instead of ignoring collisions, grid will try to move all coliding items to the nearest available position.
+
+> ⚠️ Setting `collision` to `true` will sets `rows` to `0` and force grid to compress items in vertical direction.
+
+<!-- repl -->
+
+✨ [repl](https://svelte.dev/repl/527ef09f35cd4d7094cd6cf38bcf822d?version=4.0.4)
+
+```svelte
+<script lang="ts">
+	import Grid from '$lib';
+
+	const items = [
+		{ id: '0', x: 0, y: 0, w: 2, h: 5 },
+		{ id: '1', x: 2, y: 2, w: 2, h: 2 }
+	];
+	const itemSize = { height: 100 };
+</script>
+
+<Grid {items} cols={10} {itemSize} collision={true} let:item>
+	<div class="item">{item.id}</div>
 </Grid>
 ```
