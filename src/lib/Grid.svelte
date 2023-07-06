@@ -124,7 +124,7 @@
 	/**
 	 * This option allows for collision between grid items, And it also deprecates 'rows' option. (fix to 0)
 	 */
-	export let collision: boolean | undefined = undefined;
+	export let collision = false;
 
 	let _itemSize: ItemSize;
 
@@ -228,9 +228,9 @@
 					bounds,
 					boundsTo: gridContainer,
 					items,
-					readOnly
+					readOnly,
+					collision
 				}}
-				{collision}
 				activeClass={itemActiveClass}
 				previewClass={itemPreviewClass}
 				resizerClass={itemResizerClass}

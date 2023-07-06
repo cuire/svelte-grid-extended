@@ -25,8 +25,6 @@
 
 	export let resizerClass: string | undefined = undefined;
 
-	export let collision: boolean | undefined = undefined;
-
 	let active = false;
 
 	let left: number;
@@ -122,7 +120,7 @@
 		left = _left;
 		top = _top;
 
-		if (!collision) {
+		if (!gridParams.collision) {
 			window.scroll({
 				left: left - window.innerWidth / 2,
 				top: top - window.innerHeight / 2,
@@ -132,12 +130,11 @@
 
 		if (
 			Math.abs(left - item.w * gridParams.itemSize.width) > gridParams.itemSize.width / 8 ||
-			Math.abs(left - item.w * gridParams.itemSize.width) > gridParams.itemSize.width / 8 ||
 			Math.abs(top - item.h * gridParams.itemSize.height) > gridParams.itemSize.height / 8
 		) {
 			const { x, y } = snapOnMove(left, top, previewItem, gridParams);
 
-			if (collision) {
+			if (gridParams.collision) {
 				movePreviewWithCollisions(x, y);
 			} else {
 				if (!hasCollisions({ ...previewItem, x, y }, gridParams.items)) {
@@ -255,7 +252,7 @@
 			height = Math.min(height, max.height);
 		}
 
-		if (!collision) {
+		if (!gridParams.collision) {
 			window.scroll({
 				left: left - window.innerWidth / 2,
 				top: top - window.innerHeight / 2,
@@ -268,7 +265,7 @@
 			Math.abs(top - item.h * gridParams.itemSize.height) > gridParams.itemSize.height / 8
 		) {
 			const { w, h } = snapOnResize(width, height, previewItem, gridParams);
-			if (collision) {
+			if (gridParams.collision) {
 				resizePreviewWithCollisions(w, h);
 			} else {
 				if (!hasCollisions({ ...previewItem, w, h }, gridParams.items)) {

@@ -38,6 +38,7 @@ export type GridParams = {
 	boundsTo: HTMLElement;
 	items: LayoutItem[];
 	readOnly: boolean;
+	collision: boolean;
 };
 
 export type LayoutChangeDetail<T = unknown> = {

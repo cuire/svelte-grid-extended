@@ -156,7 +156,11 @@ const gridParams: GridParams = {
 	maxCols: 8,
 	maxRows: 8,
 	items: [],
-	bounds: false
+	bounds: false,
+	//It can be tested on the environment of a browser.
+	boundsTo: new Object() as HTMLElement,
+	readOnly: false,
+	collision: true
 };
 
 describe('🥥 snapOnMove()', () => {
