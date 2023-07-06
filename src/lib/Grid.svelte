@@ -121,6 +121,11 @@
 	 */
 	export let itemResizerClass: string | undefined = undefined;
 
+	/**
+	 * This option allows for collision between grid items, And it also deprecates 'rows' option. (fix to 0)
+	 */
+	export let collision = false;
+
 	let _itemSize: ItemSize;
 
 	let _cols: number;
@@ -138,6 +143,8 @@
 	let shouldExpandRows = false;
 
 	let shouldExpandCols = false;
+
+	$: if (collision) rows = 0;
 
 	$: if (typeof cols === 'number') _cols = cols;
 
@@ -221,7 +228,8 @@
 					bounds,
 					boundsTo: gridContainer,
 					items,
-					readOnly
+					readOnly,
+					collision
 				}}
 				activeClass={itemActiveClass}
 				previewClass={itemPreviewClass}

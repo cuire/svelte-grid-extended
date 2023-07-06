@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
-
 	import { coordinate2size, calcPosition, snapOnMove, snapOnResize } from './utils/item';
-	import { hasCollisions } from './utils/grid';
-
+	import { hasCollisions, getCollisions } from './utils/grid';
 	import type { LayoutItem, ItemSize, GridParams, LayoutChangeDetail } from './types';
 
 	type T = $$Generic;
@@ -122,20 +120,70 @@
 		left = _left;
 		top = _top;
 
-		window.scroll({
-			left: left - window.innerWidth / 2,
-			top: top - window.innerHeight / 2,
-			behavior: 'smooth'
-		});
+		if (!gridParams.collision) {
+			window.scroll({
+				left: left - window.innerWidth / 2,
+				top: top - window.innerHeight / 2,
+				behavior: 'smooth'
+			});
+		}
 
 		if (
 			Math.abs(left - item.w * gridParams.itemSize.width) > gridParams.itemSize.width / 8 ||
 			Math.abs(top - item.h * gridParams.itemSize.height) > gridParams.itemSize.height / 8
 		) {
 			const { x, y } = snapOnMove(left, top, previewItem, gridParams);
-			if (!hasCollisions({ ...previewItem, x, y }, gridParams.items)) {
-				previewItem = { ...previewItem, x, y };
+
+			if (gridParams.collision) {
+				movePreviewWithCollisions(x, y);
+			} else {
+				if (!hasCollisions({ ...previewItem, x, y }, gridParams.items)) {
+					previewItem = { ...previewItem, x, y };
+					dispatch('itemchange', { item: previewItem as LayoutItem<T> });
+				}
 			}
+		}
+	}
+
+	function movePreviewWithCollisions(x: number, y: number) {
+		let newY = y;
+		const itemsExceptPreview = gridParams.items.filter((item) => item.id != previewItem.id);
+		while (newY >= 0) {
+			const collItems = getCollisions({ ...previewItem, x, y: newY }, gridParams.items);
+			if (collItems.length > 0) {
+				const sortedItems = collItems.sort((a, b) => b.y - a.y);
+				let moved = false;
+				sortedItems.forEach((sortItem) => {
+					//if you want to fix sensitivity of grid, change this statement
+					if (y + previewItem.h / 2 >= sortItem.y + sortItem.h / 2) {
+						moved = true;
+						newY = sortItem.y + sortItem.h;
+						sortedItems.forEach((item) => {
+							if (
+								!hasCollisions({ ...item, y: item.y - previewItem.h }, itemsExceptPreview) &&
+								item.y - previewItem.h >= 0
+							) {
+								item.y -= previewItem.h;
+							}
+						});
+						return false;
+					}
+				});
+				if (!moved) {
+					newY = previewItem.y;
+				}
+				break;
+			}
+			newY--;
+		}
+		if (newY < 0 || y === 0) {
+			newY = 0;
+		}
+		const positionChanged = x != previewItem.x || newY != previewItem.y;
+		previewItem = { ...previewItem, x, y: newY };
+		if (positionChanged) {
+			compressItems();
+			applyPreview();
 		}
 	}
 
@@ -204,20 +252,41 @@
 			height = Math.min(height, max.height);
 		}
 
-		window.scroll({
-			left: left - window.innerWidth / 2,
-			top: top - window.innerHeight / 2,
-			behavior: 'smooth'
-		});
+		if (!gridParams.collision) {
+			window.scroll({
+				left: left - window.innerWidth / 2,
+				top: top - window.innerHeight / 2,
+				behavior: 'smooth'
+			});
+		}
 
 		if (
 			Math.abs(left - item.w * gridParams.itemSize.width) > gridParams.itemSize.width / 8 ||
 			Math.abs(top - item.h * gridParams.itemSize.height) > gridParams.itemSize.height / 8
 		) {
 			const { w, h } = snapOnResize(width, height, previewItem, gridParams);
-			if (!hasCollisions({ ...previewItem, w, h }, gridParams.items)) {
-				previewItem = { ...previewItem, w, h };
+			if (gridParams.collision) {
+				resizePreviewWithCollisions(w, h);
+			} else {
+				if (!hasCollisions({ ...previewItem, w, h }, gridParams.items)) {
+					previewItem = { ...previewItem, w, h };
+				}
 			}
+		}
+	}
+
+	function resizePreviewWithCollisions(w: number, h: number) {
+		const sizeChanged = w != previewItem.w || h != previewItem.h;
+		if (sizeChanged) {
+			const hGap = h - previewItem.h;
+			previewItem = { ...previewItem, w, h };
+			applyPreview();
+			const collItems = getCollisions({ ...previewItem, w, h: 9999 }, gridParams.items);
+			collItems.forEach((item) => {
+				item.y += hGap;
+				dispatch('itemchange', { item: item as LayoutItem<T> });
+			});
+			compressItems();
 		}
 	}
 
@@ -226,6 +295,49 @@
 		endInteraction(event);
 		window.removeEventListener('pointermove', resize);
 		window.removeEventListener('pointerup', resizeEnd);
+	}
+
+	function compressItems() {
+		const sortedItems = [...gridParams.items].sort((a, b) => a.y - b.y);
+		sortedItems.reduce(
+			(accItem, currentItem) => {
+				if (currentItem.id === previewItem.id) {
+					//if previewItem do nothing
+				} else if (previewItem.y < currentItem.y + currentItem.h) {
+					//compress items above previewItem
+					const maxY =
+						currentItem.y >= previewItem.y
+							? currentItem.y + previewItem.h + 1
+							: previewItem.y + currentItem.h + 1;
+					let newY = maxY;
+					while (newY >= 0) {
+						if (hasCollisions({ ...currentItem, y: newY }, accItem)) {
+							break;
+						}
+						newY--;
+					}
+					currentItem.y = newY + 1;
+					dispatch('itemchange', { item: currentItem as LayoutItem<T> });
+					accItem.push(currentItem as LayoutItem<T>);
+				} else {
+					//compress items below previewItem
+					let newY = currentItem.y;
+					while (newY >= 0) {
+						if (hasCollisions({ ...currentItem, y: newY }, accItem)) {
+							break;
+						}
+						newY--;
+					}
+					if (newY < currentItem.y && newY > 0) {
+						currentItem.y = newY + 1;
+					}
+					dispatch('itemchange', { item: currentItem as LayoutItem<T> });
+					accItem.push(currentItem as LayoutItem<T>);
+				}
+				return accItem;
+			},
+			[previewItem]
+		);
 	}
 </script>
 
