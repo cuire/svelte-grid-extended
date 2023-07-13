@@ -345,6 +345,7 @@
 	class={`${classes} ${active ? activeClass : ''}`}
 	class:item-default={!classes}
 	class:active-default={!activeClass && active}
+	class:non-active-default={!active}
 	on:pointerdown={moveStart}
 	style={`position: absolute; left:${left}px; top:${top}px; width: ${width}px; height: ${height}px; 
 			${movable ? 'cursor: move;' : ''} touch-action: none; user-select: none;`}
@@ -387,7 +388,10 @@
 		background-color: rgb(192, 127, 127);
 		transition: all 0.2s;
 	}
-
+	.non-active-default {
+		transition: left 0.2s, top 0.2s;
+		transition-timing-function: ease-in-out;
+	}
 	.resizer-default {
 		user-select: none;
 		touch-action: none;
