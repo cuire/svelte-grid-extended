@@ -314,9 +314,9 @@ Make item non-interactive: ✨ [repl](https://svelte.dev/repl/1b3b9b9b9b9b9b9b9b
 
 <!-- set collision = true -->
 
-To enable collisions, set `collision` prop to `true`. Now instead of ignoring collisions, grid will try to move all coliding items to the nearest available position.
+To enable collisions, set the `collision` prop to `true`. Now, instead of ignoring collisions, the grid will relocate all colliding items to the first available space. If necessary, it will also expand the grid vertically to accommodate these items.
 
-> ⚠️ Setting `collision` to `true` will sets `rows` to `0` and force grid to compress items in vertical direction.
+> ⚠️ Setting `collision` to `true` will sets `rows` to `0`.
 
 <!-- repl -->
 
@@ -334,6 +334,34 @@ To enable collisions, set `collision` prop to `true`. Now instead of ignoring co
 </script>
 
 <Grid {items} cols={10} {itemSize} collision={true} let:item>
+	<div class="item">{item.id}</div>
+</Grid>
+```
+
+### Enable Compression
+
+<!-- set compress = true -->
+
+By setting the `compress` prop to `true`, you modify the default behavior of item dragging. In the default state (`compress` set to `false`), items can be dragged freely and are moved to the first available position when a collision occurs. However, when `compress` is `true`, the grid will compress items vertically towards the top into any available space instead.
+
+> ⚠️ The `compress` prop only takes effect when `collision` is set to `true`.
+
+<!-- repl -->
+
+✨ [repl](https://svelte.dev/repl/065b1b4d674740d6a73b49c863d60cda?version%253D4.0.4)
+
+```svelte
+<script lang="ts">
+	import Grid from '$lib';
+
+	const items = [
+		{ id: '0', x: 0, y: 0, w: 2, h: 5 },
+		{ id: '1', x: 2, y: 2, w: 2, h: 2 }
+	];
+	const itemSize = { height: 100 };
+</script>
+
+<Grid {items} cols={10} {itemSize} collision={true} compress={true} let:item>
 	<div class="item">{item.id}</div>
 </Grid>
 ```
