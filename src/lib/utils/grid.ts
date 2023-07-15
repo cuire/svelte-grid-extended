@@ -24,3 +24,26 @@ export function getGridDimensions(items: LayoutItem[]): GridDimensions {
 
 	return { cols, rows };
 }
+
+export function getAvailablePosition(
+	currentItem: LayoutItem,
+	items: LayoutItem[],
+	maxCols: number
+): { x: number; y: number } | null {
+	const { cols, rows } = getGridDimensions(items);
+
+	if (maxCols === 0 || maxCols === Infinity) maxCols = cols;
+
+	for (let y = 0; y <= rows - currentItem.h; y++) {
+		for (let x = 0; x <= maxCols - currentItem.w; x++) {
+			const item = { ...currentItem, x, y };
+
+			if (!hasCollisions(item, items)) {
+				const newPosition = { x, y };
+				return newPosition;
+			}
+		}
+	}
+
+	return null;
+}
