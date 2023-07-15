@@ -126,6 +126,11 @@
 	 */
 	export let collision = false;
 
+	/**
+	 * This option allows for vertical compression grid items when collision is enabled.
+	 */
+	export let compress = false;
+
 	let _itemSize: ItemSize;
 
 	let _cols: number;
@@ -229,7 +234,8 @@
 					boundsTo: gridContainer,
 					items,
 					readOnly,
-					collision
+					collision,
+					compress
 				}}
 				activeClass={itemActiveClass}
 				previewClass={itemPreviewClass}
