@@ -160,7 +160,8 @@ const gridParams: GridParams = {
 	//It can be tested on the environment of a browser.
 	boundsTo: new Object() as HTMLElement,
 	readOnly: false,
-	collision: true
+	collision: true,
+	compress: true
 };
 
 describe('🥥 snapOnMove()', () => {
