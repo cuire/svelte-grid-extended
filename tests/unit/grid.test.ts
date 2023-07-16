@@ -4,7 +4,8 @@ import {
 	getCollisions,
 	getGridDimensions,
 	hasCollisions,
-	isItemColliding
+	isItemColliding,
+	getAvailablePosition
 } from '../../src/lib/utils/grid';
 
 import type { LayoutItem } from '../../src/lib/types';
@@ -110,5 +111,42 @@ describe('🍦 getGridDimensions()', () => {
 		const { cols, rows } = getGridDimensions(items);
 		expect(cols).toBe(4);
 		expect(rows).toBe(4);
+	});
+});
+
+describe('🍨 getAvailablePosition()', () => {
+	test.each([
+		{
+			item: { id: '8', x: 0, y: 0, w: 1, h: 1 },
+			expected: { x: 4, y: 0 },
+			maxCols: 5,
+			maxRows: Infinity
+		},
+		{
+			item: { id: '8', x: 0, y: 0, w: 1, h: 1 },
+			expected: { x: 1, y: 3 },
+			maxCols: Infinity,
+			maxRows: Infinity
+		},
+		{
+			item: { id: '8', x: 0, y: 0, w: 4, h: 4 },
+			expected: { x: 0, y: 4 },
+			maxCols: 5,
+			maxRows: Infinity
+		},
+		{
+			item: { id: '8', x: 0, y: 0, w: 4, h: 4 },
+			expected: { x: 4, y: 0 },
+			maxCols: Infinity,
+			maxRows: 5
+		},
+		{
+			item: { id: '8', x: 0, y: 0, w: 4, h: 4 },
+			expected: null,
+			maxCols: 5,
+			maxRows: 5
+		}
+	])('should return available position', ({ item, expected, maxCols, maxRows }) => {
+		expect(getAvailablePosition(item, items, maxCols, maxRows)).toEqual(expected);
 	});
 });
