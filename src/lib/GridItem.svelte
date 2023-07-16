@@ -155,16 +155,16 @@
 	}
 
 	function updateCollItemPositionWithoutCompress(collItem: LayoutItem, items: LayoutItem[]) {
-		const newPosition = getAvailablePosition(collItem, items, gridParams.maxCols);
+		const newPosition = getAvailablePosition(
+			collItem,
+			items,
+			gridParams.maxCols,
+			gridParams.maxRows
+		);
 		if (newPosition) {
 			const { x, y } = newPosition;
 			collItem.x = x;
 			collItem.y = y;
-		} else {
-			// no available space
-			const { rows } = getGridDimensions(items);
-			collItem.x = 0;
-			collItem.y = rows;
 		}
 		dispatch('itemchange', { item: collItem as LayoutItem<T> });
 	}
