@@ -32,16 +32,17 @@ pnpm add svelte-grid-extended
 
 ### Main props
 
-| prop      | description                                                                                             | type                                | default  |
-| --------- | ------------------------------------------------------------------------------------------------------- | ----------------------------------- | -------- |
-| cols      | Grid columns count. If set to 0, grid will grow infinitly. Must be >= 0.                                | number                              | 0        |
-| rows      | Grid rows count. If set to 0, grid will grow infinitly. Must be >= 0.                                   | number                              | 0        |
-| itemSize  | Size of the grid item. If not set, grid will calculate it based on container size.                      | { width?: number, height?: number } | {}       |
-| items     | Array of grid items.                                                                                    | [Layout\<T\>](#layout-type)         | requried |
-| gap       | Gap between grid items.                                                                                 | number                              | 10       |
-| bounds    | Should grid items be bounded by the grid container.                                                     | boolean                             | false    |
-| readonly  | If true disables interaction with grid items.                                                           | boolean                             | false    |
-| collision | If true, grid will try to move all coliding items to the nearest available position. ⚠️ Sets `rows = 0` | boolean                             | false    |
+| prop      | description                                                                                                                             | type                                | default  |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- | -------- |
+| cols      | Grid columns count. If set to 0, grid will grow infinitly. Must be >= 0.                                                                | number                              | 0        |
+| rows      | Grid rows count. If set to 0, grid will grow infinitly. Must be >= 0.                                                                   | number                              | 0        |
+| itemSize  | Size of the grid item. If not set, grid will calculate it based on container size.                                                      | { width?: number, height?: number } | {}       |
+| items     | Array of grid items.                                                                                                                    | [Layout\<T\>](#layout-type)         | requried |
+| gap       | Gap between grid items.                                                                                                                 | number                              | 10       |
+| bounds    | Should grid items be bounded by the grid container.                                                                                     | boolean                             | false    |
+| readonly  | If true disables interaction with grid items.                                                                                           | boolean                             | false    |
+| collision | If true, grid will try to move all coliding items to the first available space. ⚠️ Sets `rows = 0`                                      | boolean                             | false    |
+| compress  | If true, the grid will compress items vertically towards the top into any available space. ⚠️ Only takes effect when `collision = true` | boolean                             | false    |
 
 > ⚠️ if `cols` or/and `rows` are set to 0, `itemSize.width` or/and `itemSize.height` must be setted.
 
