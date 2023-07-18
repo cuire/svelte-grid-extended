@@ -15,7 +15,7 @@
 	const itemSize = { height: 100 };
 </script>
 
-<Grid {items} cols={10} {itemSize} collision={true} let:item>
+<Grid {items} cols={10} {itemSize} collision={true} compress={false} let:item>
 	<div class="item">{item.id}</div>
 </Grid>
 

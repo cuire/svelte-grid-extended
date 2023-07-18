@@ -1,7 +1,12 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 	import { coordinate2size, calcPosition, snapOnMove, snapOnResize } from './utils/item';
-	import { hasCollisions, getCollisions } from './utils/grid';
+	import {
+		hasCollisions,
+		getCollisions,
+		getAvailablePosition,
+		getGridDimensions
+	} from './utils/grid';
 	import type { LayoutItem, ItemSize, GridParams, LayoutChangeDetail } from './types';
 
 	type T = $$Generic;
@@ -47,6 +52,10 @@
 	}
 
 	let previewItem: LayoutItem<T> = item;
+
+	$: if (!active && item) {
+		previewItem = item;
+	}
 
 	$: previewItem, dispatch('previewchange', { item: previewItem });
 
@@ -145,7 +154,49 @@
 		}
 	}
 
-	function movePreviewWithCollisions(x: number, y: number) {
+	function updateCollItemPositionWithoutCompress(collItem: LayoutItem, items: LayoutItem[]) {
+		const newPosition = getAvailablePosition(
+			collItem,
+			items,
+			gridParams.maxCols,
+			gridParams.maxRows
+		);
+		if (newPosition) {
+			const { x, y } = newPosition;
+			collItem.x = x;
+			collItem.y = y;
+		}
+		dispatch('itemchange', { item: collItem as LayoutItem<T> });
+	}
+
+	function handleCollisionsForPreviewItemWithoutCompress(newAttributes: {
+		x?: number;
+		y?: number;
+		w?: number;
+		h?: number;
+	}) {
+		const itemsExceptPreview = gridParams.items.filter((item) => item.id != previewItem.id);
+		const collItems = getCollisions({ ...previewItem, ...newAttributes }, itemsExceptPreview);
+
+		collItems.forEach((collItem: LayoutItem) => {
+			const itemsExceptCollItem = gridParams.items.filter((item) => item.id != collItem.id);
+			const items = [
+				...itemsExceptCollItem.filter((item) => item.id != previewItem.id),
+				{ ...previewItem, ...newAttributes }
+			];
+			updateCollItemPositionWithoutCompress(collItem, items);
+		});
+
+		previewItem = { ...previewItem, ...newAttributes };
+		dispatch('itemchange', { item: previewItem as LayoutItem<T> });
+		applyPreview();
+	}
+
+	function movePreviewWithCollisionsWithoutCompress(x: number, y: number) {
+		handleCollisionsForPreviewItemWithoutCompress({ x, y });
+	}
+
+	function movePreviewWithCollisionsWithCompress(x: number, y: number) {
 		let newY = y;
 		const itemsExceptPreview = gridParams.items.filter((item) => item.id != previewItem.id);
 		while (newY >= 0) {
@@ -184,6 +235,14 @@
 		if (positionChanged) {
 			compressItems();
 			applyPreview();
+		}
+	}
+
+	function movePreviewWithCollisions(x: number, y: number) {
+		if (gridParams.compress) {
+			movePreviewWithCollisionsWithCompress(x, y);
+		} else {
+			movePreviewWithCollisionsWithoutCompress(x, y);
 		}
 	}
 
@@ -275,7 +334,11 @@
 		}
 	}
 
-	function resizePreviewWithCollisions(w: number, h: number) {
+	function resizePreviewWithCollisionsWithoutCompress(w: number, h: number) {
+		handleCollisionsForPreviewItemWithoutCompress({ w, h });
+	}
+
+	function resizePreviewWithCollisionsWithCompress(w: number, h: number) {
 		const sizeChanged = w != previewItem.w || h != previewItem.h;
 		if (sizeChanged) {
 			const hGap = h - previewItem.h;
@@ -287,6 +350,14 @@
 				dispatch('itemchange', { item: item as LayoutItem<T> });
 			});
 			compressItems();
+		}
+	}
+
+	function resizePreviewWithCollisions(w: number, h: number) {
+		if (gridParams.compress) {
+			resizePreviewWithCollisionsWithCompress(w, h);
+		} else {
+			resizePreviewWithCollisionsWithoutCompress(w, h);
 		}
 	}
 

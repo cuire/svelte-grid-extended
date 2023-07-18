@@ -39,6 +39,7 @@ export type GridParams = {
 	items: LayoutItem[];
 	readOnly: boolean;
 	collision: boolean;
+	compress: boolean;
 };
 
 export type LayoutChangeDetail<T = unknown> = {
