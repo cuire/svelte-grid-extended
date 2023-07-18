@@ -1,6 +1,6 @@
 {
 	"name": "svelte-grid-extended",
-	"version": "0.3.2",
+	"version": "0.4.0",
 	"description": "A draggable and resizable grid layout, for Svelte",
 	"repository": "https://github.com/cuire/svelte-grid-extended",
 	"scripts": {
