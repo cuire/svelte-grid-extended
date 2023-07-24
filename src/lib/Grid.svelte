@@ -24,7 +24,8 @@
 		GridSize,
 		LayoutItem,
 		LayoutChangeDetail,
-		GridParams
+		GridParams,
+		Collision
 	} from './types';
 	import { writable, type Readable, type Writable } from 'svelte/store';
 
@@ -109,6 +110,11 @@
 
 	export { classes as class };
 
+	/**
+	 * This option set the collision strategy between grid items. If is not 'none' then it sets 'rows' option to 0.
+	 */
+	export let collision: Collision = 'none';
+
 	let _cols: number;
 
 	let _rows: number;
@@ -150,10 +156,14 @@
 		maxRows = shouldExpandRows ? Infinity : _rows;
 	}
 
+	$: if (collision !== 'none') {
+		rows = 0;
+	}
+
 	/**
-	 * Force the grid to update its dimensions. By default called when any of the grid items changes.
+	 * Force the grid to update. By default called when any of the grid items changes.
 	 */
-	function updateGridDimensions() {
+	function updateGrid() {
 		items = items;
 	}
 
@@ -207,9 +217,10 @@
 		bounds,
 		readOnly,
 		debug,
+		collision,
 		registerItem,
 		unregisterItem,
-		updateGridDimensions
+		updateGrid
 	});
 
 	$: gridSettings.update((settings) => ({
@@ -222,7 +233,8 @@
 		items,
 		bounds,
 		readOnly,
-		debug
+		debug,
+		collision
 	}));
 
 	setContext(GRID_CONTEXT_NAME, gridSettings);

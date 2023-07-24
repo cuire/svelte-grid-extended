@@ -153,15 +153,24 @@ describe('🥝 clamp()', () => {
 const gridParams: GridParams = {
 	itemSize: { width: 100, height: 100 },
 	gap: 0,
+	cols: 8,
+	rows: 8,
 	maxCols: 8,
 	maxRows: 8,
-	items: [],
-	bounds: false
+	items: {},
+	bounds: false,
+	boundsTo: new Object() as HTMLElement,
+	debug: false,
+	readOnly: false,
+	collision: 'none',
+	registerItem: () => {},
+	unregisterItem: () => {},
+	updateGrid: () => {}
 };
 
 describe('🥥 snapOnMove()', () => {
-	const item1x1: LayoutItem = { id: '0', x: 0, y: 0, w: 1, h: 1 };
-	const item4x4: LayoutItem = { id: '0', x: 0, y: 0, w: 4, h: 4 };
+	const item1x1: LayoutItem = { id: '0', x: 0, y: 0, w: 1, h: 1, movable: true, resizable: true };
+	const item4x4: LayoutItem = { id: '0', x: 0, y: 0, w: 4, h: 4, movable: true, resizable: true };
 
 	test.each([
 		[0, 0, item1x1, gridParams, { x: 0, y: 0 }],
@@ -213,8 +222,8 @@ describe('🥥 snapOnMove()', () => {
 });
 
 describe('🍍 snapOnResize()', () => {
-	const itemX1Y1: LayoutItem = { id: '0', x: 1, y: 1, w: 1, h: 1 };
-	const itemX4Y4: LayoutItem = { id: '0', x: 4, y: 4, w: 1, h: 1 };
+	const itemX1Y1: LayoutItem = { id: '0', x: 1, y: 1, w: 1, h: 1, movable: true, resizable: true };
+	const itemX4Y4: LayoutItem = { id: '0', x: 4, y: 4, w: 1, h: 1, movable: true, resizable: true };
 
 	test.each([
 		[100, 100, itemX1Y1, gridParams, { w: 1, h: 1 }],
@@ -266,7 +275,7 @@ describe('🍍 snapOnResize()', () => {
 });
 
 describe('🫑 calcPosition()', () => {
-	const item: LayoutItem = { id: '0', x: 1, y: 1, w: 1, h: 1 };
+	const item: LayoutItem = { id: '0', x: 1, y: 1, w: 1, h: 1, movable: true, resizable: true };
 	const itemSize: ItemSize = { width: 100, height: 100 };
 	const gap = 0;
 
