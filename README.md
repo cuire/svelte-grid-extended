@@ -32,16 +32,16 @@ pnpm add svelte-grid-extended
 
 ### Main props
 
-| prop     | description                                                                        | type                                | default  |
-| -------- | ---------------------------------------------------------------------------------- | ----------------------------------- | -------- |
-| cols     | Grid columns count. If set to 0, grid will grow infinitly. Must be >= 0.           | number                              | 0        |
-| rows     | Grid rows count. If set to 0, grid will grow infinitly. Must be >= 0.              | number                              | 0        |
-| itemSize | Size of the grid item. If not set, grid will calculate it based on container size. | { width?: number, height?: number } | {}       |
-| items    | Array of grid items.                                                               | [Layout\<T\>](#layout-type)         | required |
-| gap      | Gap between grid items.                                                            | number                              | 10       |
-| bounds   | Should grid items be bounded by the grid container.                                | boolean                             | false    |
-| readonly | If true disables interaction with grid items.                                      | boolean                             | false    |
-| collision | Collision behavior of grid items. Can be `none`, `push`, or `compress`.                                      | string                             | `none`    |
+| prop      | description                                                                        | type                                | default  |
+| --------- | ---------------------------------------------------------------------------------- | ----------------------------------- | -------- |
+| cols      | Grid columns count. If set to 0, grid will grow infinitly. Must be >= 0.           | number                              | 0        |
+| rows      | Grid rows count. If set to 0, grid will grow infinitly. Must be >= 0.              | number                              | 0        |
+| itemSize  | Size of the grid item. If not set, grid will calculate it based on container size. | { width?: number, height?: number } | {}       |
+| items     | Array of grid items.                                                               | [Layout\<T\>](#layout-type)         | required |
+| gap       | Gap between grid items.                                                            | number                              | 10       |
+| bounds    | Should grid items be bounded by the grid container.                                | boolean                             | false    |
+| readonly  | If true disables interaction with grid items.                                      | boolean                             | false    |
+| collision | Collision behavior of grid items. Can be `none`, `push`, or `compress`.            | string                              | `none`   |
 
 > ⚠️ if `cols` or/and `rows` are set to 0, `itemSize.width` or/and `itemSize.height` must be setted.
 
@@ -125,23 +125,23 @@ Grid emits the following events:
 ## Usage
 
 - [svelte-grid-extended](#svelte-grid-extended)
-	- [Description](#description)
-	- [Installation](#installation)
-	- [Props](#props)
-		- [Main props](#main-props)
-		- [Layout](#layout)
-		- [Style related props:](#style-related-props)
-	- [Events](#events)
-	- [Usage](#usage)
-		- [Basic](#basic)
-		- [Static grid](#static-grid)
-		- [Grid without bounds](#grid-without-bounds)
-		- [Styling](#styling)
-		- [Disable interactions](#disable-interactions)
-		- [Collision Behavior](#collision-behavior)
-			- [None](#none)
-			- [Push](#push)
-			- [Compress](#compress)
+  - [Description](#description)
+  - [Installation](#installation)
+  - [Props](#props)
+    - [Main props](#main-props)
+    - [Layout](#layout)
+    - [Style related props:](#style-related-props)
+  - [Events](#events)
+  - [Usage](#usage)
+    - [Basic](#basic)
+    - [Static grid](#static-grid)
+    - [Grid without bounds](#grid-without-bounds)
+    - [Styling](#styling)
+    - [Disable interactions](#disable-interactions)
+    - [Collision Behavior](#collision-behavior)
+      - [None](#none)
+      - [Push](#push)
+      - [Compress](#compress)
 
 ### Basic
 
@@ -344,7 +344,7 @@ Setting `collision` prop to `none` will ignore any collisions. This is the defau
 		{ id: '4', x: 4, y: 2, w: 1, h: 3 },
 		{ id: '5', x: 8, y: 0, w: 2, h: 8 }
 	];
-	
+
 	const itemSize = { height: 40 };
 </script>
 
@@ -358,6 +358,7 @@ Setting `collision` prop to `none` will ignore any collisions. This is the defau
 ```
 
 #### Push
+
 Setting `collision` prop to `push` will cause grid items to move to the first available space when colliding. The grid will grow vertically as needed to accommodate all items.
 
 ✨ [repl](https://svelte.dev/repl/36abb5e5be6f4b0ebe637b2676ccf606?version=4.1.1)
@@ -374,7 +375,7 @@ Setting `collision` prop to `push` will cause grid items to move to the first av
 		{ id: '4', x: 4, y: 2, w: 1, h: 3 },
 		{ id: '5', x: 8, y: 0, w: 2, h: 8 }
 	];
-	
+
 	const itemSize = { height: 40 };
 </script>
 
@@ -388,6 +389,7 @@ Setting `collision` prop to `push` will cause grid items to move to the first av
 ```
 
 #### Compress
+
 Setting `collision` prop to `compress` will compress items vertically towards the top into any available space when colliding. The grid will grow vertically as needed to accommodate all items.
 
 ✨ [repl](https://svelte.dev/repl/86cff54f2efa437285c3245ecb713702?version=4.1.1)
@@ -404,7 +406,7 @@ Setting `collision` prop to `compress` will compress items vertically towards th
 		{ id: '4', x: 4, y: 2, w: 1, h: 3 },
 		{ id: '5', x: 8, y: 0, w: 2, h: 8 }
 	];
-	
+
 	const itemSize = { height: 40 };
 </script>
 

@@ -1,7 +1,13 @@
 <script lang="ts">
 	import { createEventDispatcher, onMount } from 'svelte';
 
-	import { coordinate2size, calcPosition, snapOnMove, snapOnResize } from './utils/item';
+	import {
+		coordinate2size,
+		calcPosition,
+		snapOnMove,
+		snapOnResize,
+		type SnapGridParams
+	} from './utils/item';
 	import { hasCollisions, getCollisions, getAvailablePosition } from './utils/grid';
 
 	import type { LayoutItem, LayoutChangeDetail, Size, ItemSize } from './types';
@@ -181,7 +187,7 @@
 
 		// TODO: throttle this, hasColisions is expensive
 		{
-			const { x, y } = snapOnMove(left, top, previewItem, $gridParams);
+			const { x, y } = snapOnMove(left, top, previewItem, $gridParams as SnapGridParams);
 
 			if ($gridParams.collision !== 'none') {
 				movePreviewWithCollisions(x, y);
@@ -365,7 +371,7 @@
 
 		// TODO: throttle this, hasColisions is expensive
 		{
-			const { w, h } = snapOnResize(width, height, previewItem, $gridParams);
+			const { w, h } = snapOnResize(width, height, previewItem, $gridParams as SnapGridParams);
 			if ($gridParams.collision !== 'none') {
 				resizePreviewWithCollisions(w, h);
 			} else {
