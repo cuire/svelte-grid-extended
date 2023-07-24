@@ -2,7 +2,7 @@
 	import { createEventDispatcher, onMount } from 'svelte';
 
 	import { coordinate2size, calcPosition, snapOnMove, snapOnResize } from './utils/item';
-	import { hasCollisions } from './utils/grid';
+	import { hasCollisions, getCollisions, getAvailablePosition } from './utils/grid';
 
 	import type { LayoutItem, LayoutChangeDetail, Size, ItemSize } from './types';
 	import { getGridContext } from './Grid.svelte';
@@ -94,7 +94,7 @@
 		height = newPosition.height;
 	}
 
-	$: previewItem = { ...item };
+	$: previewItem = item;
 
 	$: previewItem, dispatch('previewchange', { item: previewItem });
 
@@ -125,7 +125,7 @@
 		initialPointerPosition.left = 0;
 		initialPointerPosition.top = 0;
 		itemRef.releasePointerCapture(event.pointerId);
-		$gridParams.updateGridDimensions();
+		$gridParams.updateGrid();
 	}
 
 	// MOVE ITEM LOGIC
@@ -171,18 +171,119 @@
 		left = _left;
 		top = _top;
 
-		window.scroll({
-			left: left - window.innerWidth / 2,
-			top: top - window.innerHeight / 2,
-			behavior: 'smooth'
-		});
+		if ($gridParams.collision === 'none') {
+			window.scroll({
+				left: left - window.innerWidth / 2,
+				top: top - window.innerHeight / 2,
+				behavior: 'smooth'
+			});
+		}
 
 		// TODO: throttle this, hasColisions is expensive
 		{
 			const { x, y } = snapOnMove(left, top, previewItem, $gridParams);
-			if (!hasCollisions({ ...previewItem, x, y }, Object.values($gridParams.items))) {
-				previewItem = { ...previewItem, x, y };
+
+			if ($gridParams.collision !== 'none') {
+				movePreviewWithCollisions(x, y);
+			} else {
+				if (!hasCollisions({ ...previewItem, x, y }, Object.values($gridParams.items))) {
+					previewItem = { ...previewItem, x, y };
+				}
 			}
+		}
+	}
+
+	function updateCollItemPositionWithPush(collItem: LayoutItem, items: LayoutItem[]) {
+		const newPosition = getAvailablePosition(
+			collItem,
+			items,
+			$gridParams.maxCols,
+			$gridParams.maxRows
+		);
+		if (newPosition) {
+			const { x, y } = newPosition;
+			collItem.x = x;
+			collItem.y = y;
+		}
+		$gridParams.updateGrid();
+	}
+
+	function handleCollisionsForPreviewItemWithPush(newAttributes: {
+		x?: number;
+		y?: number;
+		w?: number;
+		h?: number;
+	}) {
+		const gridItems = Object.values($gridParams.items);
+		const itemsExceptPreview = gridItems.filter((item) => item.id != previewItem.id);
+		const collItems = getCollisions({ ...previewItem, ...newAttributes }, itemsExceptPreview);
+
+		collItems.forEach((collItem: LayoutItem) => {
+			const itemsExceptCollItem = gridItems.filter((item) => item.id != collItem.id);
+			const items = [
+				...itemsExceptCollItem.filter((item) => item.id != previewItem.id),
+				{ ...previewItem, ...newAttributes }
+			];
+			updateCollItemPositionWithPush(collItem, items);
+		});
+
+		previewItem = { ...previewItem, ...newAttributes };
+		$gridParams.updateGrid();
+		applyPreview();
+	}
+
+	function movePreviewWithCollisionsWithPush(x: number, y: number) {
+		handleCollisionsForPreviewItemWithPush({ x, y });
+	}
+
+	function movePreviewWithCollisionsWithCompress(x: number, y: number) {
+		const gridItems = Object.values($gridParams.items);
+		let newY = y;
+		const itemsExceptPreview = gridItems.filter((item) => item.id != previewItem.id);
+		while (newY >= 0) {
+			const collItems = getCollisions({ ...previewItem, x, y: newY }, gridItems);
+			if (collItems.length > 0) {
+				const sortedItems = collItems.sort((a, b) => b.y - a.y);
+				let moved = false;
+				sortedItems.forEach((sortItem) => {
+					//if you want to fix sensitivity of grid, change this statement
+					if (y + previewItem.h / 2 >= sortItem.y + sortItem.h / 2) {
+						moved = true;
+						newY = sortItem.y + sortItem.h;
+						sortedItems.forEach((item) => {
+							if (
+								!hasCollisions({ ...item, y: item.y - previewItem.h }, itemsExceptPreview) &&
+								item.y - previewItem.h >= 0
+							) {
+								item.y -= previewItem.h;
+							}
+						});
+						return false;
+					}
+				});
+				if (!moved) {
+					newY = previewItem.y;
+				}
+				break;
+			}
+			newY--;
+		}
+		if (newY < 0 || y === 0) {
+			newY = 0;
+		}
+		const positionChanged = x != previewItem.x || newY != previewItem.y;
+		previewItem = { ...previewItem, x, y: newY };
+		if (positionChanged) {
+			compressItems();
+			applyPreview();
+		}
+	}
+
+	function movePreviewWithCollisions(x: number, y: number) {
+		if ($gridParams.collision === 'compress') {
+			movePreviewWithCollisionsWithCompress(x, y);
+		} else {
+			movePreviewWithCollisionsWithPush(x, y);
 		}
 	}
 
@@ -254,18 +355,54 @@
 			height = Math.min(height, maxSize.height);
 		}
 
-		window.scroll({
-			left: left - window.innerWidth / 2,
-			top: top - window.innerHeight / 2,
-			behavior: 'smooth'
-		});
+		if ($gridParams.collision === 'none') {
+			window.scroll({
+				left: left - window.innerWidth / 2,
+				top: top - window.innerHeight / 2,
+				behavior: 'smooth'
+			});
+		}
 
 		// TODO: throttle this, hasColisions is expensive
 		{
 			const { w, h } = snapOnResize(width, height, previewItem, $gridParams);
-			if (!hasCollisions({ ...previewItem, w, h }, Object.values($gridParams.items))) {
-				previewItem = { ...previewItem, w, h };
+			if ($gridParams.collision !== 'none') {
+				resizePreviewWithCollisions(w, h);
+			} else {
+				if (!hasCollisions({ ...previewItem, w, h }, Object.values($gridParams.items))) {
+					previewItem = { ...previewItem, w, h };
+				}
 			}
+		}
+	}
+
+	function resizePreviewWithCollisionsWithPush(w: number, h: number) {
+		handleCollisionsForPreviewItemWithPush({ w, h });
+	}
+
+	function resizePreviewWithCollisionsWithCompress(w: number, h: number) {
+		const sizeChanged = w != previewItem.w || h != previewItem.h;
+		if (sizeChanged) {
+			const hGap = h - previewItem.h;
+			previewItem = { ...previewItem, w, h };
+			applyPreview();
+			const collItems = getCollisions(
+				{ ...previewItem, w, h: 9999 },
+				Object.values($gridParams.items)
+			);
+			collItems.forEach((item) => {
+				item.y += hGap;
+				$gridParams.updateGrid();
+			});
+			compressItems();
+		}
+	}
+
+	function resizePreviewWithCollisions(w: number, h: number) {
+		if ($gridParams.collision === 'compress') {
+			resizePreviewWithCollisionsWithCompress(w, h);
+		} else {
+			resizePreviewWithCollisionsWithPush(w, h);
 		}
 	}
 
@@ -275,12 +412,57 @@
 		window.removeEventListener('pointermove', resize);
 		window.removeEventListener('pointerup', resizeEnd);
 	}
+
+	function compressItems() {
+		const gridItems = Object.values($gridParams.items);
+		const sortedItems = [...gridItems].sort((a, b) => a.y - b.y);
+		sortedItems.reduce(
+			(accItem, currentItem) => {
+				if (currentItem.id === previewItem.id) {
+					//if previewItem do nothing
+				} else if (previewItem.y < currentItem.y + currentItem.h) {
+					//compress items above previewItem
+					const maxY =
+						currentItem.y >= previewItem.y
+							? currentItem.y + previewItem.h + 1
+							: previewItem.y + currentItem.h + 1;
+					let newY = maxY;
+					while (newY >= 0) {
+						if (hasCollisions({ ...currentItem, y: newY }, accItem)) {
+							break;
+						}
+						newY--;
+					}
+					currentItem.y = newY + 1;
+					$gridParams.updateGrid();
+					accItem.push(currentItem);
+				} else {
+					//compress items below previewItem
+					let newY = currentItem.y;
+					while (newY >= 0) {
+						if (hasCollisions({ ...currentItem, y: newY }, accItem)) {
+							break;
+						}
+						newY--;
+					}
+					if (newY < currentItem.y && newY > 0) {
+						currentItem.y = newY + 1;
+					}
+					$gridParams.updateGrid();
+					accItem.push(currentItem);
+				}
+				return accItem;
+			},
+			[previewItem]
+		);
+	}
 </script>
 
 <div
 	class={`${classes} ${active ? activeClass : ''}`}
 	class:item-default={!classes}
 	class:active-default={!activeClass && active}
+	class:non-active-default={!active}
 	on:pointerdown={_movable && !$$slots.moveHandle ? moveStart : null}
 	style={`position: absolute; left:${left}px; top:${top}px; width: ${width}px; height: ${height}px; 
 			${_movable && !$$slots.moveHandle ? 'cursor: move;' : ''} touch-action: none; user-select: none;`}
@@ -324,7 +506,10 @@
 		background-color: rgb(192, 127, 127);
 		transition: all 0.2s;
 	}
-
+	.non-active-default {
+		transition: left 0.2s, top 0.2s;
+		transition-timing-function: ease-in-out;
+	}
 	.resizer-default {
 		user-select: none;
 		touch-action: none;

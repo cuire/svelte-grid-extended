@@ -51,11 +51,14 @@ export type GridParams = {
 	items: Record<string, LayoutItem>;
 	readOnly: boolean;
 	debug: boolean;
+	collision: Collision;
 	registerItem: (item: LayoutItem) => void;
 	unregisterItem: (item: LayoutItem) => void;
-	updateGridDimensions: () => void;
+	updateGrid: () => void;
 };
 
 export type LayoutChangeDetail = {
 	item: LayoutItem;
 };
+
+export type Collision = 'none' | 'push' | 'compress';
