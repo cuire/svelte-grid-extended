@@ -14,7 +14,7 @@
 	import { getGridContext } from './Grid.svelte';
 
 	const dispatch = createEventDispatcher<{
-		itemchange: LayoutChangeDetail;
+		change: LayoutChangeDetail;
 		previewchange: LayoutChangeDetail;
 	}>();
 
@@ -109,7 +109,8 @@
 		item.y = previewItem.y;
 		item.w = previewItem.w;
 		item.h = previewItem.h;
-		dispatch('itemchange', { item });
+		dispatch('change', { item });
+		$gridParams.dispatch('change', { item });
 	}
 
 	// INTERACTION LOGIC

@@ -220,7 +220,8 @@
 		collision,
 		registerItem,
 		unregisterItem,
-		updateGrid
+		updateGrid,
+		dispatch
 	});
 
 	$: gridSettings.update((settings) => ({

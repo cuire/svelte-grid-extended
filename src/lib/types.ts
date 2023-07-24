@@ -1,3 +1,4 @@
+import type { createEventDispatcher } from 'svelte';
 import type { RequireAtLeastOne } from '$lib/utils/types';
 
 export type LayoutItem = Size &
@@ -55,6 +56,11 @@ export type GridParams = {
 	registerItem: (item: LayoutItem) => void;
 	unregisterItem: (item: LayoutItem) => void;
 	updateGrid: () => void;
+	dispatch: ReturnType<
+		typeof createEventDispatcher<{
+			change: LayoutChangeDetail;
+		}>
+	>;
 };
 
 export type LayoutChangeDetail = {
