@@ -56,7 +56,7 @@ pnpm add svelte-grid-extended
 
 ### Basic
 
-✨ [repl](https://svelte.dev/repl/b3e11826a1b54e05aefeb1f9fead15ac?version=3.52.0)
+✨ [repl](https://svelte.dev/repl/effd88614c0c4372864ebeb582415a21?version=4.1.1)
 
 ```svelte
 <script lang="ts">
@@ -80,7 +80,7 @@ When `cols` or `rows` and `itemsSize` are set, grid becomes static and ignores t
 It can be set to both dimensions or just one.
 
 Both:
-✨ [repl](https://svelte.dev/repl/d38bd9b77ad34f6da278a69fcdc09adf?version=3.52.0)
+✨ [repl](https://svelte.dev/repl/7d431c0884d343529e5e98fcbe74afbd?version=4.1.1)
 
 ```svelte
 <script lang="ts">
@@ -100,7 +100,7 @@ Both:
 ```
 
 Only rows:
-✨ [repl](https://svelte.dev/repl/3e92c8de8c924a3d9e0cc340063b4381?version=3.52.0)
+✨ [repl](https://svelte.dev/repl/53994707c9f84d2cad2f9eac5a9f9ea6?version=4.1.1)
 
 ```svelte
 <script lang="ts">
@@ -125,7 +125,7 @@ When `cols` or/and `rows` set to 0, grid grows infinitly. The grid container ada
 
 It can be set to both dimensions or just one.
 
-✨ [repl](https://svelte.dev/repl/858bb48cc8f8477590b8d45ac0c8891e?version=3.52.0)
+✨ [repl](https://svelte.dev/repl/ade95bbc3a7445518df6a51c3fd9be2e?version=4.1.1)
 
 ```svelte
 <script lang="ts">
@@ -148,7 +148,7 @@ It can be set to both dimensions or just one.
 
 Grid can be styled with classes passed to various props. Check [Style related props](#style-related-props) section for more info.
 
-✨ [repl](https://svelte.dev/repl/b158b6fbb2234241b7ea9737b7e2fc24?version=3.53.1)
+✨ [repl](https://svelte.dev/repl/97243bc1472d42ff944e47c30b72d73d?version=4.1.1)
 
 ```svelte
 <script lang="ts">
@@ -199,7 +199,7 @@ Grid can be styled with classes passed to various props. Check [Style related pr
 
 To disable interactions, set `readOnly` prop to `true`. Or set `movable` and/or `resizable` to `false` on specific item.
 
-Read Only grid: ✨ [repl](https://svelte.dev/repl/29ce85a23a714c51b6638f12f5ecdd7c?version=3.53.1)
+Read Only grid: ✨ [repl](https://svelte.dev/repl/e7183ff3136c47fe94fcd5398573aef5?version=4.1.1)
 
 ```svelte
 <script lang="ts">
@@ -216,7 +216,7 @@ Read Only grid: ✨ [repl](https://svelte.dev/repl/29ce85a23a714c51b6638f12f5ecd
 </Grid>
 ```
 
-Make item non-interactive: ✨ [repl](https://svelte.dev/repl/1b3b9b9b9b9b9b9b9b9b9b9b9b9b9b9b?version=3.53.1)
+Make item non-interactive: ✨ [repl](https://svelte.dev/repl/50f1acb8be5b426896cb6d9b6c10e9f8?version=4.1.1)
 
 ```svelte
 <script lang="ts">
@@ -334,6 +334,8 @@ Setting `collision` prop to `compress` will compress items vertically towards th
 
 ### Custom move/resize handle
 
+✨ [repl](https://svelte.dev/repl/5f9dbbd845cc40f6a222734856fc9b1d?version=4.1.1)
+
 ```svelte
 <script lang="ts">
 	import Grid, { GridItem } from 'svelte-grid-extended';
@@ -355,6 +357,8 @@ Setting `collision` prop to `compress` will compress items vertically towards th
 ```
 
 ### Two way binding
+
+✨ [repl](https://svelte.dev/repl/ef5d5716505642b7a9212c3d0c7b6803?version=4.1.1)
 
 ```svelte
 <script lang="ts">
