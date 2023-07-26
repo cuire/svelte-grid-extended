@@ -131,8 +131,6 @@
 
 	let shouldExpandCols = false;
 
-	$: if (collision) rows = 0;
-
 	$: if (typeof cols === 'number') _cols = cols;
 
 	$: if (typeof rows === 'number') _rows = rows;
