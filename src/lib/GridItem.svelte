@@ -36,6 +36,8 @@
 
 	export let previewClass: string | undefined = undefined;
 
+	export let resizerClass: string | undefined = undefined;
+
 	export let x: number;
 
 	export let y: number;
@@ -526,7 +528,11 @@
 
 	{#if _resizable}
 		<slot name="resizeHandle" {resizeStart}>
-			<div class="resizer-default" on:pointerdown={resizeStart} />
+			<div
+				class={resizerClass}
+				class:resizer-default={!resizerClass}
+				on:pointerdown={resizeStart}
+			/>
 		</slot>
 	{/if}
 </div>
