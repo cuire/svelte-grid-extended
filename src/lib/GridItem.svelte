@@ -1,34 +1,65 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
-	import { coordinate2size, calcPosition, snapOnMove, snapOnResize } from './utils/item';
-	import {
-		hasCollisions,
-		getCollisions,
-		getAvailablePosition,
-		getGridDimensions
-	} from './utils/grid';
-	import type { LayoutItem, ItemSize, GridParams, LayoutChangeDetail } from './types';
+	import { createEventDispatcher, onMount } from 'svelte';
 
-	type T = $$Generic;
+	import {
+		coordinate2size,
+		calcPosition,
+		snapOnMove,
+		snapOnResize,
+		type SnapGridParams
+	} from './utils/item';
+	import { hasCollisions, getCollisions, getAvailablePosition } from './utils/grid';
+
+	import type { LayoutItem, LayoutChangeDetail, Size, ItemSize } from './types';
+	import { getGridContext } from './Grid.svelte';
 
 	const dispatch = createEventDispatcher<{
-		itemchange: LayoutChangeDetail<T>;
-		previewchange: LayoutChangeDetail<T>;
+		change: LayoutChangeDetail;
+		previewchange: LayoutChangeDetail;
 	}>();
 
-	export let item: LayoutItem<T>;
-
-	export let gridParams: GridParams;
+	let gridParams = getGridContext();
 
 	let classes: string | undefined = undefined;
 
 	export { classes as class };
+
+	/**
+	 * Unique identifier of the item. Used to identify the item in collision checks.
+	 * @default uuidv4
+	 *
+	 * TODO: crypto.randomUUID() is not supported in non ssl environments
+	 */
+	export let id: string = crypto.randomUUID();
 
 	export let activeClass: string | undefined = undefined;
 
 	export let previewClass: string | undefined = undefined;
 
 	export let resizerClass: string | undefined = undefined;
+
+	export let x: number;
+
+	export let y: number;
+
+	export let w = 1;
+
+	export let h = 1;
+
+	/**
+	 * Minimum size of the item in Grid Units.
+	 */
+	export let min: Size = { w: 1, h: 1 };
+
+	/**
+	 * Maximum size of the item in Grid Units.
+	 * If not provided, the item will be able to grow infinitely.
+	 */
+	export let max: Size | undefined = undefined;
+
+	export let movable = true;
+
+	export let resizable = true;
 
 	let active = false;
 
@@ -40,10 +71,71 @@
 
 	let height: number;
 
-	$: if (!active) {
+	/**
+	 * Item object that is used in `$gridParams.items`.
+	 * When the item is mounted, it is registered in `$gridParams.items`.
+	 * By default, all props are in sync with the item object.
+	 * If item ref is used to change its size or position, the invalidate method should be called.
+	 * That is used to support two way binding of item props.
+	 * @see {invalidate}
+	 * @example
+	 * ```
+	 * item.x = 10;
+	 * item.invalidate();
+	 * ```
+	 * @example
+	 * ```
+	 * item.x = 10;
+	 * item.y = 10;
+	 * item.w = 2;
+	 * item.h = 2;
+	 * item.invalidate();
+	 * ```
+	 */
+	let item = {
+		id,
+		x,
+		y,
+		w,
+		h,
+		min,
+		max,
+		movable,
+		resizable,
+		invalidate
+	} as LayoutItem;
+
+	$: item.x = x;
+	$: item.y = y;
+	$: item.w = w;
+	$: item.h = h;
+	$: item.min = min;
+	$: item.max = max;
+	$: item.movable = movable;
+	$: item.resizable = resizable;
+
+	/**
+	 * Updates svelte-components props behind that item. Should be called when the item
+	 * changes its size or position by manipulation with item object.
+	 */
+	function invalidate() {
+		({ x, y, w, h } = item);
+		dispatch('change', { item });
+		$gridParams.dispatch('change', { item });
+	}
+
+	onMount(() => {
+		$gridParams.registerItem(item);
+		return () => {
+			$gridParams.unregisterItem(item);
+		};
+	});
+
+	// reposition item on grid change
+	$: if (!active && $gridParams.itemSize) {
 		const newPosition = calcPosition(item, {
-			itemSize: gridParams.itemSize,
-			gap: gridParams.gap
+			itemSize: $gridParams.itemSize,
+			gap: $gridParams.gap
 		});
 		left = newPosition.left;
 		top = newPosition.top;
@@ -51,7 +143,7 @@
 		height = newPosition.height;
 	}
 
-	let previewItem: LayoutItem<T> = item;
+	$: previewItem = { ...item };
 
 	$: if (!active && item) {
 		previewItem = item;
@@ -64,7 +156,7 @@
 		item.y = previewItem.y;
 		item.w = previewItem.w;
 		item.h = previewItem.h;
-		dispatch('itemchange', { item });
+		item.invalidate();
 	}
 
 	// INTERACTION LOGIC
@@ -86,32 +178,35 @@
 		initialPointerPosition.left = 0;
 		initialPointerPosition.top = 0;
 		itemRef.releasePointerCapture(event.pointerId);
+		$gridParams.updateGrid();
 	}
 
 	// MOVE ITEM LOGIC
 
 	let initialPosition = { left: 0, top: 0 };
 
-	$: movable = !gridParams.readOnly && item.movable === undefined && item.movable !== false;
+	$: _movable = !$gridParams.readOnly && movable;
 
 	let pointerShift = { left: 0, top: 0 };
 
 	function moveStart(event: PointerEvent) {
-		if (!movable) return;
 		if (event.button !== 0) return;
 		initInteraction(event);
 		initialPosition = { left, top };
-		// pointerShift = { left: event.pageX - left, top: event.pageY - top };
+		pointerShift = { left: event.pageX - left, top: event.pageY - top };
 		window.addEventListener('pointermove', move);
 		window.addEventListener('pointerup', moveEnd);
 	}
 
 	function move(event: PointerEvent) {
+		if (!$gridParams.itemSize) {
+			throw new Error('Grid is not mounted yet');
+		}
 		let _left = event.pageX - initialPointerPosition.left + initialPosition.left;
 		let _top = event.pageY - initialPointerPosition.top + initialPosition.top;
 
-		if (gridParams.bounds) {
-			const parentRect = gridParams.boundsTo.getBoundingClientRect();
+		if ($gridParams.bounds && $gridParams.boundsTo) {
+			const parentRect = $gridParams.boundsTo.getBoundingClientRect();
 			if (_left < parentRect.left) {
 				_left = parentRect.left;
 			}
@@ -129,7 +224,7 @@
 		left = _left;
 		top = _top;
 
-		if (!gridParams.collision) {
+		if ($gridParams.collision === 'none') {
 			window.scroll({
 				left: left - window.innerWidth / 2,
 				top: top - window.innerHeight / 2,
@@ -137,70 +232,70 @@
 			});
 		}
 
-		if (
-			Math.abs(left - item.w * gridParams.itemSize.width) > gridParams.itemSize.width / 8 ||
-			Math.abs(top - item.h * gridParams.itemSize.height) > gridParams.itemSize.height / 8
-		) {
-			const { x, y } = snapOnMove(left, top, previewItem, gridParams);
+		// TODO: throttle this, hasColisions is expensive
+		{
+			const { x, y } = snapOnMove(left, top, previewItem, $gridParams as SnapGridParams);
 
-			if (gridParams.collision) {
+			if ($gridParams.collision !== 'none') {
 				movePreviewWithCollisions(x, y);
 			} else {
-				if (!hasCollisions({ ...previewItem, x, y }, gridParams.items)) {
+				if (!hasCollisions({ ...previewItem, x, y }, Object.values($gridParams.items))) {
 					previewItem = { ...previewItem, x, y };
-					dispatch('itemchange', { item: previewItem as LayoutItem<T> });
 				}
 			}
 		}
 	}
 
-	function updateCollItemPositionWithoutCompress(collItem: LayoutItem, items: LayoutItem[]) {
+	function updateCollItemPositionWithPush(collItem: LayoutItem, items: LayoutItem[]) {
 		const newPosition = getAvailablePosition(
 			collItem,
 			items,
-			gridParams.maxCols,
-			gridParams.maxRows
+			$gridParams.maxCols,
+			$gridParams.maxRows
 		);
 		if (newPosition) {
 			const { x, y } = newPosition;
 			collItem.x = x;
 			collItem.y = y;
+			collItem.invalidate();
 		}
-		dispatch('itemchange', { item: collItem as LayoutItem<T> });
+		$gridParams.updateGrid();
 	}
 
-	function handleCollisionsForPreviewItemWithoutCompress(newAttributes: {
+	function handleCollisionsForPreviewItemWithPush(newAttributes: {
 		x?: number;
 		y?: number;
 		w?: number;
 		h?: number;
 	}) {
-		const itemsExceptPreview = gridParams.items.filter((item) => item.id != previewItem.id);
+		const gridItems = Object.values($gridParams.items);
+		const itemsExceptPreview = gridItems.filter((item) => item.id != previewItem.id);
 		const collItems = getCollisions({ ...previewItem, ...newAttributes }, itemsExceptPreview);
 
 		collItems.forEach((collItem: LayoutItem) => {
-			const itemsExceptCollItem = gridParams.items.filter((item) => item.id != collItem.id);
+			const itemsExceptCollItem = gridItems.filter((item) => item.id != collItem.id);
 			const items = [
 				...itemsExceptCollItem.filter((item) => item.id != previewItem.id),
 				{ ...previewItem, ...newAttributes }
 			];
-			updateCollItemPositionWithoutCompress(collItem, items);
+			updateCollItemPositionWithPush(collItem, items);
 		});
 
 		previewItem = { ...previewItem, ...newAttributes };
-		dispatch('itemchange', { item: previewItem as LayoutItem<T> });
+		$gridParams.updateGrid();
 		applyPreview();
 	}
 
-	function movePreviewWithCollisionsWithoutCompress(x: number, y: number) {
-		handleCollisionsForPreviewItemWithoutCompress({ x, y });
+	function movePreviewWithCollisionsWithPush(x: number, y: number) {
+		handleCollisionsForPreviewItemWithPush({ x, y });
 	}
 
 	function movePreviewWithCollisionsWithCompress(x: number, y: number) {
+		const gridItems = Object.values($gridParams.items);
 		let newY = y;
-		const itemsExceptPreview = gridParams.items.filter((item) => item.id != previewItem.id);
+		const itemsExceptPreview = gridItems.filter((item) => item.id != previewItem.id);
 		while (newY >= 0) {
-			const collItems = getCollisions({ ...previewItem, x, y: newY }, gridParams.items);
+			const collItems = getCollisions({ ...previewItem, x, y: newY }, gridItems);
 			if (collItems.length > 0) {
 				const sortedItems = collItems.sort((a, b) => b.y - a.y);
 				let moved = false;
@@ -215,6 +310,7 @@
 								item.y - previewItem.h >= 0
 							) {
 								item.y -= previewItem.h;
+								item.invalidate();
 							}
 						});
 						return false;
@@ -239,10 +335,10 @@
 	}
 
 	function movePreviewWithCollisions(x: number, y: number) {
-		if (gridParams.compress) {
+		if ($gridParams.collision === 'compress') {
 			movePreviewWithCollisionsWithCompress(x, y);
 		} else {
-			movePreviewWithCollisionsWithoutCompress(x, y);
+			movePreviewWithCollisionsWithPush(x, y);
 		}
 	}
 
@@ -256,28 +352,27 @@
 
 	// RESIZE ITEM LOGIC
 
-	let min: ItemSize;
-
-	let max: ItemSize | undefined;
-
 	let initialSize = { width: 0, height: 0 };
 
-	$: {
-		const minSize = item.min ?? { w: 1, h: 1 };
-		min = {
-			width: coordinate2size(minSize.w, gridParams.itemSize.width, gridParams.gap),
-			height: coordinate2size(minSize.h, gridParams.itemSize.height, gridParams.gap)
+	let minSize: ItemSize | undefined;
+
+	let maxSize: ItemSize | undefined;
+
+	$: if ($gridParams.itemSize) {
+		minSize = {
+			width: coordinate2size(min.w, $gridParams.itemSize.width, $gridParams.gap),
+			height: coordinate2size(min.h, $gridParams.itemSize.height, $gridParams.gap)
 		};
 	}
 
-	$: if (item.max) {
-		max = {
-			width: coordinate2size(item.max.w, gridParams.itemSize.width, gridParams.gap),
-			height: coordinate2size(item.max.h, gridParams.itemSize.height, gridParams.gap)
+	$: if ($gridParams.itemSize && max) {
+		maxSize = {
+			width: coordinate2size(max.w, $gridParams.itemSize.width, $gridParams.gap),
+			height: coordinate2size(max.h, $gridParams.itemSize.height, $gridParams.gap)
 		};
 	}
 
-	$: resizable = !gridParams.readOnly && item.resizable === undefined && item.resizable !== false;
+	$: _resizable = !$gridParams.readOnly && item.resizable;
 
 	function resizeStart(event: PointerEvent) {
 		if (event.button !== 0) return;
@@ -289,11 +384,15 @@
 	}
 
 	function resize(event: PointerEvent) {
+		if (!$gridParams.itemSize) {
+			throw new Error('Grid is not mounted yet');
+		}
+
 		width = event.pageX + initialSize.width - initialPointerPosition.left;
 		height = event.pageY + initialSize.height - initialPointerPosition.top;
 
-		if (gridParams.bounds) {
-			const parentRect = gridParams.boundsTo.getBoundingClientRect();
+		if ($gridParams.bounds && $gridParams.boundsTo) {
+			const parentRect = $gridParams.boundsTo.getBoundingClientRect();
 			if (width + left > parentRect.width) {
 				width = parentRect.width - left;
 			}
@@ -302,16 +401,16 @@
 			}
 		}
 
-		if (min) {
-			width = Math.max(width, min.width);
-			height = Math.max(height, min.height);
+		if (minSize) {
+			width = Math.max(width, minSize.width);
+			height = Math.max(height, minSize.height);
 		}
-		if (max) {
-			width = Math.min(width, max.width);
-			height = Math.min(height, max.height);
+		if (maxSize) {
+			width = Math.min(width, maxSize.width);
+			height = Math.min(height, maxSize.height);
 		}
 
-		if (!gridParams.collision) {
+		if ($gridParams.collision === 'none') {
 			window.scroll({
 				left: left - window.innerWidth / 2,
 				top: top - window.innerHeight / 2,
@@ -319,23 +418,21 @@
 			});
 		}
 
-		if (
-			Math.abs(left - item.w * gridParams.itemSize.width) > gridParams.itemSize.width / 8 ||
-			Math.abs(top - item.h * gridParams.itemSize.height) > gridParams.itemSize.height / 8
-		) {
-			const { w, h } = snapOnResize(width, height, previewItem, gridParams);
-			if (gridParams.collision) {
+		// TODO: throttle this, hasColisions is expensive
+		{
+			const { w, h } = snapOnResize(width, height, previewItem, $gridParams as SnapGridParams);
+			if ($gridParams.collision !== 'none') {
 				resizePreviewWithCollisions(w, h);
 			} else {
-				if (!hasCollisions({ ...previewItem, w, h }, gridParams.items)) {
+				if (!hasCollisions({ ...previewItem, w, h }, Object.values($gridParams.items))) {
 					previewItem = { ...previewItem, w, h };
 				}
 			}
 		}
 	}
 
-	function resizePreviewWithCollisionsWithoutCompress(w: number, h: number) {
-		handleCollisionsForPreviewItemWithoutCompress({ w, h });
+	function resizePreviewWithCollisionsWithPush(w: number, h: number) {
+		handleCollisionsForPreviewItemWithPush({ w, h });
 	}
 
 	function resizePreviewWithCollisionsWithCompress(w: number, h: number) {
@@ -344,20 +441,24 @@
 			const hGap = h - previewItem.h;
 			previewItem = { ...previewItem, w, h };
 			applyPreview();
-			const collItems = getCollisions({ ...previewItem, w, h: 9999 }, gridParams.items);
+			const collItems = getCollisions(
+				{ ...previewItem, w, h: 9999 },
+				Object.values($gridParams.items)
+			);
 			collItems.forEach((item) => {
 				item.y += hGap;
-				dispatch('itemchange', { item: item as LayoutItem<T> });
+				item.invalidate();
+				$gridParams.updateGrid();
 			});
 			compressItems();
 		}
 	}
 
 	function resizePreviewWithCollisions(w: number, h: number) {
-		if (gridParams.compress) {
+		if ($gridParams.collision === 'compress') {
 			resizePreviewWithCollisionsWithCompress(w, h);
 		} else {
-			resizePreviewWithCollisionsWithoutCompress(w, h);
+			resizePreviewWithCollisionsWithPush(w, h);
 		}
 	}
 
@@ -369,7 +470,8 @@
 	}
 
 	function compressItems() {
-		const sortedItems = [...gridParams.items].sort((a, b) => a.y - b.y);
+		const gridItems = Object.values($gridParams.items);
+		const sortedItems = [...gridItems].sort((a, b) => a.y - b.y);
 		sortedItems.reduce(
 			(accItem, currentItem) => {
 				if (currentItem.id === previewItem.id) {
@@ -388,8 +490,8 @@
 						newY--;
 					}
 					currentItem.y = newY + 1;
-					dispatch('itemchange', { item: currentItem as LayoutItem<T> });
-					accItem.push(currentItem as LayoutItem<T>);
+					$gridParams.updateGrid();
+					accItem.push(currentItem);
 				} else {
 					//compress items below previewItem
 					let newY = currentItem.y;
@@ -402,8 +504,8 @@
 					if (newY < currentItem.y && newY > 0) {
 						currentItem.y = newY + 1;
 					}
-					dispatch('itemchange', { item: currentItem as LayoutItem<T> });
-					accItem.push(currentItem as LayoutItem<T>);
+					$gridParams.updateGrid();
+					accItem.push(currentItem);
 				}
 				return accItem;
 			},
@@ -417,14 +519,19 @@
 	class:item-default={!classes}
 	class:active-default={!activeClass && active}
 	class:non-active-default={!active}
-	on:pointerdown={moveStart}
+	on:pointerdown={_movable && !$$slots.moveHandle ? moveStart : null}
 	style={`position: absolute; left:${left}px; top:${top}px; width: ${width}px; height: ${height}px; 
-			${movable ? 'cursor: move;' : ''} touch-action: none; user-select: none;`}
+			${_movable && !$$slots.moveHandle ? 'cursor: move;' : ''} touch-action: none; user-select: none;`}
 	bind:this={itemRef}
 >
+	{#if _movable}
+		<slot name="moveHandle" {moveStart} />
+	{/if}
+
 	<slot />
-	{#if resizable}
-		<slot name="resizeHandle">
+
+	{#if _resizable}
+		<slot name="resizeHandle" {resizeStart}>
 			<div
 				class={resizerClass}
 				class:resizer-default={!resizerClass}
@@ -434,13 +541,13 @@
 	{/if}
 </div>
 
-{#if active}
+{#if active && $gridParams.itemSize}
 	{@const preview = calcPosition(previewItem, {
-		itemSize: gridParams.itemSize,
-		gap: gridParams.gap
+		itemSize: $gridParams.itemSize,
+		gap: $gridParams.gap
 	})}
 	<div
-		class={previewClass}
+		class={previewClass ?? ''}
 		class:item-preview-default={!previewClass}
 		style={`position: absolute; left:${preview.left}px; top:${preview.top}px;  
 		width: ${preview.width}px; height: ${preview.height}px; z-index: -10;`}

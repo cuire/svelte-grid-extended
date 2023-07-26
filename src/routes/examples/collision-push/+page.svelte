@@ -13,10 +13,10 @@
 		{ id: '8', x: 2, y: 4, w: 2, h: 2 }
 	];
 
-	const itemSize = { width: 100, height: 40 };
+	const itemSize = { height: 40 };
 </script>
 
-<Grid {itemSize} cols={10} rows={10}>
+<Grid {itemSize} cols={10} collision="push">
 	{#each items as item}
 		<GridItem x={item.x} y={item.y} w={item.w} h={item.h}>
 			<div class="item">{item.id}</div>

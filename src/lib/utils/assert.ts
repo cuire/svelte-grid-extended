@@ -22,11 +22,11 @@ export function assertGridOptions(options: GridOptions) {
 		throw new Error('If `rows` === `0`, the `itemSize.height` parameter must be specified');
 	}
 
-	if (cols < 0) {
+	if (typeof cols === 'number' && cols < 0) {
 		throw new Error('`cols` must be greater than or equal to `0`');
 	}
 
-	if (rows < 0) {
+	if (typeof rows === 'number' && rows < 0) {
 		throw new Error('`rows` must be greater than or equal to `0`');
 	}
 }

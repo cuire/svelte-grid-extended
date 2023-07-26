@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Grid from '$lib';
+	import Grid, { GridItem } from '$lib';
 
 	const items = [
 		{ id: '0', x: 0, y: 0, w: 2, h: 5 },
@@ -14,17 +14,20 @@
 	];
 </script>
 
-<Grid
-	{items}
-	class="grid-container"
-	itemClass="grid-item"
-	itemActiveClass="grid-item-active"
-	itemPreviewClass="bg-red-500 rounded"
-	cols={10}
-	rows={10}
-	let:item
->
-	<div class="item">{item.id}</div>
+<Grid class="grid-container" cols={10} rows={10}>
+	{#each items as item}
+		<GridItem
+			x={item.x}
+			y={item.y}
+			w={item.w}
+			h={item.h}
+			class="grid-item"
+			activeClass="grid-item-active"
+			previewClass="bg-green-500 rounded"
+		>
+			<div class="item">{item.id}</div>
+		</GridItem>
+	{/each}
 </Grid>
 
 <style>
@@ -50,8 +53,8 @@
 	}
 
 	/* tailwind classes */
-	/* :global(.bg-red-500) {
-		background-color: rgb(202, 33, 33);
+	/* :global(.bg-green-500) {
+		background-color: rgb(33, 202, 33);
 	}
 
 	:global(.rounded) {

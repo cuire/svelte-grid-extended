@@ -19,8 +19,13 @@ export function hasCollisions(currentItem: LayoutItem, items: LayoutItem[]): boo
 }
 
 export function getGridDimensions(items: LayoutItem[]): GridDimensions {
-	const cols = Math.max(...items.map((item) => item.x + item.w), 1);
-	const rows = Math.max(...items.map((item) => item.y + item.h), 1);
+	let cols = 0;
+	let rows = 0;
+
+	items.forEach((item) => {
+		cols = Math.max(cols, item.x + item.w);
+		rows = Math.max(rows, item.y + item.h);
+	});
 
 	return { cols, rows };
 }

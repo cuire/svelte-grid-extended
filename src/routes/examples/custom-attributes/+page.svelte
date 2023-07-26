@@ -1,20 +1,23 @@
 <script lang="ts">
-	import Grid from '$lib';
-	import type { Layout } from '$lib';
+	import Grid, { GridItem } from '$lib';
 
-	const items: Layout<{ text: string }> = [
-		{ id: '0', x: 6, y: 0, w: 2, h: 2, data: { text: '🎅' } },
-		{ id: '1', x: 6, y: 2, w: 2, h: 2, data: { text: '🤶' } },
-		{ id: '2', x: 4, y: 0, w: 2, h: 2, data: { text: '🦌' } },
-		{ id: '3', x: 4, y: 2, w: 2, h: 2, data: { text: '🦌' } },
-		{ id: '4', x: 2, y: 1, w: 2, h: 2, data: { text: '🦌' } },
-		{ id: '5', x: 8, y: 2, w: 2, h: 2, data: { text: '🎄' } },
-		{ id: '6', x: 8, y: 0, w: 2, h: 2, data: { text: '🎁' } }
+	const items = [
+		{ x: 6, y: 0, w: 2, h: 2, data: { text: '🎅' } },
+		{ x: 6, y: 2, w: 2, h: 2, data: { text: '🤶' } },
+		{ x: 4, y: 0, w: 2, h: 2, data: { text: '🦌' } },
+		{ x: 4, y: 2, w: 2, h: 2, data: { text: '🦌' } },
+		{ x: 2, y: 1, w: 2, h: 2, data: { text: '🦌' } },
+		{ x: 8, y: 2, w: 2, h: 2, data: { text: '🎄' } },
+		{ x: 8, y: 0, w: 2, h: 2, data: { text: '🎁' } }
 	];
 </script>
 
-<Grid {items} cols={10} rows={10} let:item>
-	<div class="item">{item.data?.text}</div>
+<Grid cols={10} rows={10}>
+	{#each items as item}
+		<GridItem x={item.x} y={item.y} w={item.w} h={item.h}>
+			<div class="item">{item.data.text}</div>
+		</GridItem>
+	{/each}
 </Grid>
 
 <style>
