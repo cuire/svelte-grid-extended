@@ -36,9 +36,9 @@
 
 	export let previewClass: string | undefined = undefined;
 
-	export let x = 0;
+	export let x: number;
 
-	export let y = 0;
+	export let y: number;
 
 	export let w = 1;
 
