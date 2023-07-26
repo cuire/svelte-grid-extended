@@ -145,6 +145,10 @@
 
 	$: previewItem = { ...item };
 
+	$: if (!active && item) {
+		previewItem = item;
+	}
+
 	$: previewItem, dispatch('previewchange', { item: previewItem });
 
 	function applyPreview() {
