@@ -60,16 +60,12 @@ pnpm add svelte-grid-extended
 
 ```svelte
 <script lang="ts">
-	import Grid from 'svelte-grid-extended';
-
-	const items = [
-		{ id: '0', x: 0, y: 0, w: 1, h: 1 },
-		{ id: '1', x: 0, y: 1, w: 3, h: 1 }
-	];
+	import Grid, { GridItem } from 'svelte-grid-extended';
 </script>
 
-<Grid {items} cols={10} rows={10}>
-	<div>Content</div>
+<Grid cols={10} rows={10}>
+	<GridItem x={1} y={0} class="item">Hey</GridItem>
+	<GridItem x={3} y={3} w={4} class="item">Hoy</GridItem>
 </Grid>
 ```
 
@@ -84,18 +80,14 @@ Both:
 
 ```svelte
 <script lang="ts">
-	import Grid from 'svelte-grid-extended';
-
-	const items = [
-		{ id: '0', x: 0, y: 0, w: 1, h: 1 },
-		{ id: '1', x: 0, y: 1, w: 1, h: 1 }
-	];
+	import Grid, { GridItem } from 'svelte-grid-extended';
 
 	const itemSize = { width: 100, height: 40 };
 </script>
 
-<Grid {items} {itemSize} cols={10} rows={10}>
-	<div>Content</div>
+<Grid {itemSize} cols={10} rows={10}>
+	<GridItem x={1} y={0} class="item">Hey</GridItem>
+	<GridItem x={3} y={3} w={4} class="item">Hoy</GridItem>
 </Grid>
 ```
 
@@ -104,18 +96,14 @@ Only rows:
 
 ```svelte
 <script lang="ts">
-	import Grid from 'svelte-grid-extended';
-
-	const items = [
-		{ id: '0', x: 0, y: 0, w: 1, h: 1 },
-		{ id: '1', x: 0, y: 1, w: 1, h: 1 }
-	];
+	import Grid, { GridItem } from 'svelte-grid-extended';
 
 	const itemSize = { height: 40 };
 </script>
 
-<Grid {items} {itemSize} cols={10} rows={10}>
-	<div>Content</div>
+<Grid {itemSize} cols={10} rows={10}>
+	<GridItem x={1} y={0} class="item">Hey</GridItem>
+	<GridItem x={3} y={3} w={4} class="item">Hoy</GridItem>
 </Grid>
 ```
 
@@ -129,18 +117,14 @@ It can be set to both dimensions or just one.
 
 ```svelte
 <script lang="ts">
-	import Grid from 'svelte-grid-extended';
-
-	const items = [
-		{ id: '0', x: 0, y: 0, w: 1, h: 1 },
-		{ id: '1', x: 0, y: 1, w: 1, h: 1 }
-	];
+	import Grid, { GridItem } from 'svelte-grid-extended';
 
 	const itemSize = { width: 100, height: 40 };
 </script>
 
-<Grid {items} {itemSize} cols={0} rows={0}>
-	<div>Content</div>
+<Grid {itemSize} cols={0} rows={0}>
+	<GridItem x={1} y={0} class="item">Hey</GridItem>
+	<GridItem x={3} y={3} w={4} class="item">Hoy</GridItem>
 </Grid>
 ```
 
@@ -152,22 +136,20 @@ Grid can be styled with classes passed to various props. Check [Style related pr
 
 ```svelte
 <script lang="ts">
-	import Grid from 'svelte-grid-extended';
-
-	const items = [
-		{ id: '0', x: 0, y: 0, w: 1, h: 1 },
-		{ id: '1', x: 0, y: 1, w: 1, h: 1 }
-	];
+	import Grid, { GridItem } from 'svelte-grid-extended';
 </script>
 
-<Grid
-	{items}
-	class="grid-container"
-	itemClass="grid-item"
-	itemActiveClass="grid-item-active"
-	itemPreviewClass="bg-red-500 rounded"
->
-	<div>Content</div>
+<Grid class="grid-container" cols={10} rows={10}>
+	<GridItem
+		x={0}
+		y={0}
+		class="grid-item"
+		activeClass="grid-item-active"
+		previewClass="bg-green-500 rounded"
+		resizerClass=""
+	>
+		<div class="item">{item.id}</div>
+	</GridItem>
 </Grid>
 
 <style>
@@ -203,16 +185,12 @@ Read Only grid: ✨ [repl](https://svelte.dev/repl/e7183ff3136c47fe94fcd5398573a
 
 ```svelte
 <script lang="ts">
-	import Grid from 'svelte-grid-extended';
-
-	const items = [
-		{ id: '0', x: 0, y: 0, w: 1, h: 1 },
-		{ id: '1', x: 0, y: 1, w: 1, h: 1 }
-	];
+	import Grid, { GridItem } from 'svelte-grid-extended';
 </script>
 
-<Grid {items} cols={10} rows={10} readOnly>
-	<div>Content</div>
+<Grid cols={10} rows={10} readOnly>
+	<GridItem x={1} y={0} class="item">Hey</GridItem>
+	<GridItem x={3} y={3} w={4} class="item">Hoy</GridItem>
 </Grid>
 ```
 
@@ -220,16 +198,12 @@ Make item non-interactive: ✨ [repl](https://svelte.dev/repl/50f1acb8be5b426896
 
 ```svelte
 <script lang="ts">
-	import Grid from 'svelte-grid-extended';
-
-	const items = [
-		{ id: '0', x: 0, y: 0, w: 1, h: 1, movable: false },
-		{ id: '1', x: 0, y: 1, w: 1, h: 1, movable: false, resizable: false }
-	];
+	import Grid, { GridItem } from 'svelte-grid-extended';
 </script>
 
-<Grid {items} cols={10} rows={10}>
-	<div>Content</div>
+<Grid cols={10} rows={10}>
+	<GridItem x={1} y={0} class="item" movable={false}>Hey</GridItem>
+	<GridItem x={3} y={3} w={4} class="item" resizable={false}>Hoy</GridItem>
 </Grid>
 ```
 
