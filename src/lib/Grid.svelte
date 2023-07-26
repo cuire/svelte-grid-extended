@@ -85,7 +85,7 @@
 		xs: 320
 	};
 
-	assertGridOptions({ cols, rows, itemSize });
+	$: assertGridOptions({ cols, rows, itemSize });
 
 	/**
 	 * Bound the grid items to the grid container.
