@@ -194,10 +194,10 @@
 		return () => sizeObserver.disconnect();
 	});
 
-	// writable with grid settings
-
 	function registerItem(item: LayoutItem): void {
-		if (item.id in items) return;
+		if (item.id in items) {
+			throw new Error(`Item with id ${item.id} already exists`);
+		}
 		items[item.id] = item;
 		items = items;
 	}

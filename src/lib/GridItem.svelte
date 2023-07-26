@@ -69,7 +69,28 @@
 
 	let height: number;
 
-	$: item = {
+	/**
+	 * Item object that is used in `$gridParams.items`.
+	 * When the item is mounted, it is registered in `$gridParams.items`.
+	 * By default, all props are in sync with the item object.
+	 * If item ref is used to change its size or position, the invalidate method should be called.
+	 * That is used to support two way binding of item props.
+	 * @see {invalidate}
+	 * @example
+	 * ```
+	 * item.x = 10;
+	 * item.invalidate();
+	 * ```
+	 * @example
+	 * ```
+	 * item.x = 10;
+	 * item.y = 10;
+	 * item.w = 2;
+	 * item.h = 2;
+	 * item.invalidate();
+	 * ```
+	 */
+	let item = {
 		id,
 		x,
 		y,
@@ -78,8 +99,28 @@
 		min,
 		max,
 		movable,
-		resizable
+		resizable,
+		invalidate
 	} as LayoutItem;
+
+	$: item.x = x;
+	$: item.y = y;
+	$: item.w = w;
+	$: item.h = h;
+	$: item.min = min;
+	$: item.max = max;
+	$: item.movable = movable;
+	$: item.resizable = resizable;
+
+	/**
+	 * Updates svelte-components props behind that item. Should be called when the item
+	 * changes its size or position by manipulation with item object.
+	 */
+	function invalidate() {
+		({ x, y, w, h } = item);
+		dispatch('change', { item });
+		$gridParams.dispatch('change', { item });
+	}
 
 	onMount(() => {
 		$gridParams.registerItem(item);
@@ -100,7 +141,7 @@
 		height = newPosition.height;
 	}
 
-	$: previewItem = item;
+	$: previewItem = { ...item };
 
 	$: previewItem, dispatch('previewchange', { item: previewItem });
 
@@ -109,8 +150,7 @@
 		item.y = previewItem.y;
 		item.w = previewItem.w;
 		item.h = previewItem.h;
-		dispatch('change', { item });
-		$gridParams.dispatch('change', { item });
+		item.invalidate();
 	}
 
 	// INTERACTION LOGIC
@@ -211,6 +251,7 @@
 			const { x, y } = newPosition;
 			collItem.x = x;
 			collItem.y = y;
+			collItem.invalidate();
 		}
 		$gridParams.updateGrid();
 	}
@@ -263,6 +304,7 @@
 								item.y - previewItem.h >= 0
 							) {
 								item.y -= previewItem.h;
+								item.invalidate();
 							}
 						});
 						return false;
@@ -399,6 +441,7 @@
 			);
 			collItems.forEach((item) => {
 				item.y += hGap;
+				item.invalidate();
 				$gridParams.updateGrid();
 			});
 			compressItems();

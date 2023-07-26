@@ -8,6 +8,7 @@ export type LayoutItem = Size &
 		max?: Size;
 		movable: boolean;
 		resizable: boolean;
+		invalidate: () => void;
 	};
 
 /**
