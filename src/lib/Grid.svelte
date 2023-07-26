@@ -247,7 +247,9 @@
 		height: ${containerHeight ? `${containerHeight}px` : '100%'};`}
 	bind:this={gridContainer}
 >
-	<slot />
+	{#if $gridSettings.itemSize}
+		<slot />
+	{/if}
 </div>
 
 <style>
