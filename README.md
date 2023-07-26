@@ -1,12 +1,13 @@
-# svelte-grid-extended
+# svelte-grid-extended 🍾
 
-> ⚠️ Package currently in alpha, please consider that it **will** be changed in the future.
+[![npm version](https://badge.fury.io/js/svelte-grid-extended.svg)](https://badge.fury.io/js/svelte-grid-extended)
 
-<!-- plase gif here -->
+<!-- image at .github/images/santa.gif -->
+<img src=".github/images/santa.gif" width="100%" />
 
 ## Description
 
-Svelte-Grid-Extended is a draggable, resizable ~~and responsive~~ grid layout. The package is created as extended verison of [svelte-grid](<[url](https://github.com/vaheqelyan/svelte-grid)>), and will implement all of its features in future releases.
+Svelte-Grid-Extended is a draggable, resizable ~~and responsive~~ grid layout. The package is created as extended verison of [svelte-grid](https://github.com/vaheqelyan/svelte-grid).
 
 ## Installation
 
@@ -28,120 +29,30 @@ With pnpm:
 pnpm add svelte-grid-extended
 ```
 
-## Props
+### Table of Contents
 
-### Main props
-
-| prop      | description                                                                        | type                                | default  |
-| --------- | ---------------------------------------------------------------------------------- | ----------------------------------- | -------- |
-| cols      | Grid columns count. If set to 0, grid will grow infinitly. Must be >= 0.           | number                              | 0        |
-| rows      | Grid rows count. If set to 0, grid will grow infinitly. Must be >= 0.              | number                              | 0        |
-| itemSize  | Size of the grid item. If not set, grid will calculate it based on container size. | { width?: number, height?: number } | {}       |
-| items     | Array of grid items.                                                               | [Layout\<T\>](#layout-type)         | required |
-| gap       | Gap between grid items.                                                            | number                              | 10       |
-| bounds    | Should grid items be bounded by the grid container.                                | boolean                             | false    |
-| readonly  | If true disables interaction with grid items.                                      | boolean                             | false    |
-| collision | Collision behavior of grid items. Can be `none`, `push`, or `compress`.            | string                              | `none`   |
-
-> ⚠️ if `cols` or/and `rows` are set to 0, `itemSize.width` or/and `itemSize.height` must be setted.
-
-### Layout
-
-`Layout<T>` are represented as an array of objects, items of which must have the following properties:
-
-| prop      | description                                                         | type    | default   |
-| --------- | ------------------------------------------------------------------- | ------- | --------- |
-| id        | Unique id of the item. Used to compare items during collision tests | string  | required  |
-| x         | X position of the item in grid units.                               | number  | required  |
-| y         | Y position of the item in grid units.                               | number  | required  |
-| w         | Width of the item in grid units.                                    | number  | required  |
-| h         | Height of the item in grid units.                                   | number  | required  |
-| movable   | If true, item can be moved by user.                                 | boolean | true      |
-| resizable | If true, item can be resized by user.                               | boolean | true      |
-| data      | Custom attributes. 🦌                                               | T       | undefined |
-
-### Style related props:
-
-Component can be styled with css framework of your choice or with global classes. To do so, you can use the following props:
-
-- `class` - class name for grid container.
-- `itemClass` - class name for grid item.
-- `itemActiveClass` - class name that applies when item is currently being dragged or resized. By default, it is used to make active grid item transparent.
-- `itemPreviewClass` - class name for preview where item will be placed after interaction.
-- `resizerClass` - class name for item's resize handle.
-
-To understand how to use these props, look at `<Grid />` component simplified structure.
-
-> 📄 `active` is variable that indicates if grid item is currently being dragged or resized:
-
-```svelte
-<!-- Grid -->
-<div class={class}>
-	<!-- GridItem -->
-	<div class={itemClass} class:itemActiveClass={active}>
-		<slot />
-		<!-- Resizer -->
-		<div class={resizerClass} />
-		<!-- Resizer -->
-	</div>
-
-	{#if active}
-		<!-- GridItemGhost -->
-		<div class={itemPreviewClass} />
-	{/if}
-
-	<!-- /GridItem -->
-</div>
-<!-- /Grid -->
-```
-
-## Events
-
-Grid emits the following events:
-
-| event name | description                          | payload            |
-| ---------- | ------------------------------------ | ------------------ |
-| change     | Emitted when grid items are changed. | {item: LayoutItem} |
-
-```svelte
-<script lang="ts">
-	import Grid, { type LayoutChangeDetail } from 'svelte-grid-extended';
-
-	const items = [
-		{ id: '0', x: 0, y: 0, w: 1, h: 1 },
-		{ id: '1', x: 0, y: 1, w: 3, h: 1 }
-	];
-
-	function hanleGridChange(event: CustomEvent<LayoutChangeDetail>) {
-		console.log(event.detail.item);
-	}
-</script>
-
-<Grid {items} cols={10} rows={10} on:change={hanleGridChange}>
-	<div>Content</div>
-</Grid>
-```
+- [Description](#description)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Basic](#basic)
+  - [Static grid](#static-grid)
+  - [Grid without bounds](#grid-without-bounds)
+  - [Styling](#styling)
+  - [Disable interactions](#disable-interactions)
+  - [Collision Behavior](#collision-behavior)
+    - [None](#none)
+    - [Push](#push)
+    - [Compress](#compress)
+  - [Custom move/resize handle](#custom-moveresize-handle)
+  - [Two way binding](#two-way-binding)
+- [API Documentation](#api-documentation)
+  - [Grid props](#grid-props)
+  - [GridItem props](#griditem-props)
+  - [Style related props:](#style-related-props)
+  - [Events](#events)
+- [License](#📜-license)
 
 ## Usage
-
-- [svelte-grid-extended](#svelte-grid-extended)
-  - [Description](#description)
-  - [Installation](#installation)
-  - [Props](#props)
-    - [Main props](#main-props)
-    - [Layout](#layout)
-    - [Style related props:](#style-related-props)
-  - [Events](#events)
-  - [Usage](#usage)
-    - [Basic](#basic)
-    - [Static grid](#static-grid)
-    - [Grid without bounds](#grid-without-bounds)
-    - [Styling](#styling)
-    - [Disable interactions](#disable-interactions)
-    - [Collision Behavior](#collision-behavior)
-      - [None](#none)
-      - [Push](#push)
-      - [Compress](#compress)
 
 ### Basic
 
@@ -420,3 +331,148 @@ Setting `collision` prop to `compress` will compress items vertically towards th
 ```
 
 > ⚠️ Setting `collision` to `push` or `compress` will set `rows` to `0` so `ItemSize.height` must be setted.
+
+### Custom move/resize handle
+
+```svelte
+<script lang="ts">
+	import Grid, { GridItem } from 'svelte-grid-extended';
+</script>
+
+<Grid cols={10} rows={10}>
+	<GridItem x={0} y={0}>
+		<div slot="moveHandle" let:moveStart>
+			<div on:pointerdown={moveStart}>MOVE</div>
+		</div>
+
+		<div slot="resizeHandle" let:resizeStart>
+			<div on:pointerdown={resizeStart}>Resize</div>
+		</div>
+
+		<!-- content -->
+	</GridItem>
+</Grid>
+```
+
+### Two way binding
+
+```svelte
+<script lang="ts">
+	import Grid, { GridItem } from 'svelte-grid-extended';
+
+	let items = [
+		{ x: 6, y: 0, w: 2, h: 2, data: { text: '🎅' } },
+		{ x: 6, y: 2, w: 2, h: 2, data: { text: '🤶' } }
+	];
+
+	const itemsBackup = structuredClone(items);
+
+	function resetGrid() {
+		items = structuredClone(itemsBackup);
+	}
+</script>
+
+<button on:click={resetGrid}> RESET </button>
+
+<Grid cols={10} {itemSize}>
+	{#each items as item}
+		<GridItem bind:x={item.x} bind:y={item.y} bind:w={item.w} bind:h={item.h}>
+			{item.data.text}
+		</GridItem>
+	{/each}
+</Grid>
+```
+
+## API Documentation
+
+### Grid props
+
+| prop      | description                                                                        | type                                | default |
+| --------- | ---------------------------------------------------------------------------------- | ----------------------------------- | ------- |
+| cols      | Grid columns count. If set to 0, grid will grow infinitly. Must be >= 0.           | number                              | 0       |
+| rows      | Grid rows count. If set to 0, grid will grow infinitly. Must be >= 0.              | number                              | 0       |
+| itemSize  | Size of the grid item. If not set, grid will calculate it based on container size. | { width?: number, height?: number } | {}      |
+| gap       | Gap between grid items.                                                            | number                              | 10      |
+| bounds    | Should grid items be bounded by the grid container.                                | boolean                             | false   |
+| readonly  | If true disables interaction with grid items.                                      | boolean                             | false   |
+| collision | Collision behavior of grid items. [About](#collision-behavior)                     | none \| push \| compress            | none    |
+
+> ⚠️ if `cols` or/and `rows` are set to 0, `itemSize.width` or/and `itemSize.height` must be setted.
+
+> ⚠️ Setting `collision` to `push` or `compress` will set `rows` to `0` so `ItemSize.height` must be setted.
+
+### GridItem props
+
+| prop      | description                                                                                        | type                                  | default        |
+| --------- | -------------------------------------------------------------------------------------------------- | ------------------------------------- | -------------- |
+| id        | Unique id of the item. Used to compare items during collision tests                                | string                                | uuid.v4        |
+| x         | X position of the item in grid units.                                                              | number                                | required       |
+| y         | Y position of the item in grid units.                                                              | number                                | required       |
+| w         | Width of the item in grid units.                                                                   | number                                | 1              |
+| h         | Height of the item in grid units.                                                                  | number                                | 1              |
+| min       | Minimum size of the item in Grid Units.                                                            | { w: number, h: number }              | { w: 1, h: 1 } |
+| max       | Maximum size of the item in Grid Units. If not provided, the item will be able to grow infinitely. | { w: number, h: number } \| undefined | undefined      |
+| movable   | If true, item can be moved by user.                                                                | boolean                               | true           |
+| resizable | If true, item can be resized by user.                                                              | boolean                               | true           |
+
+### Style related props:
+
+Component can be styled with css framework of your choice or with global classes. To do so, you can use the following props:
+
+- `<Grid class="..." />` - class name for grid container.
+- `<GridItem class="..." />` - class name for grid item.
+- `<GridItem activeClass="..." />` - class name that applies when item is currently being dragged or resized. By default, it is used to make active grid item transparent.
+- `<GridItem previewClass="..." />` - class name for preview where item will be placed after interaction.
+- `<GridItem resizerClass="..." />` - class name for item's resize handle.
+
+To understand how to use these props, look at `<Grid />` component simplified structure.
+
+> 📄 `active` is variable that indicates if grid item is currently being dragged or resized:
+
+```svelte
+<!-- Grid -->
+<div class={class}>
+	<!-- GridItem -->
+	<div class={itemClass} class:activeClass={active}>
+		<slot />
+		<!-- Resizer -->
+		<div class={resizerClass} />
+		<!-- Resizer -->
+	</div>
+
+	{#if active}
+		<!-- GridItemGhost -->
+		<div class={previewClass} />
+	{/if}
+
+	<!-- /GridItem -->
+</div>
+<!-- /Grid -->
+```
+
+## Events
+
+Grid emits the following events:
+
+| event name | description                          | payload            |
+| ---------- | ------------------------------------ | ------------------ |
+| change     | Emitted when grid items are changed. | {item: LayoutItem} |
+
+```svelte
+<script lang="ts">
+	import Grid, { GridItem, type LayoutChangeDetail } from 'svelte-grid-extended';
+
+	function logItem(event: CustomEvent<LayoutChangeDetail>) {
+		console.log(event.detail.item);
+	}
+</script>
+
+<Grid cols={10} rows={10} on:change={logItem}>
+	<GridItem x={1} y={0} class="item" on:change={logItem}>Hey</GridItem>
+	<GridItem x={3} y={3} w={4} class="item" on:previewchange={logItem}>Hoy</GridItem>
+</Grid>
+```
+
+## 📜 License
+
+MIT
