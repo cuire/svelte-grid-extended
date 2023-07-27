@@ -13,6 +13,7 @@
 
 <script lang="ts">
 	import { createEventDispatcher, getContext, onMount, setContext } from 'svelte';
+	import { gridSettings } from './stores';
 
 	import { assertGridOptions } from './utils/assert';
 	import { findGridSize } from './utils/breakpoints';
@@ -27,8 +28,7 @@
 		GridParams,
 		Collision
 	} from './types';
-	import { writable, type Readable, type Writable } from 'svelte/store';
-
+	import type { Readable, Writable } from 'svelte/store';
 	const dispatch = createEventDispatcher<{
 		change: LayoutChangeDetail;
 	}>();
@@ -135,11 +135,11 @@
 
 	$: if (typeof rows === 'number') _rows = rows;
 
-	$: if (itemSize?.width && itemSize?.height) $gridSettings.itemSize = { ...itemSize } as ItemSize;
+	$: if (itemSize?.width && itemSize?.height && $gridSettings) $gridSettings.itemSize = { ...itemSize } as ItemSize;
 
-	$: if ($gridSettings.itemSize) containerWidth = _cols * ($gridSettings.itemSize.width + gap + 1);
+	$: if ($gridSettings?.itemSize) containerWidth = _cols * ($gridSettings.itemSize.width + gap + 1);
 
-	$: if ($gridSettings.itemSize)
+	$: if ($gridSettings?.itemSize)
 		containerHeight = _rows * ($gridSettings.itemSize.height + gap + 1);
 
 	$: calculatedGridSize = getGridDimensions(Object.values(items));
@@ -183,10 +183,15 @@
 			shouldExpandCols = _cols === 0;
 			shouldExpandRows = _rows === 0;
 
-			$gridSettings.itemSize = {
-				width: itemSize.width ?? (width - (gap + 1) * _cols) / _cols,
-				height: itemSize.height ?? (height - (gap + 1) * _rows) / _rows
-			};
+			if ($gridSettings) {
+				$gridSettings.itemSize = {
+					width: itemSize.width ?? (width - (gap + 1) * _cols) / _cols,
+					height: itemSize.height ?? (height - (gap + 1) * _rows) / _rows
+				};
+			}
+
+			
+		
 		});
 
 		sizeObserver.observe(gridContainer);
@@ -207,7 +212,7 @@
 		items = items;
 	}
 
-	const gridSettings = writable<GridParams>({
+	gridSettings.set({
 		cols: 0,
 		rows: 0,
 		maxCols,
@@ -235,7 +240,11 @@
 		bounds,
 		readOnly,
 		debug,
-		collision
+		collision,
+		registerItem,
+		unregisterItem,
+		updateGrid,
+		dispatch
 	}));
 
 	setContext(GRID_CONTEXT_NAME, gridSettings);
@@ -247,7 +256,7 @@
 		height: ${containerHeight ? `${containerHeight}px` : '100%'};`}
 	bind:this={gridContainer}
 >
-	{#if $gridSettings.itemSize}
+	{#if $gridSettings?.itemSize}
 		<slot />
 	{/if}
 </div>
