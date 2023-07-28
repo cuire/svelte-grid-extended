@@ -16,7 +16,9 @@ export class GridHelper {
 				h,
 				movable: true,
 				resizable: true,
-				invalidate: () => {}
+				invalidate: () => {
+					/* .. */
+				}
 			},
 			Object.values(items),
 			maxCols,

@@ -135,7 +135,8 @@
 
 	$: if (typeof rows === 'number') _rows = rows;
 
-	$: if (itemSize?.width && itemSize?.height && $gridSettings) $gridSettings.itemSize = { ...itemSize } as ItemSize;
+	$: if (itemSize?.width && itemSize?.height && $gridSettings)
+		$gridSettings.itemSize = { ...itemSize } as ItemSize;
 
 	$: if ($gridSettings?.itemSize) containerWidth = _cols * ($gridSettings.itemSize.width + gap + 1);
 
@@ -189,9 +190,6 @@
 					height: itemSize.height ?? (height - (gap + 1) * _rows) / _rows
 				};
 			}
-
-			
-		
 		});
 
 		sizeObserver.observe(gridContainer);

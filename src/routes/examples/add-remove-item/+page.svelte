@@ -22,39 +22,45 @@
 		items = structuredClone(itemsBackup);
 	}
 
-    function remove(item: any) {
-        items = items.filter(i => i.id !== item.id)
-    }
+	function remove(item: any) {
+		items = items.filter((i) => i.id !== item.id);
+	}
 </script>
 
-<button class="btn" on:click={() => {
-	const w = Math.floor(Math.random() * 2) + 1
-	const h = Math.floor(Math.random() * 5) + 1
-	const newPosition = gridHelper.getFirstAvailablePosition(w, h);
-	items = newPosition ? [...items, { id: crypto.randomUUID(), x: newPosition.x, y: newPosition.y, w, h }] : items;
-}}>Add New Item</button>
-<button class="btn" on:click={() => {
-	resetGrid()
-}}>Reset Grid</button>
+<button
+	class="btn"
+	on:click={() => {
+		const w = Math.floor(Math.random() * 2) + 1;
+		const h = Math.floor(Math.random() * 5) + 1;
+		const newPosition = gridHelper.getFirstAvailablePosition(w, h);
+		items = newPosition
+			? [...items, { id: crypto.randomUUID(), x: newPosition.x, y: newPosition.y, w, h }]
+			: items;
+	}}>Add New Item</button
+>
+<button
+	class="btn"
+	on:click={() => {
+		resetGrid();
+	}}>Reset Grid</button
+>
 
-
-<Grid {itemSize} cols={10} collision="push" >
+<Grid {itemSize} cols={10} collision="push">
 	{#each items as item (item.id)}
 		<div transition:fade={{ duration: 300 }}>
 			<GridItem id={item.id} bind:x={item.x} bind:y={item.y} bind:w={item.w} bind:h={item.h}>
-				<button on:pointerdown={e => e.stopPropagation()}
+				<button
+					on:pointerdown={(e) => e.stopPropagation()}
 					on:click={() => remove(item)}
-					class=remove
-					>
+					class="remove"
+				>
 					✕
 				</button>
 				<div class="item">{item.id.slice(0, 5)}</div>
 			</GridItem>
 		</div>
 	{/each}
-
 </Grid>
-
 
 <style>
 	.item {
@@ -64,17 +70,17 @@
 		width: 100%;
 		height: 100%;
 	}
-    .remove { 
-        cursor: pointer;
-        position: absolute;
-        right: 10px; 
-        top: 3px;
-    }
-    .btn {
-        margin-top: 10px;
-        margin-left: 10px;
-        right: 2px; 
-        top: 1px;
-        color:aqua;
-    }
+	.remove {
+		cursor: pointer;
+		position: absolute;
+		right: 10px;
+		top: 3px;
+	}
+	.btn {
+		margin-top: 10px;
+		margin-left: 10px;
+		right: 2px;
+		top: 1px;
+		color: aqua;
+	}
 </style>
