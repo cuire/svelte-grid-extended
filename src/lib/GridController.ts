@@ -1,10 +1,14 @@
 import { getAvailablePosition } from './utils/grid';
-import type { GridParams } from './types';
+import type { GridParams, GridController as GridControllerType } from './types';
 
-export class GridController {
-	static gridParams: GridParams | undefined;
-	static getFirstAvailablePosition(w: number, h: number) {
-		if (!this.gridParams) throw new Error('Grid not initialized');
+export class GridController implements GridControllerType {
+	gridParams: GridParams;
+
+	constructor(gridParams: GridParams) {
+		this.gridParams = gridParams;
+	}
+
+	getFirstAvailablePosition(w: number, h: number) {
 		const { items, maxCols, maxRows } = this.gridParams;
 		return getAvailablePosition(
 			{

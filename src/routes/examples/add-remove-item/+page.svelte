@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
-	import Grid, { GridItem, gridController } from '$lib';
+	import Grid, { GridItem, type GridController } from '$lib';
 
 	let items = [
 		{ id: crypto.randomUUID(), x: 0, y: 0, w: 2, h: 5 },
@@ -25,6 +25,8 @@
 	function remove(id: string) {
 		items = items.filter((i) => i.id !== id);
 	}
+
+	let gridController: GridController;
 </script>
 
 <button
@@ -45,7 +47,7 @@
 	}}>Reset Grid</button
 >
 
-<Grid {itemSize} cols={10} collision="push">
+<Grid {itemSize} cols={10} collision="push" bind:controller={gridController}>
 	{#each items as item (item.id)}
 		<div transition:fade={{ duration: 300 }}>
 			<GridItem id={item.id} bind:x={item.x} bind:y={item.y} bind:w={item.w} bind:h={item.h}>

@@ -17,7 +17,7 @@
 	import { assertGridOptions } from './utils/assert';
 	import { findGridSize } from './utils/breakpoints';
 	import { getGridDimensions } from './utils/grid';
-	import { gridController } from '$lib';
+	import { GridController } from '$lib/GridController';
 
 	import type {
 		Breakpoints,
@@ -239,7 +239,7 @@
 		collision
 	}));
 
-	$: gridController.gridParams = $gridSettings;
+	export const controller = new GridController($gridSettings);
 
 	setContext(GRID_CONTEXT_NAME, gridSettings);
 </script>
