@@ -528,7 +528,7 @@
 		<slot name="moveHandle" {moveStart} />
 	{/if}
 
-	<slot />
+	<slot {id} {active} {w} {h} />
 
 	{#if _resizable}
 		<slot name="resizeHandle" {resizeStart}>
