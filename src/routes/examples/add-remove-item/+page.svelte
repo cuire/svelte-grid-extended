@@ -27,25 +27,19 @@
 	}
 
 	let gridController: GridController;
-</script>
 
-<button
-	class="btn"
-	on:click={() => {
+	function addNewItem() {
 		const w = Math.floor(Math.random() * 2) + 1;
 		const h = Math.floor(Math.random() * 5) + 1;
 		const newPosition = gridController.getFirstAvailablePosition(w, h);
 		items = newPosition
 			? [...items, { id: crypto.randomUUID(), x: newPosition.x, y: newPosition.y, w, h }]
 			: items;
-	}}>Add New Item</button
->
-<button
-	class="btn"
-	on:click={() => {
-		resetGrid();
-	}}>Reset Grid</button
->
+	}
+</script>
+
+<button class="btn" on:click={addNewItem}>Add New Item</button>
+<button class="btn" on:click={resetGrid}>Reset Grid</button>
 
 <Grid {itemSize} cols={10} collision="push" bind:controller={gridController}>
 	{#each items as item (item.id)}
