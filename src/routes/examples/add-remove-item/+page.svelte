@@ -22,7 +22,7 @@
 		items = structuredClone(itemsBackup);
 	}
 
-	function remove(id: any) {
+	function remove(id: string) {
 		items = items.filter((i) => i.id !== id);
 	}
 </script>
