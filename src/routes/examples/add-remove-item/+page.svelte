@@ -22,8 +22,8 @@
 		items = structuredClone(itemsBackup);
 	}
 
-	function remove(item: any) {
-		items = items.filter((i) => i.id !== item.id);
+	function remove(id: any) {
+		items = items.filter((i) => i.id !== id);
 	}
 </script>
 
@@ -51,7 +51,7 @@
 			<GridItem id={item.id} bind:x={item.x} bind:y={item.y} bind:w={item.w} bind:h={item.h}>
 				<button
 					on:pointerdown={(e) => e.stopPropagation()}
-					on:click={() => remove(item)}
+					on:click={() => remove(item.id)}
 					class="remove"
 				>
 					✕
