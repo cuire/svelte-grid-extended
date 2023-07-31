@@ -2,7 +2,7 @@ import { get } from 'svelte/store';
 import { gridSettings } from './stores';
 import { getAvailablePosition } from './utils/grid';
 
-export class GridHelper {
+export class GridController {
 	static getFirstAvailablePosition(w: number, h: number) {
 		const gridParams = get(gridSettings);
 		if (!gridParams) throw new Error('Grid not initialized');

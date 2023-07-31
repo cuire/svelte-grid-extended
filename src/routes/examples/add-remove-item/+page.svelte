@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
-	import Grid, { GridItem, gridHelper } from '$lib';
+	import Grid, { GridItem, gridController } from '$lib';
 
 	let items = [
 		{ id: crypto.randomUUID(), x: 0, y: 0, w: 2, h: 5 },
@@ -32,7 +32,7 @@
 	on:click={() => {
 		const w = Math.floor(Math.random() * 2) + 1;
 		const h = Math.floor(Math.random() * 5) + 1;
-		const newPosition = gridHelper.getFirstAvailablePosition(w, h);
+		const newPosition = gridController.getFirstAvailablePosition(w, h);
 		items = newPosition
 			? [...items, { id: crypto.randomUUID(), x: newPosition.x, y: newPosition.y, w, h }]
 			: items;
