@@ -32,31 +32,31 @@ pnpm add svelte-grid-extended
 ### Table of Contents
 
 - [svelte-grid-extended 🍾](#svelte-grid-extended-)
-	- [Description](#description)
-	- [Installation](#installation)
-		- [Table of Contents](#table-of-contents)
-	- [Usage](#usage)
-		- [Basic](#basic)
-		- [Static grid](#static-grid)
-		- [Grid without bounds](#grid-without-bounds)
-		- [Styling](#styling)
-		- [Disable interactions](#disable-interactions)
-		- [Collision Behavior](#collision-behavior)
-			- [None](#none)
-			- [Push](#push)
-			- [Compress](#compress)
-		- [Custom move/resize handle](#custom-moveresize-handle)
-		- [Two way binding](#two-way-binding)
-	- [API Documentation](#api-documentation)
-		- [Grid props](#grid-props)
-		- [GridItem props](#griditem-props)
-		- [Style related props:](#style-related-props)
-	- [Events](#events)
-	- [Grid Controller](#grid-controller)
-		- [Methods](#methods)
-			- [getFirstAvailablePosition(w, h)](#getfirstavailablepositionw-h)
-				- [Example](#example)
-	- [📜 License](#-license)
+  - [Description](#description)
+  - [Installation](#installation)
+    - [Table of Contents](#table-of-contents)
+  - [Usage](#usage)
+    - [Basic](#basic)
+    - [Static grid](#static-grid)
+    - [Grid without bounds](#grid-without-bounds)
+    - [Styling](#styling)
+    - [Disable interactions](#disable-interactions)
+    - [Collision Behavior](#collision-behavior)
+      - [None](#none)
+      - [Push](#push)
+      - [Compress](#compress)
+    - [Custom move/resize handle](#custom-moveresize-handle)
+    - [Two way binding](#two-way-binding)
+  - [API Documentation](#api-documentation)
+    - [Grid props](#grid-props)
+    - [GridItem props](#griditem-props)
+    - [Style related props:](#style-related-props)
+  - [Events](#events)
+  - [Grid Controller](#grid-controller)
+    - [Methods](#methods)
+      - [getFirstAvailablePosition(w, h)](#getfirstavailablepositionw-h)
+        - [Example](#example)
+  - [📜 License](#-license)
 
 ## Usage
 
@@ -468,13 +468,16 @@ The Grid Controller provides utility functions that allow for more advanced cont
 Finds the first available position within the grid that can accommodate an item of the specified width (w) and height (h). This method is useful when dynamically adding new items to the grid, ensuring that they fit into the first available space that can hold them.
 
 **Parameters:**
+
 - `w` (number): Width of the item.
 - `h` (number): Height of the item.
 
 **Returns:**
+
 - An object containing the `x` and `y` coordinates of the first available position, or `null` if no position is available.
 
 ##### Example
+
 ✨ [repl](https://svelte.dev/repl/6af014e1f754458dbc15c1823dbdca3c?version=4.1.2)
 
 ```svelte
@@ -505,13 +508,12 @@ Finds the first available position within the grid that can accommodate an item 
 <Grid {itemSize} cols={10} collision="push" bind:controller={gridController}>
 	{#each items as { id, x, y, w, h } (id)}
 		<div transition:fade={{ duration: 300 }}>
-			<GridItem id={id} bind:x={x} bind:y={y} bind:w={w} bind:h={h}>
+			<GridItem {id} bind:x bind:y bind:w bind:h>
 				<div>{id}</div>
 			</GridItem>
 		</div>
 	{/each}
 </Grid>
-
 ```
 
 ## 📜 License
