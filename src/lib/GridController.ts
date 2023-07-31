@@ -1,12 +1,11 @@
-import { get } from 'svelte/store';
-import { gridSettings } from './stores';
 import { getAvailablePosition } from './utils/grid';
+import type { GridParams } from './types';
 
 export class GridController {
+	static gridParams: GridParams | undefined;
 	static getFirstAvailablePosition(w: number, h: number) {
-		const gridParams = get(gridSettings);
-		if (!gridParams) throw new Error('Grid not initialized');
-		const { items, maxCols, maxRows } = gridParams;
+		if (!this.gridParams) throw new Error('Grid not initialized');
+		const { items, maxCols, maxRows } = this.gridParams;
 		return getAvailablePosition(
 			{
 				id: '',
