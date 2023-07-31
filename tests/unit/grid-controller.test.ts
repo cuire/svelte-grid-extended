@@ -25,9 +25,15 @@ describe('🍦 GridController firstAvailablePosition', () => {
 		readOnly: false,
 		debug: false,
 		collision: 'none',
-		registerItem: () => {},
-		unregisterItem: () => {},
-		updateGrid: () => {},
+		registerItem: () => {
+			/* .. */
+		},
+		unregisterItem: () => {
+			/* .. */
+		},
+		updateGrid: () => {
+			/* .. */
+		},
 		dispatch: {} as ReturnType<typeof createEventDispatcher>
 	};
 
@@ -42,7 +48,9 @@ describe('🍦 GridController firstAvailablePosition', () => {
 					h: 5,
 					movable: true,
 					resizable: true,
-					invalidate: () => {}
+					invalidate: () => {
+						/* .. */
+					}
 				},
 				'2': {
 					id: '2',
@@ -52,7 +60,9 @@ describe('🍦 GridController firstAvailablePosition', () => {
 					h: 2,
 					movable: true,
 					resizable: true,
-					invalidate: () => {}
+					invalidate: () => {
+						/* .. */
+					}
 				},
 				'3': {
 					id: '3',
@@ -62,7 +72,9 @@ describe('🍦 GridController firstAvailablePosition', () => {
 					h: 2,
 					movable: true,
 					resizable: true,
-					invalidate: () => {}
+					invalidate: () => {
+						/* .. */
+					}
 				},
 				'4': {
 					id: '4',
@@ -72,7 +84,9 @@ describe('🍦 GridController firstAvailablePosition', () => {
 					h: 2,
 					movable: true,
 					resizable: true,
-					invalidate: () => {}
+					invalidate: () => {
+						/* .. */
+					}
 				},
 				'5': {
 					id: '5',
@@ -82,7 +96,9 @@ describe('🍦 GridController firstAvailablePosition', () => {
 					h: 3,
 					movable: true,
 					resizable: true,
-					invalidate: () => {}
+					invalidate: () => {
+						/* .. */
+					}
 				},
 				'6': {
 					id: '6',
@@ -92,7 +108,9 @@ describe('🍦 GridController firstAvailablePosition', () => {
 					h: 8,
 					movable: true,
 					resizable: true,
-					invalidate: () => {}
+					invalidate: () => {
+						/* .. */
+					}
 				},
 				'7': {
 					id: '7',
@@ -102,7 +120,9 @@ describe('🍦 GridController firstAvailablePosition', () => {
 					h: 1,
 					movable: true,
 					resizable: true,
-					invalidate: () => {}
+					invalidate: () => {
+						/* .. */
+					}
 				},
 				'8': {
 					id: '8',
@@ -112,7 +132,9 @@ describe('🍦 GridController firstAvailablePosition', () => {
 					h: 2,
 					movable: true,
 					resizable: true,
-					invalidate: () => {}
+					invalidate: () => {
+						/* .. */
+					}
 				},
 				'9': {
 					id: '9',
@@ -122,7 +144,9 @@ describe('🍦 GridController firstAvailablePosition', () => {
 					h: 2,
 					movable: true,
 					resizable: true,
-					invalidate: () => {}
+					invalidate: () => {
+						/* .. */
+					}
 				}
 			},
 			maxCols: 5,
@@ -141,7 +165,9 @@ describe('🍦 GridController firstAvailablePosition', () => {
 					h: 1,
 					movable: true,
 					resizable: true,
-					invalidate: () => {}
+					invalidate: () => {
+						/* .. */
+					}
 				},
 				'2': {
 					id: '2',
@@ -151,7 +177,9 @@ describe('🍦 GridController firstAvailablePosition', () => {
 					h: 2,
 					movable: true,
 					resizable: true,
-					invalidate: () => {}
+					invalidate: () => {
+						/* .. */
+					}
 				},
 				'3': {
 					id: '3',
@@ -161,7 +189,9 @@ describe('🍦 GridController firstAvailablePosition', () => {
 					h: 1,
 					movable: true,
 					resizable: true,
-					invalidate: () => {}
+					invalidate: () => {
+						/* .. */
+					}
 				}
 			},
 			maxCols: 3,
@@ -180,7 +210,9 @@ describe('🍦 GridController firstAvailablePosition', () => {
 					h: 3,
 					movable: true,
 					resizable: true,
-					invalidate: () => {}
+					invalidate: () => {
+						/* .. */
+					}
 				},
 				'2': {
 					id: '2',
@@ -190,7 +222,9 @@ describe('🍦 GridController firstAvailablePosition', () => {
 					h: 1,
 					movable: true,
 					resizable: true,
-					invalidate: () => {}
+					invalidate: () => {
+						/* .. */
+					}
 				},
 				'3': {
 					id: '3',
@@ -200,7 +234,9 @@ describe('🍦 GridController firstAvailablePosition', () => {
 					h: 1,
 					movable: true,
 					resizable: true,
-					invalidate: () => {}
+					invalidate: () => {
+						/* .. */
+					}
 				}
 			},
 			maxCols: 5,
@@ -219,7 +255,9 @@ describe('🍦 GridController firstAvailablePosition', () => {
 					h: 2,
 					movable: true,
 					resizable: true,
-					invalidate: () => {}
+					invalidate: () => {
+						/* .. */
+					}
 				},
 				'2': {
 					id: '2',
@@ -229,7 +267,9 @@ describe('🍦 GridController firstAvailablePosition', () => {
 					h: 2,
 					movable: true,
 					resizable: true,
-					invalidate: () => {}
+					invalidate: () => {
+						/* .. */
+					}
 				},
 				'3': {
 					id: '3',
@@ -239,7 +279,9 @@ describe('🍦 GridController firstAvailablePosition', () => {
 					h: 2,
 					movable: true,
 					resizable: true,
-					invalidate: () => {}
+					invalidate: () => {
+						/* .. */
+					}
 				}
 			},
 			maxCols: 4,
