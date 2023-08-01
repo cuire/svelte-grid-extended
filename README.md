@@ -31,26 +31,32 @@ pnpm add svelte-grid-extended
 
 ### Table of Contents
 
-- [Description](#description)
-- [Installation](#installation)
-- [Usage](#usage)
-  - [Basic](#basic)
-  - [Static grid](#static-grid)
-  - [Grid without bounds](#grid-without-bounds)
-  - [Styling](#styling)
-  - [Disable interactions](#disable-interactions)
-  - [Collision Behavior](#collision-behavior)
-    - [None](#none)
-    - [Push](#push)
-    - [Compress](#compress)
-  - [Custom move/resize handle](#custom-moveresize-handle)
-  - [Two way binding](#two-way-binding)
-- [API Documentation](#api-documentation)
-  - [Grid props](#grid-props)
-  - [GridItem props](#griditem-props)
-  - [Style related props:](#style-related-props)
+- [svelte-grid-extended 🍾](#svelte-grid-extended-)
+  - [Description](#description)
+  - [Installation](#installation)
+    - [Table of Contents](#table-of-contents)
+  - [Usage](#usage)
+    - [Basic](#basic)
+    - [Static grid](#static-grid)
+    - [Grid without bounds](#grid-without-bounds)
+    - [Styling](#styling)
+    - [Disable interactions](#disable-interactions)
+    - [Collision Behavior](#collision-behavior)
+      - [None](#none)
+      - [Push](#push)
+      - [Compress](#compress)
+    - [Custom move/resize handle](#custom-moveresize-handle)
+    - [Two way binding](#two-way-binding)
+  - [API Documentation](#api-documentation)
+    - [Grid props](#grid-props)
+    - [GridItem props](#griditem-props)
+    - [Style related props:](#style-related-props)
   - [Events](#events)
-- [License](#📜-license)
+  - [Grid Controller](#grid-controller)
+    - [Methods](#methods)
+      - [getFirstAvailablePosition(w, h)](#getfirstavailablepositionw-h)
+        - [Example](#example)
+  - [📜 License](#-license)
 
 ## Usage
 
@@ -448,6 +454,65 @@ Grid emits the following events:
 <Grid cols={10} rows={10} on:change={logItem}>
 	<GridItem x={1} y={0} class="item" on:change={logItem}>Hey</GridItem>
 	<GridItem x={3} y={3} w={4} class="item" on:previewchange={logItem}>Hoy</GridItem>
+</Grid>
+```
+
+## Grid Controller
+
+The Grid Controller provides utility functions that allow for more advanced control and customization of the grid. It's obtained from the Grid component using the `bind:controller` attribute, offering a way to interact with the grid in a programmatic and flexible manner.
+
+### Methods
+
+#### getFirstAvailablePosition(w, h)
+
+Finds the first available position within the grid that can accommodate an item of the specified width (w) and height (h). This method is useful when dynamically adding new items to the grid, ensuring that they fit into the first available space that can hold them.
+
+**Parameters:**
+
+- `w` (number): Width of the item.
+- `h` (number): Height of the item.
+
+**Returns:**
+
+- An object containing the `x` and `y` coordinates of the first available position, or `null` if no position is available.
+
+##### Example
+
+✨ [repl](https://svelte.dev/repl/6af014e1f754458dbc15c1823dbdca3c?version=4.1.2)
+
+```svelte
+<script lang="ts">
+	import Grid, { GridItem, type GridController } from 'svelte-grid-extended';
+
+	let items = [
+		{ id: '1', x: 0, y: 0, w: 2, h: 5 },
+		{ id: '2', x: 2, y: 2, w: 2, h: 2 }
+	];
+
+	let gridController: GridController;
+
+	function addNewItem() {
+		const w = Math.floor(Math.random() * 2) + 1;
+		const h = Math.floor(Math.random() * 5) + 1;
+		const newPosition = gridController.getFirstAvailablePosition(w, h);
+		items = newPosition
+			? [...items, { id: crypto.randomUUID(), x: newPosition.x, y: newPosition.y, w, h }]
+			: items;
+	}
+
+	const itemSize = { height: 40 };
+</script>
+
+<button on:click={addNewItem}>Add New Item</button>
+
+<Grid {itemSize} cols={10} collision="push" bind:controller={gridController}>
+	{#each items as { id, x, y, w, h } (id)}
+		<div transition:fade={{ duration: 300 }}>
+			<GridItem {id} bind:x bind:y bind:w bind:h>
+				<div>{id}</div>
+			</GridItem>
+		</div>
+	{/each}
 </Grid>
 ```
 
