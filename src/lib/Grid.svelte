@@ -240,6 +240,7 @@
 	}));
 
 	export const controller = new GridController($gridSettings);
+	$: controller.gridParams = $gridSettings;
 
 	setContext(GRID_CONTEXT_NAME, gridSettings);
 </script>
