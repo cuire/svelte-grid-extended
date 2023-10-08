@@ -124,10 +124,6 @@
 
 	let maxRows = Infinity;
 
-	let containerWidth: number;
-
-	let containerHeight: number;
-
 	let shouldExpandRows = false;
 
 	let shouldExpandCols = false;
@@ -137,11 +133,6 @@
 	$: if (typeof rows === 'number') _rows = rows;
 
 	$: if (itemSize?.width && itemSize?.height) $gridSettings.itemSize = { ...itemSize } as ItemSize;
-
-	$: if ($gridSettings.itemSize) containerWidth = _cols * ($gridSettings.itemSize.width + gap + 1);
-
-	$: if ($gridSettings.itemSize)
-		containerHeight = _rows * ($gridSettings.itemSize.height + gap + 1);
 
 	$: calculatedGridSize = getGridDimensions(Object.values(items));
 
@@ -245,12 +236,7 @@
 	setContext(GRID_CONTEXT_NAME, gridSettings);
 </script>
 
-<div
-	class={`svelte-grid-extended ${classes}`}
-	style={`width: ${containerWidth ? `${containerWidth}px` : '100%'}; 
-		height: ${containerHeight ? `${containerHeight}px` : '100%'};`}
-	bind:this={gridContainer}
->
+<div class={`svelte-grid-extended ${classes}`} bind:this={gridContainer}>
 	{#if $gridSettings.itemSize}
 		<slot />
 	{/if}
