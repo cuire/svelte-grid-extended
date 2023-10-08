@@ -159,6 +159,10 @@
 		item.invalidate();
 	}
 
+	function scroll(): void {
+		// TODO: scroll
+	}
+
 	// INTERACTION LOGIC
 
 	let itemRef: HTMLElement;
@@ -225,11 +229,7 @@
 		top = _top;
 
 		if ($gridParams.collision === 'none') {
-			window.scroll({
-				left: left - window.innerWidth / 2,
-				top: top - window.innerHeight / 2,
-				behavior: 'smooth'
-			});
+			scroll();
 		}
 
 		// TODO: throttle this, hasColisions is expensive
@@ -411,11 +411,7 @@
 		}
 
 		if ($gridParams.collision === 'none') {
-			window.scroll({
-				left: left - window.innerWidth / 2,
-				top: top - window.innerHeight / 2,
-				behavior: 'smooth'
-			});
+			scroll;
 		}
 
 		// TODO: throttle this, hasColisions is expensive
