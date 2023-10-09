@@ -486,6 +486,7 @@
 						newY--;
 					}
 					currentItem.y = newY + 1;
+					currentItem.invalidate();
 					$gridParams.updateGrid();
 					accItem.push(currentItem);
 				} else {
@@ -500,6 +501,7 @@
 					if (newY < currentItem.y && newY > 0) {
 						currentItem.y = newY + 1;
 					}
+					currentItem.invalidate();
 					$gridParams.updateGrid();
 					accItem.push(currentItem);
 				}
