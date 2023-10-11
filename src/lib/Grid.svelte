@@ -128,6 +128,24 @@
 
 	let shouldExpandCols = false;
 
+	let containerWidth: number | null = null;
+
+	let containerHeight: number | null = null;
+
+	// Check for colls / rows === 0 used to recalculate the grid container only if the grid is dynamic size
+	// #gh-48
+	$: if ($gridSettings.itemSize && cols === 0) {
+		containerWidth = _cols * ($gridSettings.itemSize.width + gap + 1);
+	} else {
+		containerWidth = null;
+	}
+
+	$: if ($gridSettings.itemSize && rows === 0) {
+		containerHeight = _rows * ($gridSettings.itemSize.height + gap + 1);
+	} else {
+		containerHeight = null;
+	}
+
 	$: if (typeof cols === 'number') _cols = cols;
 
 	$: if (typeof rows === 'number') _rows = rows;
@@ -236,7 +254,12 @@
 	setContext(GRID_CONTEXT_NAME, gridSettings);
 </script>
 
-<div class={`svelte-grid-extended ${classes}`} bind:this={gridContainer}>
+<div
+	class={`svelte-grid-extended ${classes}`}
+	bind:this={gridContainer}
+	style={`width: ${containerWidth ? `${containerWidth}px` : '100%'}; 
+	height: ${containerHeight ? `${containerHeight}px` : '100%'};`}
+>
 	{#if $gridSettings.itemSize}
 		<slot />
 	{/if}
