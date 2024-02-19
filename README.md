@@ -370,15 +370,16 @@ Setting `collision` prop to `compress` will compress items vertically towards th
 
 ### Grid props
 
-| prop      | description                                                                        | type                                | default |
-| --------- | ---------------------------------------------------------------------------------- | ----------------------------------- | ------- |
-| cols      | Grid columns count. If set to 0, grid will grow infinitly. Must be >= 0.           | number                              | 0       |
-| rows      | Grid rows count. If set to 0, grid will grow infinitly. Must be >= 0.              | number                              | 0       |
-| itemSize  | Size of the grid item. If not set, grid will calculate it based on container size. | { width?: number, height?: number } | {}      |
-| gap       | Gap between grid items.                                                            | number                              | 10      |
-| bounds    | Should grid items be bounded by the grid container.                                | boolean                             | false   |
-| readonly  | If true disables interaction with grid items.                                      | boolean                             | false   |
-| collision | Collision behavior of grid items. [About](#collision-behavior)                     | none \| push \| compress            | none    |
+| prop         | description                                                                                                            | type                                | default |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------- | ----------------------------------- | ------- |
+| cols         | Grid columns count. If set to 0, grid will grow infinitly. Must be >= 0.                                               | number                              | 0       |
+| rows         | Grid rows count. If set to 0, grid will grow infinitly. Must be >= 0.                                                  | number                              | 0       |
+| itemSize     | Size of the grid item. If not set, grid will calculate it based on container size.                                     | { width?: number, height?: number } | {}      |
+| gap          | Gap between grid items.                                                                                                | number                              | 10      |
+| bounds       | Should grid items be bounded by the grid container.                                                                    | boolean                             | false   |
+| readonly     | If true disables interaction with grid items.                                                                          | boolean                             | false   |
+| collision    | Collision behavior of grid items. [About](#collision-behavior)                                                         | none \| push \| compress            | none    |
+| autoCompress | Auto compress the grid items when programmatically changing grid items. Only works with 'compress' collision strategy. | boolean                             | true    |
 
 > ⚠️ if `cols` or/and `rows` are set to 0, `itemSize.width` or/and `itemSize.height` must be setted.
 
@@ -511,6 +512,43 @@ Finds the first available position within the grid that can accommodate an item 
 				<div>{id}</div>
 			</GridItem>
 		</div>
+	{/each}
+</Grid>
+```
+
+#### compress()
+
+Compresses all items vertically towards the top into any available space.
+
+##### Example
+
+✨ [repl](https://svelte.dev/repl/79bcc70f11944d9e9b03970de731b3e2?version=4.2.11)
+
+```svelte
+<script lang="ts">
+	import Grid, { GridItem, type GridController } from 'svelte-grid-extended';
+
+	let items = [
+		{ id: '1', x: 0, y: 0, w: 2, h: 5 },
+		{ id: '2', x: 2, y: 2, w: 2, h: 2 }
+	];
+
+	let gridController: GridController;
+
+	function compressItems() {
+		gridController.compress();
+	}
+
+	const itemSize = { height: 40 };
+</script>
+
+<button class="btn" on:click={compressItems}>Compress Items</button>
+
+<Grid {itemSize} cols={10} collision="push" bind:controller={gridController}>
+	{#each items as item (item.id)}
+		<GridItem id={item.id} bind:x={item.x} bind:y={item.y} bind:w={item.w} bind:h={item.h}>
+			<div class="item">{item.id.slice(0, 5)}</div>
+		</GridItem>
 	{/each}
 </Grid>
 ```
