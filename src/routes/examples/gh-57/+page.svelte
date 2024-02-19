@@ -14,6 +14,10 @@
 		{ id: crypto.randomUUID(), x: 2, y: 4, w: 2, h: 2 }
 	];
 
+	type Collision = 'none' | 'push' | 'compress';
+
+	let collision: Collision = 'compress';
+
 	const itemsBackup = structuredClone(items);
 
 	const itemSize = { height: 40 };
@@ -36,25 +40,32 @@
 			? [...items, { id: crypto.randomUUID(), x: newPosition.x, y: newPosition.y, w, h }]
 			: items;
 	}
+
+	function moveAll() {
+		items = items.map((i) => ({ ...i, x: i.x, y: i.y + 1 }));
+	}
 </script>
 
 <button class="btn" on:click={addNewItem}>Add New Item</button>
 <button class="btn" on:click={resetGrid}>Reset Grid</button>
+<button class="btn" on:click={moveAll}>Move all</button>
 
-<Grid {itemSize} cols={10} collision="compress" bind:controller={gridController}>
+<button class="btn" on:click={() => (collision = 'none')}>No collision</button>
+<button class="btn" on:click={() => (collision = 'push')}>Push</button>
+<button class="btn" on:click={() => (collision = 'compress')}>Compress</button>
+
+<Grid {itemSize} cols={10} {collision} bind:controller={gridController}>
 	{#each items as item (item.id)}
-		<div transition:fade={{ duration: 300 }}>
-			<GridItem id={item.id} bind:x={item.x} bind:y={item.y} bind:w={item.w} bind:h={item.h}>
-				<button
-					on:pointerdown={(e) => e.stopPropagation()}
-					on:click={() => remove(item.id)}
-					class="remove"
-				>
-					✕
-				</button>
-				<div class="item">{item.id.slice(0, 5)}</div>
-			</GridItem>
-		</div>
+		<GridItem id={item.id} bind:x={item.x} bind:y={item.y} bind:w={item.w} bind:h={item.h}>
+			<button
+				on:pointerdown={(e) => e.stopPropagation()}
+				on:click={() => remove(item.id)}
+				class="remove"
+			>
+				✕
+			</button>
+			<div class="item">{item.id.slice(0, 5)}</div>
+		</GridItem>
 	{/each}
 </Grid>
 

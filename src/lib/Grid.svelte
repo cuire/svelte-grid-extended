@@ -26,7 +26,8 @@
 		LayoutItem,
 		LayoutChangeDetail,
 		GridParams,
-		Collision
+		Collision,
+		GridController as GridControllerType
 	} from './types';
 	import { writable, type Readable, type Writable } from 'svelte/store';
 
@@ -116,6 +117,13 @@
 	 */
 	export let collision: Collision = 'none';
 
+	/**
+	 * Auto compress the grid items when programmatically changing grid items.
+	 * Only works with 'compress' collision strategy.
+	 * @default true
+	 */
+	export let autoCompress = true;
+
 	let _cols: number;
 
 	let _rows: number;
@@ -175,6 +183,10 @@
 	 */
 	function updateGrid() {
 		items = items;
+
+		if (autoCompress && collision === 'compress') {
+			controller.compress();
+		}
 	}
 
 	onMount(() => {
@@ -209,12 +221,12 @@
 			throw new Error(`Item with id ${item.id} already exists`);
 		}
 		items[item.id] = item;
-		items = items;
+		updateGrid();
 	}
 
 	function unregisterItem(item: LayoutItem): void {
 		delete items[item.id];
-		items = items;
+		updateGrid();
 	}
 
 	const gridSettings = writable<GridParams>({
@@ -248,7 +260,7 @@
 		collision
 	}));
 
-	export const controller = new GridController($gridSettings);
+	export const controller: GridControllerType = new GridController($gridSettings);
 	$: controller.gridParams = $gridSettings;
 
 	setContext(GRID_CONTEXT_NAME, gridSettings);
