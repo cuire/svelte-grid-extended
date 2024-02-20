@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Grid, { GridItem, type LayoutChangeDetail } from '$lib';
+	import Grid, { GridItem } from '$lib';
 
 	let items = [
 		{ id: '1', x: 6, y: 0, w: 2, h: 2, data: { text: '🎅' } },
