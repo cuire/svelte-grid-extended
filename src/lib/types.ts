@@ -73,4 +73,5 @@ export type Collision = 'none' | 'push' | 'compress';
 export type GridController = {
 	gridParams: GridParams;
 	getFirstAvailablePosition: (w: number, h: number) => Position | null;
+	compress: () => void;
 };

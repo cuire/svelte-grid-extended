@@ -113,6 +113,7 @@
 	$: item.max = max;
 	$: item.movable = movable;
 	$: item.resizable = resizable;
+	$: item, invalidate();
 
 	/**
 	 * Updates svelte-components props behind that item. Should be called when the item
@@ -122,6 +123,7 @@
 		({ x, y, w, h } = item);
 		dispatch('change', { item });
 		$gridParams.dispatch('change', { item });
+		$gridParams.updateGrid();
 	}
 
 	onMount(() => {
