@@ -554,8 +554,12 @@
 
 <style>
 	.item-default {
-		transition: width 0.2s, height 0.2s;
-		transition: transform 0.2s, opacity 0.2s;
+		transition:
+			width 0.2s,
+			height 0.2s;
+		transition:
+			transform 0.2s,
+			opacity 0.2s;
 	}
 	.active-default {
 		opacity: 0.7;
@@ -565,7 +569,9 @@
 		transition: all 0.2s;
 	}
 	.non-active-default {
-		transition: left 0.2s, top 0.2s;
+		transition:
+			left 0.2s,
+			top 0.2s;
 		transition-timing-function: ease-in-out;
 	}
 	.resizer-default {

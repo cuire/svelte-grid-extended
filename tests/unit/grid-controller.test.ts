@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest';
 import type { createEventDispatcher } from 'svelte';
 
 import { GridController } from '../../src/lib/GridController';
-import type { LayoutItem, GridParams, LayoutChangeDetail } from '../../src/lib/types';
+import type { LayoutItem, GridParams } from '../../src/lib/types';
 
 describe('🍦 GridController firstAvailablePosition', () => {
 	type TestCase = {

@@ -44,8 +44,12 @@
 	}
 
 	:global(.grid-item) {
-		transition: width 4s, height 4s;
-		transition: transform 4s, opacity 4s;
+		transition:
+			width 4s,
+			height 4s;
+		transition:
+			transform 4s,
+			opacity 4s;
 	}
 
 	:global(.grid-item-active) {
