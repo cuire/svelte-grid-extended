@@ -260,7 +260,7 @@
 		collision
 	}));
 
-	export const controller: GridControllerType = new GridController($gridSettings);
+	export const controller = new GridController($gridSettings) as GridControllerType;
 	$: controller.gridParams = $gridSettings;
 
 	setContext(GRID_CONTEXT_NAME, gridSettings);

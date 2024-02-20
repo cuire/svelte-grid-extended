@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { fade } from 'svelte/transition';
 	import Grid, { GridItem, type GridController } from '$lib';
 
 	let items = [
