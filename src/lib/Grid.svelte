@@ -206,8 +206,8 @@
 			shouldExpandRows = _rows === 0;
 
 			$gridSettings.itemSize = {
-				width: itemSize.width ?? (width - (gap + 1) * _cols) / _cols,
-				height: itemSize.height ?? (height - (gap + 1) * _rows) / _rows
+				width: itemSize.width ?? (width - (_cols + 1) * gap) / _cols,
+				height: itemSize.height ?? (height - (_rows + 1) * gap) / _rows
 			};
 		});
 
