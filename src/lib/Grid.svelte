@@ -185,7 +185,7 @@
 		items = items;
 
 		if (autoCompress && collision === 'compress') {
-			controller.compress();
+			_controller._internalCompress();
 		}
 	}
 
@@ -260,8 +260,10 @@
 		collision
 	}));
 
-	export const controller = new GridController($gridSettings) as GridControllerType;
-	$: controller.gridParams = $gridSettings;
+	const _controller = new GridController($gridSettings);
+	$: _controller.gridParams = $gridSettings;
+
+	export const controller = _controller as GridControllerType;
 
 	setContext(GRID_CONTEXT_NAME, gridSettings);
 </script>

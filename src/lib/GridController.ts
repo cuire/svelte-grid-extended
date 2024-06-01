@@ -33,7 +33,11 @@ export class GridController implements GridControllerType {
 		this._compress(this.gridParams.items);
 	}
 
-	private _compress(items: Record<string, LayoutItem>): void {
+	_internalCompress(): void {
+		this._compress(this.gridParams.items, true);
+	}
+
+	private _compress(items: Record<string, LayoutItem>, skipUpdate = false): void {
 		const gridItems = Object.values(items);
 		const sortedItems = [...gridItems].sort((a, b) => a.y - b.y);
 
@@ -53,6 +57,8 @@ export class GridController implements GridControllerType {
 			return accItem;
 		}, [] as LayoutItem[]);
 
-		this.gridParams.updateGrid();
+		if (!skipUpdate) {
+			this.gridParams.updateGrid();
+		}
 	}
 }
