@@ -197,6 +197,7 @@
 
 	function moveStart(event: PointerEvent) {
 		if (event.button !== 0) return;
+		event.stopPropagation();
 		initInteraction(event);
 		initialPosition = { left, top };
 		pointerShift = { left: event.pageX - left, top: event.pageY - top };
