@@ -522,7 +522,8 @@
 	class:non-active-default={!active}
 	on:pointerdown={_movable && !$$slots.moveHandle ? moveStart : null}
 	style={`position: absolute; left:${left}px; top:${top}px; width: ${width}px; height: ${height}px; 
-			${_movable && !$$slots.moveHandle ? 'cursor: move;' : ''} touch-action: none; user-select: none;`}
+			${_movable && !$$slots.moveHandle ? 'cursor: move;' : ''} touch-action: none; user-select: none;
+			${$$restProps.style ?? ''}`}
 	bind:this={itemRef}
 >
 	{#if _movable}
