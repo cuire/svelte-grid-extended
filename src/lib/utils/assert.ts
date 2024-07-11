@@ -10,11 +10,11 @@ export type GridOptions = {
 export function assertGridOptions(options: GridOptions) {
 	const { cols, rows, itemSize, collision } = options;
 
-	if (rows !== 0 && collision !== 'none') {
+	if (rows !== 0 && collision && collision !== 'none') {
 		console.warn('`rows` is ignored and setted to 0 when `collision` is not `none`');
 	}
 
-	if (collision !== 'none' && itemSize?.height === undefined) {
+	if (collision && collision !== 'none' && itemSize?.height === undefined) {
 		throw new Error(
 			'If `collision` is not `none`, the `itemSize.height` parameter must be specified'
 		);
