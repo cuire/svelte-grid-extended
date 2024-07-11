@@ -1,13 +1,25 @@
-import type { GridSize, ItemSize } from '$lib/types';
+import type { Collision, GridSize, ItemSize } from '$lib/types';
 
 export type GridOptions = {
 	cols: GridSize;
 	rows: GridSize;
 	itemSize: Partial<ItemSize>;
+	collision?: Collision;
 };
 
 export function assertGridOptions(options: GridOptions) {
-	const { cols, rows, itemSize } = options;
+	const { cols, rows, itemSize, collision } = options;
+
+	if (rows !== 0 && collision && collision !== 'none') {
+		console.warn('`rows` is ignored and setted to 0 when `collision` is not `none`');
+	}
+
+	if (collision && collision !== 'none' && itemSize?.height === undefined) {
+		throw new Error(
+			'If `collision` is not `none`, the `itemSize.height` parameter must be specified'
+		);
+	}
+
 	if (
 		(cols === 0 && itemSize?.width === undefined) ||
 		(typeof cols === 'object' && Object.values(cols).includes(0) && itemSize?.width === undefined)
