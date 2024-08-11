@@ -9,6 +9,7 @@
 		type SnapGridParams
 	} from './utils/item';
 	import { hasCollisions, getCollisions, getAvailablePosition } from './utils/grid';
+	import { generateUuid } from './utils/uuid';
 
 	import type { LayoutItem, LayoutChangeDetail, Size, ItemSize } from './types';
 	import { getGridContext } from './Grid.svelte';
@@ -30,7 +31,7 @@
 	 *
 	 * TODO: crypto.randomUUID() is not supported in non ssl environments
 	 */
-	export let id: string = crypto.randomUUID();
+	export let id: string = crypto.randomUUID?.() ?? generateUuid();
 
 	export let activeClass: string | undefined = undefined;
 
