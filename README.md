@@ -405,13 +405,15 @@ Setting `collision` prop to `compress` will compress items vertically towards th
 
 ### Style related props:
 
-Component can be styled with css framework of your choice or with global classes. To do so, you can use the following props:
+Component can be styled with css framework of your choice, global classes or `style` prop. To do so, you can use the following props:
 
 - `<Grid class="..." />` - class name for grid container.
+- `<Grid style="..." />` - inline style for grid container.
 - `<GridItem class="..." />` - class name for grid item.
 - `<GridItem activeClass="..." />` - class name that applies when item is currently being dragged or resized. By default, it is used to make active grid item transparent.
 - `<GridItem previewClass="..." />` - class name for preview where item will be placed after interaction.
 - `<GridItem resizerClass="..." />` - class name for item's resize handle.
+- `<GridItem style="..." />` - inline style for grid item.
 
 To understand how to use these props, look at `<Grid />` component simplified structure.
 
