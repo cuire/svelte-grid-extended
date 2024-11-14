@@ -1,4 +1,4 @@
-import type { GridParams, LayoutItem, ItemPosition, ItemSize, Position, Size } from '$lib/types';
+import type { GridParams, LayoutItem, ItemPosition, ItemSize, Position, Size } from '$lib/types.js';
 
 export function coordinate2position(coordinate: number, cellSize: number, gap: number): number {
 	return coordinate * cellSize + (coordinate + 1) * gap;

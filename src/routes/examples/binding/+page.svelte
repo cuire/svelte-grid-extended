@@ -1,10 +1,10 @@
 <script lang="ts">
 	import Grid, { GridItem } from '$lib';
 
-	let items = [
+	let items = $state([
 		{ id: '1', x: 6, y: 0, w: 2, h: 2, data: { text: '🎅' } },
 		{ id: '2', x: 6, y: 2, w: 2, h: 2, data: { text: '🤶' } }
-	];
+	]);
 
 	const itemsBackup = structuredClone(items);
 
@@ -17,7 +17,7 @@
 
 {JSON.stringify(items)}
 
-<button on:click={resetGrid}> RESET </button>
+<button onclick={resetGrid}> RESET </button>
 
 <Grid cols={10} {itemSize} collision="push">
 	{#each items as item, i (item.id)}

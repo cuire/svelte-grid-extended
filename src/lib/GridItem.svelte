@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: Cannot split a chunk that has already been edited (522:30 – "on:pointerdown={_movable && !$$slots.moveHandle ? moveStart : null}") -->
 <script lang="ts">
 	import { createEventDispatcher, onMount } from 'svelte';
 
@@ -11,7 +12,7 @@
 	import { hasCollisions, getCollisions, getAvailablePosition } from './utils/grid';
 
 	import type { LayoutItem, LayoutChangeDetail, Size, ItemSize } from './types';
-	import { getGridContext } from './Grid.svelte';
+	import { getGridContext } from '$lib/Grid.svelte';
 
 	const dispatch = createEventDispatcher<{
 		change: LayoutChangeDetail;

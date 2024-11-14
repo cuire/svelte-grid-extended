@@ -2,7 +2,7 @@
 	import { fade } from 'svelte/transition';
 	import Grid, { GridItem, type GridController } from '$lib';
 
-	let items = [
+	let items = $state([
 		{ id: crypto.randomUUID(), x: 0, y: 0, w: 2, h: 5 },
 		{ id: crypto.randomUUID(), x: 2, y: 2, w: 2, h: 2 },
 		{ id: crypto.randomUUID(), x: 2, y: 0, w: 1, h: 2 },
@@ -12,7 +12,7 @@
 		{ id: crypto.randomUUID(), x: 4, y: 5, w: 1, h: 1 },
 		{ id: crypto.randomUUID(), x: 2, y: 6, w: 3, h: 2 },
 		{ id: crypto.randomUUID(), x: 2, y: 4, w: 2, h: 2 }
-	];
+	]);
 
 	const itemsBackup = structuredClone(items);
 
@@ -26,7 +26,7 @@
 		items = items.filter((i) => i.id !== id);
 	}
 
-	let gridController: GridController;
+	let gridController: GridController = $state();
 
 	function addNewItem() {
 		const w = Math.floor(Math.random() * 2) + 1;
@@ -38,16 +38,16 @@
 	}
 </script>
 
-<button class="btn" on:click={addNewItem}>Add New Item</button>
-<button class="btn" on:click={resetGrid}>Reset Grid</button>
+<button class="btn" onclick={addNewItem}>Add New Item</button>
+<button class="btn" onclick={resetGrid}>Reset Grid</button>
 
 <Grid {itemSize} cols={10} collision="push" bind:controller={gridController}>
 	{#each items as item (item.id)}
 		<div transition:fade={{ duration: 300 }}>
 			<GridItem id={item.id} bind:x={item.x} bind:y={item.y} bind:w={item.w} bind:h={item.h}>
 				<button
-					on:pointerdown={(e) => e.stopPropagation()}
-					on:click={() => remove(item.id)}
+					onpointerdown={(e) => e.stopPropagation()}
+					onclick={() => remove(item.id)}
 					class="remove"
 				>
 					✕

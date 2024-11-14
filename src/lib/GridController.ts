@@ -1,5 +1,5 @@
-import { getAvailablePosition, hasCollisions } from './utils/grid';
-import type { GridParams, GridController as GridControllerType, LayoutItem } from './types';
+import { getAvailablePosition, hasCollisions } from '$lib/utils/grid';
+import type { GridParams, GridController as GridControllerType, LayoutItem } from '$lib/types';
 
 export class GridController implements GridControllerType {
 	gridParams: GridParams;

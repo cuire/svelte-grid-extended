@@ -1,5 +1,5 @@
 import type { createEventDispatcher } from 'svelte';
-import type { RequireAtLeastOne } from '$lib/utils/types';
+import type { RequireAtLeastOne } from '$lib/utils/types.js';
 
 export type LayoutItem = Size &
 	Position & {
@@ -8,8 +8,11 @@ export type LayoutItem = Size &
 		max?: Size;
 		movable: boolean;
 		resizable: boolean;
-		invalidate: () => void;
 	};
+
+export type PreviewItem = LayoutItem & {
+	skipRegister: true;
+};
 
 /**
  * Item position in grid units
@@ -54,14 +57,14 @@ export type GridParams = {
 	readOnly: boolean;
 	debug: boolean;
 	collision: Collision;
-	registerItem: (item: LayoutItem) => void;
-	unregisterItem: (item: LayoutItem) => void;
-	updateGrid: () => void;
-	dispatch: ReturnType<
-		typeof createEventDispatcher<{
-			change: LayoutChangeDetail;
-		}>
-	>;
+	// registerItem: (item: LayoutItem) => void;
+	// unregisterItem: (item: LayoutItem) => void;
+	// updateGrid: () => void;
+	// dispatch: ReturnType<
+	// 	typeof createEventDispatcher<{
+	// 		change: LayoutChangeDetail;
+	// 	}>
+	// >;
 };
 
 export type LayoutChangeDetail = {
