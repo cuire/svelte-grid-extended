@@ -560,8 +560,7 @@
 	.item-default {
 		transition:
 			width 0.2s,
-			height 0.2s;
-		transition:
+			height 0.2s,
 			transform 0.2s,
 			opacity 0.2s;
 	}
